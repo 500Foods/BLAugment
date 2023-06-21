@@ -1,6 +1,5 @@
 html,
 body {
-  background: black;
   font-family: Cairo !important;
 }
 
@@ -10,3 +9,13 @@ body {
   left: 50%;
   transform: translate(-50%,-50%);
 }
+
+.DropShadow {
+  filter: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 3px black) drop-shadow(0px 0px 4px black);
+}
+
+.Background {
+  background-image: url(images/bookshelf_blue.jpg);
+  background-size: cover;
+}
+

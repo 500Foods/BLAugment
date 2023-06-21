@@ -3,7 +3,7 @@ object Form1: TForm1
   Height = 676
   Caption = 'blaugment'
   CSSLibrary = cssBootstrap
-  ElementClassName = 'bg-black d-flex justify-content-center align-items-center'
+  ElementClassName = 'Background d-flex justify-content-center align-items-center'
   ElementFont = efCSS
   object WebHTMLDiv1: TWebHTMLDiv
     Left = 176
@@ -20,13 +20,13 @@ object Form1: TForm1
         '<div class="d-flex flex-column justiy-content-center align-items' +
         '-center gap-3">'
       
-        '  <div style="font-size: 36px; font-weight: bold; color: royalbl' +
-        'ue; font-family: Cairo;">'
-      '    blaugment'
+        '  <div class="DropShadow" style="font-size: 36px; font-weight: b' +
+        'old; color: royalblue; font-family: Cairo;">'
+      '    bl<span style="color: #0047AB">augment</span>'
       '  </div>'
       
-        '  <div style="font-size: 24px; font-weight: normal; color: silve' +
-        'r; font-family: Cairo">'
+        '  <div class="DropShadow" style="font-size: 24px; font-weight: n' +
+        'ormal; color: silver; font-family: Cairo">'
       '    coming soon'
       '  </div>'
       '</div>')
