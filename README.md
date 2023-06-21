@@ -1,4 +1,4 @@
-# blaugment
+# Blaugment
 ### ***bl***<sub>og</sub> ***augment***<sub>ation</sub>
 <br />
 
