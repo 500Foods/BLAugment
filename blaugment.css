@@ -1,21 +1,127 @@
-html,
-body {
+html, body {
   font-family: Cairo !important;
+  background: black;
+  width: 100vw;
+  height: 100vh;
 }
 
-#divCenter {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+:root {
+  --bl-color-one: cornflowerblue;
+  --bl-color-two: #0047AB; /* cobalt blue */
+  --bl-color-input: white;
+
+  --bl-background: black;
+  --bl-image: url(images/bookshelf_blue.jpg);
+  --bl-image-size: 1920px 570px;
+  --bl-border: 2px solid var(--bl-color-one);
+  --bl-radius: 8px;
+  --bl-opacity: 0.75;
+  --bl-shadow: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 3px black);
+
+  --bl-background-blog: var(--bl-color-one);
+  --bl-border-blog: 2px solid var(--bl-color-two);
+
+  --fa-primary-opacity: 1;
+  --fa-secondary-opacity: 1;
+  --fa-primary-color: var(--bl-color-one);
+  --fa-secondary-color: var(--bl-color-two);
+}
+
+html[theme="light"] {
+  --bl-color-one: silver;
+  --bl-color-two: dimgray;
+  --bl-color-input: white;
+
+  --bl-image: url(images/bookshelf.jpg);
+  --bl-image-size: 1920px 570px;
+  --bl-border: 2px solid silver;
+  --bl-opacity: 0.85;
+}
+
+/* Bootstrap Tooltip Overrides */
+.BLTooltip {
+  --bs-tooltip-bg: #F0F0F0;
+  --bs-tooltip-color: black;
+}
+html[theme="light"] .BLTooltip {
+  --bs-tooltip-bg: #202020;
+  --bs-tooltip-color: white;
+}
+/* this is what fa-swap-opacity normally does */
+
+#btnSearch {
+  --fa-primary-color: var(--bl-color-two);
+  --fa-secondary-color: var(--bl-color-one);
+}
+
+/* primarily fo the main search input field */
+::placeholder {
+  color: var(--fa-primary-color);
+  opacity: 1;
+}
+
+/* Font Awesome Free uses <i>, Pro uses <svg> */
+button > i {
+  filter: var(--bl-shadow);
+  color: var(--bl-color-input);
+}
+button > svg {
+  filter: var(--bl-shadow);
+}
+.ButtonBlog {
+  --fa-primary-color: var(--bl-color-input);
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  height: 75px !important;
+}
+.ButtonBlogSwap {
+  --fa-primary-color: var(--bl-color-two);
+  --fa-secondary-color: var(--bl-color-input);
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  height: 75px !important;
+}
+.Selected {
+  background: yellow !important;
+  opacity: var(--bl-opacity);
+}
+
+
+.ContainerBG {
+  border: var(--bl-border);
+  border-radius: var(--bl-radius);
+  background: var(--bl-background);
+  opacity: var(--bl-opacity);
+  filter: var(--bl-shadow);
+}
+.ContainerBlog {
+  border: var(--bl-border-blog);
+  border-radius: var(--bl-radius);
+  background: var(--bl-background-blog);
+  opacity: var(--bl-opacity);
+  filter: var(--bl-shadow);
+}
+
+#divSearch {
+  min-width: 200px;
+}
+#editSearch {
+  background: none;
+  border: none;
+  color: var(--bl-color-input) !important;
+  font-size: 36px;
+}
+#editSearch:focus-visible {
+  outline: none;
 }
 
 .DropShadow {
-  filter: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 3px black) drop-shadow(0px 0px 4px black);
+  filter: var(--bl-shadow);
 }
 
 .Background {
-  background-image: url(images/bookshelf_blue.jpg);
-  background-size: cover;
+  background-image: var(--bl-image);
+  background-size: var(--bl-image-size);
 }
+
 
