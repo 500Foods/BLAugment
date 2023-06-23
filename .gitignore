@@ -72,3 +72,6 @@ modules/
 Win32/
 Win64/
 TMSWeb/
+xdata/Win32/
+xdata/Win64/
+xdata/icon-sets/
