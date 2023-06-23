@@ -220,6 +220,11 @@ begin
   // Switch Themes - only 'dark' and 'light' for now
   if Theme = 'dark' then
   begin
+    Theme := 'red';
+    btnTheme.Caption := '<i class="fa-duotone fa-heart fa-3x"></i>';
+  end
+  else if Theme = 'red' then
+  begin
     Theme := 'light';
     btnTheme.Caption := '<i class="fa-duotone fa-sun fa-3x"></i>';
   end

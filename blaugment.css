@@ -34,7 +34,16 @@ html[theme="light"] {
 
   --bl-image: url(images/bookshelf.jpg);
   --bl-image-size: 1920px 570px;
-  --bl-border: 2px solid silver;
+  --bl-opacity: 0.85;
+}
+
+html[theme="red"] {
+  --bl-color-one: indianred;
+  --bl-color-two: crimson;
+  --bl-color-input: lightpink;
+
+  --bl-image: url(images/bookshelf_red.jpg);
+  --bl-image-size: 1920px 570px;
   --bl-opacity: 0.85;
 }
 
