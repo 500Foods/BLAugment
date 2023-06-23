@@ -91,7 +91,6 @@ object Form1: TForm1
         ElementFont = efCSS
         ElementPosition = epRelative
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthPercent = 100.000000000000000000
         OnClick = btnThemeClick
       end
@@ -108,7 +107,6 @@ object Form1: TForm1
         ElementFont = efCSS
         ElementPosition = epRelative
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnRegisterClick
@@ -126,7 +124,6 @@ object Form1: TForm1
         ElementFont = efCSS
         ElementPosition = epRelative
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnLoginClick
@@ -193,7 +190,6 @@ object Form1: TForm1
         ElementFont = efCSS
         ElementPosition = epRelative
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnSearchClick
@@ -220,7 +216,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogFood'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -255,7 +253,6 @@ object Form1: TForm1
         ElementFont = efCSS
         ElementPosition = epRelative
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -266,7 +263,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogWellness'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -303,7 +302,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -314,7 +312,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogFitness'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -351,7 +351,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -362,7 +361,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogHealth'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -399,7 +400,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -410,7 +410,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogLifestyle'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -447,7 +449,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -458,7 +459,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogSports'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -495,7 +498,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -506,7 +508,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogFashion'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -543,7 +547,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -554,7 +557,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogBeauty'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -591,7 +596,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -602,7 +606,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogMovies'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -639,7 +645,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -650,7 +655,9 @@ object Form1: TForm1
       Top = 3
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogTravel'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -687,7 +694,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -698,7 +704,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogPhotography'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -735,7 +743,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -746,7 +753,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogMusic'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -783,7 +792,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -794,7 +802,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogArt'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -831,7 +841,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -842,7 +851,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogWriting'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -879,7 +890,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -890,7 +900,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogPersonal'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -927,7 +939,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -938,7 +949,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogNews'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -975,7 +988,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -986,7 +998,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogDIY'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1023,7 +1037,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1034,7 +1047,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogDesign'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1071,7 +1086,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1082,7 +1096,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogInteriors'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1119,7 +1135,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1130,7 +1145,9 @@ object Form1: TForm1
       Top = 35
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogParenting'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1167,7 +1184,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1178,7 +1194,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogScience'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1215,7 +1233,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1226,7 +1243,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogTechnology'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1263,7 +1282,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1274,7 +1292,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogSpace'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1311,7 +1331,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1322,7 +1341,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogFinance'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1359,7 +1380,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1370,7 +1390,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogInvesting'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1407,7 +1429,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1418,7 +1439,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogBusiness'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1455,7 +1478,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1466,7 +1488,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogIndustry'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1503,7 +1527,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1511,10 +1534,12 @@ object Form1: TForm1
     end
     object divBlogGovernment: TWebHTMLDiv
       Left = 3
-      Top = 95
+      Top = 94
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogGovernment'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1551,7 +1576,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1562,7 +1586,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogClimate'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1599,7 +1625,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1610,7 +1635,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogEducation'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1647,7 +1674,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1658,7 +1684,9 @@ object Form1: TForm1
       Top = 65
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogHealthcare'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1695,7 +1723,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1706,7 +1733,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogPolitics'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1743,7 +1772,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1754,7 +1782,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogJustice'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1791,7 +1821,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1802,7 +1831,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogReligion'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1839,7 +1870,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1850,7 +1880,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogPeople'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1887,7 +1919,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1898,7 +1929,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogMotorcycle'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1935,7 +1968,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1946,7 +1978,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogCycling'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -1983,7 +2017,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -1994,7 +2027,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogAuto'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2031,7 +2066,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2039,10 +2073,12 @@ object Form1: TForm1
     end
     object divBlogBoat: TWebHTMLDiv
       Left = 739
-      Top = 95
+      Top = 94
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogBoat'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2079,7 +2115,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2090,7 +2125,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogAviation'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2127,7 +2164,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2138,7 +2174,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder BlogButtonHolder d-flex flex-row flex-shrink-0 ' +
+        'align-items-center'
       ElementID = 'divBlogArchitecture'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2175,7 +2213,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2186,7 +2223,9 @@ object Form1: TForm1
       Top = 95
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogTrain'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2223,7 +2262,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2234,7 +2272,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogBridges'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2271,7 +2311,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2282,7 +2321,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogCats'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2319,7 +2360,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2330,7 +2370,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogDogs'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2367,7 +2409,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2378,7 +2419,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogGardening'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2415,7 +2458,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick
@@ -2426,7 +2468,9 @@ object Form1: TForm1
       Top = 125
       Width = 86
       Height = 26
-      ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
+      ElementClassName = 
+        'BlogButtonHolder d-flex flex-row flex-shrink-0 align-items-cente' +
+        'r'
       ElementID = 'divBlogGaming'
       HeightStyle = ssAuto
       WidthStyle = ssAuto
@@ -2463,7 +2507,6 @@ object Form1: TForm1
         ElementPosition = epRelative
         HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
-        ShowHint = False
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
         OnClick = btnBlogClick

@@ -94,6 +94,9 @@ button > svg {
   background: yellow !important;
   opacity: var(--bl-opacity);
 }
+.BlogButtonHolder:hover > div {
+  opacity: 0.5;
+}
 
 
 .ContainerBG {
