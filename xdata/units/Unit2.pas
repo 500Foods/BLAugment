@@ -325,7 +325,7 @@ begin
     // Create an empty AppConfiguration
     mmInfo.Lines.Add('...Using Default Configuration');
     AppConfiguration := TJSONObject.Create;
-    AppConfiguration.AddPair('BaseURL','http://+:12345/tms/xdata');
+    AppConfiguration.AddPair('BaseURL','http://+:44444/tms/xdata');
   end;
   mmInfo.Lines.Add('Done.');
   mmInfo.Lines.Add('');
