@@ -10,6 +10,9 @@ begin
     SQL.Add('SELECT '+
             '  logged_in, '+
             '  ip_address, '+
+            '  ip_location, '+
+            '  device_info, '+
+            '  browser_info, '+
             '  application, '+
             '  version '+
             'FROM '+

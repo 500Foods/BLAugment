@@ -46,7 +46,7 @@ begin
 
       // Default API Keys for testing - set to expire after three months
       SQL.Add('insert into '+TableName+' values( "testing", Datetime("now"), 0, Datetime("now"), Datetime("now", "+3 months"), "Testing XData Template Demo Data" );');
-      SQL.Add('insert into '+TableName+' values( "{39A411D0-FB62-4F95-8F34-E63839D6E98E}", Datetime("now"), 0, Datetime("now"), Datetime("now", "+3 months"), "TMS WEB Core Template Demo" );');
+      SQL.Add('insert into '+TableName+' values( "{2DF239F0-8A9D-4531-9BC2-AB911CB40C4E}", Datetime("now"), 0, Datetime("now"), Datetime("now", "+10 years"), "blaugment" );');
 
       ExecSQL;
     end;

@@ -40,7 +40,7 @@ type
   private
 
     function Info(TZ: String):TStream;
-    function Login(Login_ID: String; Password: String; API_Key: String; TZ: String):TStream;
+    function Login(Login_ID: String; Password: String; API_Key: String; TZ: String; IPAddress: String; IPLocation: String; DeviceInfo: String; BrowserInfo: String):TStream;
     function Logout(ActionSession: String; ActionLog: String):TStream;
     function Renew(ActionSession: String; ActionLog: String):TStream;
 
@@ -139,7 +139,7 @@ end;
 
 
 
-function TSystemService.Login(Login_ID, Password, API_Key, TZ: String): TStream;
+function TSystemService.Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo: String): TStream;
 var
   DBConn: TFDConnection;
   Query1: TFDQuery;
@@ -363,7 +363,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
     raise EXDataHttpUnauthorized.Create('Login not authorized for this Username.');
   end;
-  MainForm.mmInfo.lines.add('G');
+
   // Login role is present, so let's make a note of the other roles
   Roles := '';
   while not(Query1.EOF) do
@@ -488,8 +488,12 @@ begin
   try
     {$Include sql\system\login_history_insert\login_history_insert.inc}
     Query1.ParamByName('LOGGEDIN').AsDateTime := TTimeZone.local.ToUniversalTime(IssuedAt);
-    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+//    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('IPADDRESS').AsString := IPAddress;
     Query1.ParamByName('PERSONID').AsInteger := PersonID;
+    Query1.ParamByName('IPLOCATION').AsString := IPLocation;
+    Query1.ParamByName('DEVICEINFO').AsString := DeviceInfo;
+    Query1.ParamByName('BROWSERINFO').AsString := BrowserInfo;
     Query1.ParamByName('APPLICATION').AsString := ApplicationName;
     Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
     Query1.ExecSQL;

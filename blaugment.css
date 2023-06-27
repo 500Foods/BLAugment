@@ -1,22 +1,25 @@
-html, body {
+body {
   font-family: Cairo !important;
   background: black;
   width: 100vw;
   height: 100vh;
+  opacity: 0;
+  transition: opacity 1s 1s, background 1s;
 }
 
+/* Setup our Default Theme - Dark */
 :root {
   --bl-color-one: cornflowerblue;
   --bl-color-two: #0047AB; /* cobalt blue */
   --bl-color-input: white;
 
   --bl-background: black;
-  --bl-image: url(images/bookshelf_blue.jpg);
+  --bl-image: none;
   --bl-image-size: 1920px 570px;
   --bl-border: 2px solid var(--bl-color-one);
   --bl-radius: 8px;
   --bl-opacity: 0.75;
-  --bl-shadow: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 3px black);
+  --bl-shadow: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black);
 
   --bl-background-blog: var(--bl-color-one);
   --bl-border-blog: 2px solid var(--bl-color-two);
@@ -25,6 +28,10 @@ html, body {
   --fa-secondary-opacity: 1;
   --fa-primary-color: var(--bl-color-one);
   --fa-secondary-color: var(--bl-color-two);
+}
+
+html[theme="dark"] {
+  --bl-image: url(images/bookshelf_blue.jpg);
 }
 
 html[theme="light"] {
@@ -47,6 +54,21 @@ html[theme="red"] {
   --bl-opacity: 0.85;
 }
 
+
+/* https://stackoverflow.com/questions/61083813/how-to-avoid-internal-autofill-selected-style-to-be-applied */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+
+/* Page Background that is Theme-aware */
+.Background {
+  background-image: var(--bl-image);
+  background-size: var(--bl-image-size);
+}
+
+
 /* Bootstrap Tooltip Overrides */
 .BLTooltip {
   --bs-tooltip-bg: #F0F0F0;
@@ -56,18 +78,99 @@ html[theme="light"] .BLTooltip {
   --bs-tooltip-bg: #202020;
   --bs-tooltip-color: white;
 }
-/* this is what fa-swap-opacity normally does */
+html[theme="red"] .BLTooltip {
+  --bs-tooltip-bg: hotpink;
+  --bs-tooltip-color: white;
+}
 
-#btnSearch {
+
+/* This is applied to icons mainly */
+.DropShadow {
+  filter: var(--bl-shadow);
+  transition: color 1s;
+}
+.DropShadow > span {
+  transition: color 1s;
+}
+
+
+/* this is what fa-swap-opacity normally does */
+.Swap {
   --fa-primary-color: var(--bl-color-two);
   --fa-secondary-color: var(--bl-color-one);
 }
+
 
 /* primarily fo the main search input field */
 ::placeholder {
   color: var(--fa-primary-color);
   opacity: 1;
+  transition: color 1s;
 }
+
+
+/* Specific Overrides */
+#divShade {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 100;
+}
+#divAccount,
+#divAdd,
+#divLogin {
+  z-index: 101;
+  opacity: 0;
+  transition: opacity 0.5s;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+}
+#divAccount,
+#divAdd {
+  min-width: 350px;
+  max-width: 1000px;
+  min-height: 403px;
+  max-height: 1000px;
+}
+
+#divLoginMessage {
+  background: var(--bl-color-two);
+  color: var(--bl-color-input);
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  font-family: Cairo;
+  z-index: 10;
+  border: var(--bl-border);
+  border-radius: var(--bl-radius);
+}
+.Header {
+  background: var(--bl-color-two);
+  color: var(--bl-color-input);
+  top: 2px !important;
+  left: 2px !important;
+  width: calc(100% - 4px) !important;
+  height: 40px !important;
+  position: absolute;
+  font-family: Cairo;
+  z-index: 10;
+  border-bottom: var(--bl-border);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+#divAccountOptions {
+  height: calc(100% - 42px) !important;
+  border-right: var(--bl-border) !important;
+}
+
 
 /* Font Awesome Free uses <i>, Pro uses <svg> */
 button > i {
@@ -77,11 +180,15 @@ button > i {
 button > svg {
   filter: var(--bl-shadow);
 }
+button > svg > g > path {
+  transition: fill 1s;
+}
 .ButtonBlog {
   --fa-primary-color: var(--bl-color-input);
   padding-left: 10px !important;
   padding-right: 10px !important;
   height: 75px !important;
+  transition: 1s all;
 }
 .ButtonBlogSwap {
   --fa-primary-color: var(--bl-color-two);
@@ -89,13 +196,44 @@ button > svg {
   padding-left: 10px !important;
   padding-right: 10px !important;
   height: 75px !important;
+  transition: 1s all;
 }
 .Selected {
   background: yellow !important;
   opacity: var(--bl-opacity);
+  transition: background 0.4s !important;
 }
 .BlogButtonHolder:hover > div {
   opacity: 0.5;
+  transition: opacity 0.4s !important;
+}
+.ButtonUtility {
+  --fa-primary-color: var(--bl-color-input);
+  color: var(--bl-color-input);
+  border: var(--bl-border);
+  border-radius: var(--bl-radius);
+  background: var(--bl-color-two);
+  filter: var(--bl-shadow);
+  padding: 8px 8px;
+}
+.ButtonUtility:hover {
+  background: var(--bl-color-one);
+  transition: background 0.4s !important;
+}
+
+.ComboUtility {
+  border: var(--bl-border);
+  border-radius: var(--bl-radius);
+  background: var(--bl-color-two);
+  padding: 0px 8px;
+  outline: none;
+  color: var(--bl-color-input);
+  filter: var(--bl-shadow);
+  font-size: 14px;
+}
+#divActivityLogHeader {
+  left: 152px;
+  right: 0px;
 }
 
 
@@ -103,8 +241,18 @@ button > svg {
   border: var(--bl-border);
   border-radius: var(--bl-radius);
   background: var(--bl-background);
-  opacity: var(--bl-opacity);
+  opacity: 0.5;
   filter: var(--bl-shadow);
+  pointer-events: none;
+  transition: background 1s, border 1s;
+}
+.ContainerFG {
+  border: var(--bl-border);
+  border-radius: var(--bl-radius);
+  background: transparent;
+  pointer-events: none;
+  z-index: 10;
+  transition: background 1s, border 1s;
 }
 .ContainerBlog {
   border: var(--bl-border-blog);
@@ -112,10 +260,31 @@ button > svg {
   background: var(--bl-background-blog);
   opacity: var(--bl-opacity);
   filter: var(--bl-shadow);
+  pointer-events: none;
+  transition: background 1s, border 1s;
 }
+.ContainerPhoto {
+  overflow: hidden;
+  border: var(--bl-border-blog);
+  border-radius: var(--bl-radius);
+  filter: var(--bl-shadow);
+  max-width: 300px;
+}
+.ContainerPhoto > img {
+  width: 100%;
+}
+
+
 
 #divSearch {
   min-width: 200px;
+}
+#editUsername,
+#editPassword {
+  background: none;
+  border: none;
+  color: var(--bl-color-input) !important;
+  font-size: 24px;
 }
 #editSearch {
   background: none;
@@ -123,17 +292,151 @@ button > svg {
   color: var(--bl-color-input) !important;
   font-size: 36px;
 }
+#editUsername:focus-visible,
+#editPassword:focus-visible,
 #editSearch:focus-visible {
   outline: none;
 }
 
-.DropShadow {
+.Label {
+  color: var(--bl-color-one);
+}
+.LabelAlt {
+  color: var(--bl-color-input);
+}
+.Edit {
+  background: none;
+  border: none;
+  color: var(--bl-color-input) !important;
+}
+.Edit:focus-visible {
+  outline: none;
+}
+
+/* PAGES */
+#pcAccount {
+  left: 152px !important;
+  top: 42px !important;
+  width: calc(100% - 154px) !important;
+  height: calc(100% - 41px) !important;
+  background: transparent;
+}
+
+.Page {
+  position: absolute;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent;
+  overflow: auto !important;
+  overflow-x: hidden !important;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+/* Tabulator - used for lists */
+.tabulator-table {
+  background-color: transparent !important;
+  overflow: hidden !important;
+}
+.tabulator-tableholder,
+.tabulator-holder,
+.tabulator-row,
+.tabulator-row-even,
+.tabulator {
+  background-color: transparent !important;
+  color: var(--bl-color-input);
+  overflow: hidden !important;
+}
+.tabulator-cell {
+  border: none !important;
+}
+.tabulator-selected {
+  background-color: #FFFF0080 !important;
+  color: white !important;
+}
+
+.IconColumn {
+  padding: 2px !important;
+  text-overflow: hidden;
+}
+
+/* Tabulator with column headers */
+#divAccountHistory {
+  font-family: Cairo !important;
+  font-size: 14px;
+  width: calc(100% - 32px) !important;
+}
+#divAccountHistory .tabulator-header {
+  color: var(--bl-color-input);
+  border: none;
+  background: var(--bl-color-two);
+}
+#divAccountHistory .tabulator-header .tabulator-col {
+  border: 0px;
+  background: var(--bl-color-two);
+}
+#divAccountHistory .tabulator-header .tabulator-col .tabulator-col-title {
   filter: var(--bl-shadow);
+  font-weight: normal;
 }
 
-.Background {
-  background-image: var(--bl-image);
-  background-size: var(--bl-image-size);
+/* Tabulator sort icons
+/* Hide all sort icons by default */
+.tabulator-col .tabulator-col-sorter div.icon {
+  display: none;
+}
+/* Display the fa-sort icon when the column is not sorted */
+.tabulator-col[aria-sort="none"] .tabulator-col-sorter div.icon.sort{
+  display: inline-block;
+  fill: var(--bl-color-one);
+}
+/* Hover styles are good */
+.tabulator-col[aria-sort="none"] .tabulator-col-sorter div.icon:hover{
+  opacity:0.6;
+}
+/* Display the fa-sort-up icon when the column is sorted in asc order */
+.tabulator-col[aria-sort="ascending"] .tabulator-col-sorter div.icon.sort-up{
+  display: inline-block;
+  fill: var(--bl-color-input);
+}
+/* Display the fa-sort-down icon when the column is sorted in desc order */
+.tabulator-col[aria-sort="descending"] .tabulator-col-sorter div.icon.sort-down{
+  display: inline-block;
+  fill: var(--bl-color-input);
 }
 
+
+/* Customize Simplebar scrollbars */
+.simplebar-wrapper {
+  height: 100%;
+}
+.simplebar-track {
+  cursor: ns-resize !important;
+  background: var(--bl-color-two);
+  opacity: 0.8;
+  width: 32px !important;
+  border-bottom-right-radius: 6px;
+  margin-bottom: 2px;
+}
+.simplebar-scrollbar::before {
+  background: var(--bl-color-input);
+  width: 22px !important;
+  left: 5px !important;
+  margin: 3px 0px !important;
+}
+.simplebar-scrollbar {
+  min-height: 22px;
+}
+
+/* Dunno why Bootstrap only declares 1-5? */
+.order-6  {order:  6; }
+.order-7  {order:  7; }
+.order-8  {order:  8; }
+.order-9  {order:  9; }
+.order-10 {order: 10; }
+.order-11 {order: 11; }
+.order-12 {order: 12; }
+.order-13 {order: 13; }
+.order-14 {order: 14; }
+.order-15 {order: 15; }
 

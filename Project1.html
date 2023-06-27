@@ -1,16 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" theme="dark">
+<html lang="en" theme="none">
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta $(ThemeColor)>
     <noscript>Your browser does not support JavaScript!</noscript>
+
     <link rel="icon" sizes="192x192" href="IconResMid.png">
     <link rel="apple-touch-icon" href="IconResMid.png">
     <meta $(Manifest)>
     <link $(FavIcon)/>
+
     <title>blaugment</title>
-    <script type="text/javascript" src="$(ProjectName).js"></script>
+
+    <!-- HackTimer -->
+    <script src="https://cdn.jsdelivr.net/npm/hacktimer@latest/HackTimer.silent.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hacktimer@latest/HackTimerWorker.min.js"></script>
 
     <!-- Google's Cairo Font -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -24,25 +28,53 @@
     <!-- Font Awesome 6 Free -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous"> -->
 
-    <!-- Font Awesome 6 Free -->
+    <!-- Font Awesome 6 Pro -->
     <script async crossorigin="anonymous" src="https://kit.fontawesome.com/24746b3b71.js"></script>
 
     <!-- Tabulator -->
     <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@5/dist/js/tabulator.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tabulator-tables@5/dist/css/tabulator.min.css" rel="stylesheet" crossorigin="anonymous">
 
-    <!-- Custom CSS -->
+    <!-- InteractJS -->
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+
+    <!-- Simplebar -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+    <!-- Luxon -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@latest/build/global/luxon.min.js"></script>
+
+    <!-- UA-Parser-JS -->
+    <script src=" https://cdn.jsdelivr.net/npm/ua-parser-js@latest/src/ua-parser.min.js "></script>
+
+    <!-- Project Files -->
     <link href="blaugment.css" rel="stylesheet">
+    <script type="text/javascript" src="$(ProjectName).js"></script>
 
-
-
-    <style>
-    </style>
   </head>
   <body>
-<meta $(BodyParameters)>
+    <meta $(BodyParameters)>
   </body>
+
+
   <script type="text/javascript">
     rtl.run();
   </script>
+
+  <script type="text/javascript">
+    var images = [];
+    function preload() {
+      for (var i = 0; i < arguments.length; i++) {
+        images[i] = new Image();
+        images[i].src = preload.arguments[i];
+      }
+    }
+    preload(
+      "images/bookshelf.jpg",
+      "images/bookshelf_blue.jpg",
+      "images/bookshelf_red.jpg",
+    )
+  </script>
+
 </html>

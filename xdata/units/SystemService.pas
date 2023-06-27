@@ -66,7 +66,7 @@ type
     ///    - EST
     ///    - PST8PDT
     ///  </param>
-    [HttpGet] function Login(Login_ID: String; Password: String; API_Key: String; TZ: String):TStream;
+    [HttpGet] function Login(Login_ID: String; Password: String; API_Key: String; TZ: String; IPAddress:String; IPLocation: String; DeviceInfo: String; BrowserInfo: String):TStream;
 
     ///  <summary>
     ///    Logout - revoke the JWT.

@@ -25,6 +25,9 @@ begin
                 '  logged_in                  text        NOT NULL, '+
                 '  person_id                  integer     NOT NULL, '+
                 '  ip_address                 text        NOT NULL, '+
+                '  ip_location                text                , '+
+                '  device_info                text                , '+
+                '  browser_info               text                , '+
                 '  application                text        NOT NULL, '+
                 '  version                    text        NOT NULL, '+
                 '  CONSTRAINT constraint_name PRIMARY KEY (logged_in, person_id, ip_address) '+
