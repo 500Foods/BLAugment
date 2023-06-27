@@ -199,7 +199,7 @@ type
     divAccount: TWebHTMLDiv;
     divAccountBG: TWebHTMLDiv;
     divAccountTitle: TWebHTMLDiv;
-    btnAccountClose: TWebButton;
+    btnAccountRefresh: TWebButton;
     pcAccount: TWebPageControl;
     pageAccountName: TWebTabSheet;
     pageAccountPhoto: TWebTabSheet;
@@ -254,7 +254,6 @@ type
     btnActivityLogEMail: TWebButton;
     btnActivityLogTimezone: TWebButton;
     btnActivityLogReload: TWebButton;
-    comboActivityLog: TWebComboBox;
     btnActivityLogPrint: TWebButton;
     divAccountHistory: TWebHTMLDiv;
     WebLabel1: TWebLabel;
@@ -264,6 +263,11 @@ type
     WebButton3: TWebButton;
     WebButton4: TWebButton;
     divAccountPhoto: TWebHTMLDiv;
+    btnAccountClose: TWebButton;
+    btnAccountChange: TWebButton;
+    comboActivityLog: TWebLookupComboBox;
+    tmrLogout: TWebTimer;
+    procedure FinalRequest;
     procedure btnThemeClick(Sender: TObject);
     [async] procedure WebFormCreate(Sender: TObject);
     procedure btnBlogClick(Sender: TObject);
@@ -279,16 +283,16 @@ type
     [async] function XDataLogin(Username, Password: String):String;
     procedure LogAction(Action: String);
     [async] procedure XDataConnect;
-    procedure ProcessJWT(aJWT: String);
+    [async] procedure ProcessJWT(aJWT: String);
     [async] procedure btnAccountClick(Sender: TObject);
-    [async] procedure btnAccountCloseClick(Sender: TObject);
+    [async] procedure btnAccountRefreshClick(Sender: TObject);
     [async] procedure SelectAccountOption(OptionID: Integer);
-    procedure btnLogoutHereClick(Sender: TObject);
-    procedure btnLogoutCleanClick(Sender: TObject);
-    procedure btnLogoutAllClick(Sender: TObject);
+    [async] procedure btnLogoutHereClick(Sender: TObject);
+    [async] procedure btnLogoutCleanClick(Sender: TObject);
+    [async] procedure btnLogoutAllClick(Sender: TObject);
     procedure editCurrentPasswordChange(Sender: TObject);
     procedure btnChangePasswordClick(Sender: TObject);
-    [async] procedure Logout(Reason: String);
+    [async] procedure Logout(Reason: String; LogoutAll: Boolean);
     [async] procedure tmrJWTRenewalTimer(Sender: TObject);
     [async] function JSONRequest(Endpoint: String; Params: array of JSValue): String;
     procedure ProcessLogin;
@@ -298,6 +302,10 @@ type
     procedure btnActivityLogReloadClick(Sender: TObject);
     procedure btnActivityLogTimezoneClick(Sender: TObject);
     procedure btnActivityLogPrintClick(Sender: TObject);
+    [async] procedure btnAccountCloseClick(Sender: TObject);
+    procedure btnAccountChangeClick(Sender: TObject);
+    [async] procedure comboActivityLogChange(Sender: TObject);
+    procedure tmrLogoutTimer(Sender: TObject);
   private
     { Private declarations }
   public
@@ -341,6 +349,7 @@ type
     User_EMail: String;
     User_Photo: String;
     User_Account: String;
+    User_ID: Integer;
     User_Roles: TStringList;
 
     tabAccountOptions: JSValue;
@@ -459,12 +468,13 @@ begin
   User_LastName := '';
   User_EMail := '';
   User_Account := '';
+  User_id := 0;
   User_Roles := TStringList.Create;
 
   // Create an App Session key - just a custom Base48-encoded timestamp
   // https://github.com/marko-36/base29-shortener
   App_Session := '';
-  i := DateTimeToUnix(App_Start_UTC);
+  i := DateTimeToUnix(App_Start_UTC)*1000+MillisecondOf(App_Start_UTC);
 
   asm
     // Encode Integer (eg: Unix Timestamp) into String
@@ -524,35 +534,60 @@ begin
 
   // Application Details
   LogAction('Application Startup');
-  LogAction(' -> '+App_Name);
-  LogAction(' -> Version '+App_Version);
-  LogAction(' -> Release '+App_Release);
-  LogAction(' -> App Started: '+FormatDateTime(App_LogDateTimeFormat, App_Start)+' '+App_TZ);
-  LogAction(' -> App Started: '+FormatDateTime(App_LogDateTimeFormat, App_Start_UTC)+' UTC');
-  LogAction(' -> App Session: '+App_Session);
-  LogAction(' -> App IP Address: '+App_IPAddress);
-  LogAction(' -> App Location: '+App_Location);
-  LogAction(' -> App Device: '+App_Device);
-  LogAction(' -> App Browser: '+App_Browser);
+  LogAction(' -- '+App_Name);
+  LogAction(' -- Version '+App_Version);
+  LogAction(' -- Release '+App_Release);
+  LogAction(' -- App Started: '+FormatDateTime(App_LogDateTimeFormat, App_Start)+' '+App_TZ);
+  LogAction(' -- App Started: '+FormatDateTime(App_LogDateTimeFormat, App_Start_UTC)+' UTC');
+  LogAction(' -- App Session: '+App_Session);
+  LogAction(' -- App IP Address: '+App_IPAddress);
+  LogAction(' -- App Location: ');
+  asm
+    var locn = JSON.parse(this.App_Location);
+    this.LogAction(' ----- Country Code: '+locn[0]);
+    this.LogAction(' ----- Country: '+locn[1]);
+    this.LogAction(' ----- Region: '+locn[2]);
+    this.LogAction(' ----- City: '+locn[3]);
+    this.LogAction(' ----- Latitude: '+locn[4]);
+    this.LogAction(' ----- Longitude: '+locn[5]);
+    this.LogAction(' ----- Language: '+locn[6]);
+  end;
+  LogAction(' -- App Device: ');
+  asm
+    var dvc = JSON.parse(this.App_Device);
+    this.LogAction(' ----- Model: '+dvc.model);
+    this.LogAction(' ----- Type: '+dvc.type);
+    this.LogAction(' ----- Vendor: '+dvc.vendor);
+  end;
+  LogAction(' -- App Browser: ');
+  asm
+    var brw = JSON.parse(this.App_Browser);
+    this.LogAction(' ----- Browser: '+brw[0]);
+    this.LogAction(' ----- Version: '+brw[1]);
+    this.LogAction(' ----- OS: '+brw[2]);
+    this.LogAction(' ----- Version: '+brw[3]);
+  end;
   LogAction('============================================================');
   LogAction(' ');
-
 
   // Figure out what our server connection might be
   Server_URL := '';
 
   try
     asm ConfigURL = window.location.origin+(window.location.pathname.split('/').slice(0,-1).join('/')+'/blaugment_configuration.json').replace('/\/\//g','/'); end;
-    LogAction('Loading Configuration from '+ConfigURL);
+    LogAction('Loading Configuration:');
+    LogAction(' -- '+ConfigURL);
     WebHTTPRequest1.URL := ConfigURL;
     ConfigResponse := await( TJSXMLHttpRequest, WebHTTPRequest1.Perform() );
     if String(COnfigResponse.Response) <> '' then
     begin
+      LogAction(' -- Configuration Loaded');
       ConfigData := TJSONObject.ParseJSONValue(String(ConfigResponse.Response)) as TJSONObject;
 
       // Get Server URL - Presumably if we've got a config file, this is defined
       Server_URL := (ConfigData.GetValue('Server') as TJSONString).Value;
-      LogAction('Server (Configured): '+Server_URL);
+      LogAction('Server (Configured):');
+      LogAction(' -- '+Server_URL);
 
     end;
   except on E:Exception do
@@ -562,12 +597,16 @@ begin
   if (Server_URL = '') then
   begin
     Server_URL := 'http://localhost:44444/tms/xdata';
-    LogAction('Server (Config Missing-Using Default): '+Server_URL);
+     LogAction(' -- Configuration Missing');
+    LogAction('Server (Default):');
+    LogAction(' -- '+Server_URL);
   end;
-  LogAction(' ');
 
-  // Connect to XData - it will finish on its own time but give it a moment to connect
-  XDataConnect;
+  // Connect to XData
+  LogAction(' ');
+  LogAction('Attempting Connection');
+  await(XDataConnect);
+  LogAction(' ');
 
   // Configure buttons to use Bootstrap tooltips
   ConfigureTooltip(btnSearch);
@@ -781,16 +820,16 @@ begin
             formatter: function(cell, formatterParams, onRendered) {
               var device = JSON.parse(cell.getValue());
               var icon = '';
-              var title = device[0]+' / '+device[1]+' / '+device[2];
+              var title = device.model+' / '+device.type+' / '+device.vendor;
 
-              if (device[1] == undefined) {
+              if (device.type == undefined) {
                 title = 'No information Available';
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-display Swap"></i>';
+                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-computer"></i>';
               }
-              else if (browser[2] == 'mobile') {
+              else if (device.type == 'mobile') {
                 icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-mobile-button"></i>';
               }
-              else if (browser[2] == 'tablet') {
+              else if (device.type == 'tablet') {
                 icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-tablet-button"></i>';
               }
               else {
@@ -820,7 +859,7 @@ begin
     interact('.resize-drag')
       .resizable({
         edges: { left: true, right: true, bottom: true, top: true },
-        margin: 15, // size of resizing boundary interaction area
+        margin: 12, // size of resizing boundary interaction area
         listeners: {
           move (event) {
             var target = event.target
@@ -885,20 +924,29 @@ begin
     begin
       LoggedIn := True;
       LogAction('AutoLogin - JWT Time Remaining: '+IntToStr(SecondsBetween(JWT_Expiry, TTimeZone.Local.ToUniversalTime(Now)))+'s');
-      ProcessJWT(TWebLocalStorage.GetValue('Login.JWT'));
+      await(ProcessJWT(TWebLocalStorage.GetValue('Login.JWT')));
       PasswordCheck := TWebLocalStorage.GetValue('Login.PasswordHash');
 
 //      window.history.pushState(MainForm.CaptureState, '', MainForm.URL);
 //      MainForm.Position := window.history.length;
 //      MainForm.StartPosition := MainForm.Position - 1;
       ProcessLogin;
+
+      await(tmrJWTRenewalTimer(Sender));
+
     end
     else
     begin
-      Logout('AutoLogin - JWT Expired');
+      LoggedIn := False;
     end;
   end;
 
+  // AutoLogout if possible - what to do if the browser closes unexpectedly
+  asm
+    window.addEventListener('beforeunload', async function (e) {
+      pas.Unit1.Form1.FinalRequest();
+    });
+  end;
 end;
 
 function TForm1.JSONRequest(Endpoint: String; Params: array of JSValue): String;
@@ -936,11 +984,11 @@ begin
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('ERROR Request Exception Received From'+Endpoint);
-        LogAction(' --> ['+E.ClassName+']');
-        LogAction(' --> '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
-        LogAction(' --> '+Copy(E.Message,Pos('Status code:',E.Message),16));
-        LogAction(' --> '+ErrorCode);
-        LogAction(' --> '+ErrorMessage);
+        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
+        LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
+        LogAction(' -- '+ErrorCode);
+        LogAction(' -- '+ErrorMessage);
       end;
     end;
   end;
@@ -949,33 +997,48 @@ begin
   PreventCompilerHint(Blob);
 end;
 
-procedure TForm1.Logout(Reason: String);
+procedure TForm1.Logout(Reason: String; LogoutAll: Boolean);
+var
+  FinalLog: String;
 begin
-  // Make sure this doesn't fire
-  tmrJWTRenewal.Enabled := False;
+  if LoggedIn then
+  begin
+    LoggedIn := False;
 
-  // Hide the page, remove the history
-  asm
-    window.history.replaceState(null,null,window.location.href.split('#')[0]);
-    document.body.style.setProperty('opacity','0');
+    // We'll do our best to logout cleanly, but if anything is amiss, we still want to logout
+    tmrLogout.Enabled := True;
+
+    btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+    // Make sure this doesn't fire
+    tmrJWTRenewal.Enabled := False;
+
+    // Make a note of session time
+    LogAction(' ');
+    LogAction('Logout: '+Reason);
+    LogAction('Session Duration: '+FormatDateTime('h"h "m"m "s"s"', Now - App_Start));
+
+    FinalLog := ActionLogCurrent.Text;
+    ActionLogCurrent.Text := '';
+    ActionLog.text := '';
+
+    // Record logout at Server
+    if LogoutAll
+    then await(JSONRequest('ISystemService.LogoutAll',[App_Session, FinalLog]))
+    else await(JSONRequest('ISystemService.Logout',[App_Session, FinalLog]));
+
+    // Hide the page, remove the history
+    asm
+      window.history.replaceState(null,null,window.location.href.split('#')[0]);
+      document.body.style.setProperty('opacity','0');
+    end;
+
+    // This effectively ends the current session
+    JWT := '';
+    TWebLocalStorage.RemoveKey('Login.JWT');
+    TWebLocalStorage.RemoveKey('Login.Expiry');
+
   end;
-
-  // Make a note of session time
-  LogAction(' ');
-  LogAction('Logout: '+Reason);
-  LogAction('Session Duration: '+FormatDateTime('h"h "m"m "s"s"', Now - App_Start));
-
-  // Record logout at Server
-  await(JSONRequest('ISystemService.Logout',[App_Session, ActionLogCurrent.Text]));
-
-  asm await sleep(1000); end;
-
-  // This effectively ends the current session
-  JWT := '';
-  TWebLocalStorage.RemoveKey('Login.JWT');
-  TWebLocalStorage.RemoveKey('Login.Expiry');
-
-  window.location.reload(true);
 end;
 
 procedure TForm1.XDataConnect;
@@ -998,8 +1061,8 @@ begin
     except on E: Exception do
       begin
         LogAction('Connection Failed: '+XDataConn.URL);
-        LogAction(' --> ['+E.ClassName+']');
-        LogAction(' --> '+E.Message);
+        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- '+E.Message);
       end;
     end;
   end;
@@ -1043,7 +1106,6 @@ begin
   ErrorCode := '';
   ErrorMessage := '';
 
-  LogAction(' ');
   LogAction('Attempting Login');
 
 
@@ -1081,11 +1143,11 @@ begin
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('Login Exception:');
-        LogAction(' --> ['+E.ClassName+']');
-        LogAction(' --> '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
-        LogAction(' --> '+Copy(E.Message,Pos('Status code:',E.Message),16));
-        LogAction(' --> '+ErrorCode);
-        LogAction(' --> '+ErrorMessage);
+        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
+        LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
+        LogAction(' -- '+ErrorCode);
+        LogAction(' -- '+ErrorMessage);
       end;
     end;
   end;
@@ -1097,7 +1159,7 @@ begin
     LogAction('Login Successful ('+IntToStr(MilliSecondsBetween(Now, ElapsedTime))+'ms)');
 
     // Do stuff with the JWT
-    ProcessJWT(NewJWT);
+    await(ProcessJWT(NewJWT));
 
     // All done
     Result := 'Success';
@@ -1129,6 +1191,7 @@ begin
   User_LastName :=  (JWTClaims.GetValue('lnm') as TJSONString).Value;
   User_EMail :=  (JWTClaims.GetValue('eml') as TJSONString).Value;
   User_Account := (JWTClaims.GetValue('anm') as TJSONString).Value;
+  User_ID := (JWTClaims.GetValue('usr') as TJSONNumber).AsInt;
   User_Roles.CommaText :=  (JWTClaims.GetValue('rol') as TJSONString).Value;
 
   // Set renewal to one minute before expiration
@@ -1143,7 +1206,7 @@ begin
   // If it has already expired, then not much point in continuing?
   if tmrJWTRenewal.Interval <= 0 then
   begin
-    Logout('JWT Expired');
+    await(Logout('JWT Expired', False));
     exit;
   end;
 
@@ -1152,15 +1215,13 @@ begin
   TWebLocalStorage.SetValue('Login.JWT', JWT);
   TWebLocalStorage.SetValue('Login.Expiry', FloatToStr(JWT_Expiry));
 
-  LogAction('Processing Token');
-  LogAction(' -> Name: '+StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]));
-  LogAction(' -> EMail: '+User_Email);
-  LogAction(' -> Roles: '+User_Roles.CommaText);
-  LogAction(' -> Expires: '+(JWTClaims.GetValue('unt') as TJSONString).Value);
-  LogAction('Token Processed');
-  LogAction(' ');
+  LogAction('Processing Token:');
+  LogAction(' -- Name: '+StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]));
+  LogAction(' -- EMail: '+User_Email);
+  LogAction(' -- Roles: '+User_Roles.CommaText);
+  LogAction(' -- Expires: '+(JWTClaims.GetValue('unt') as TJSONString).Value);
+  LogAction(' -- Token Processed.');
 
-//  console.log('Renewed.  Expires: '+(JWTClaims.GetValue('unt') as TJSONString).Value);
 end;
 
 procedure TForm1.ProcessLogin;
@@ -1184,6 +1245,12 @@ begin
   pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
   LogAction('- Account Settings: '+pcAccount.ActivePage.Name);
 
+  if pcAccount.ActivePage.Name = 'pageAccountHistory' then
+  begin
+    asm
+      pas.Unit1.Form1.tabAccountHistory.redraw(true);
+    end;
+  end;
 end;
 
 procedure TForm1.tmrJWTRenewalTimer(Sender: TObject);
@@ -1193,20 +1260,32 @@ var
 begin
   tmrJWTRenewal.Enabled := False;
 
+  if LoggedIn then
+  begin
+    LogAction(' ');
+    LogAction('Renew JWT');
+  end;
+
   ActionLogSend := ActionLogCurrent.Text;
   ActionLogCurrent.Text := '';
 
   ResponseString := await(JSONRequest('ISystemService.Renew',[App_Session, ActionLogSend]));
   if Copy(ResponseString,1,6) =  'Bearer' then
   begin
-    LogAction('Login Renewed');
-    ProcessJWT(ResponseString);
+    await(ProcessJWT(ResponseString));
+    LogAction('JWT Renewed');
   end
   else
   begin
     // Otherwise perform an automatic logout of this session
-    LogAction('Login NOT Renewed');
-    Logout('NoRenewal');
+    LogAction('JWT NOT Renewed');
+    LoggedIn := False;
+    btnRegister.Visible := True;
+    btnLogin.Visible := True;
+    btnAdd.Visible := False;
+    btnAccount.Visible := False;
+
+//    await(Logout('NoRenewal', False));
   end
 end;
 
@@ -1261,7 +1340,7 @@ begin
   TWebLocalStorage.RemoveKey('Login.JWT');
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
-  Logout('All');
+  await(Logout('All', True));
 end;
 
 procedure TForm1.btnLogoutCleanClick(Sender: TObject);
@@ -1272,37 +1351,51 @@ begin
   TWebLocalStorage.RemoveKey('Login.JWT');
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
-  Logout('Clean');
+  await(Logout('Clean', False));
 end;
 
 procedure TForm1.btnLogoutHereClick(Sender: TObject);
 begin
   // Logout Here
-  Logout('Normal');
+  await(Logout('Normal', False));
+end;
+
+procedure TForm1.btnAccountChangeClick(Sender: TObject);
+begin
+  // Manage different Account
+
 end;
 
 procedure TForm1.btnAccountClick(Sender: TObject);
 var
+  i: Integer;
   ResponseString: String;
+  SessionTimestamp: Array of String;
+  SessionID: Array of String;
+  OldDate: TDateTime;
+  NewDate: TDateTime;
 begin
   // Account Information
-  LogAction(' ');
-  LogAction('[ Account Settings ]');
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccount) then
+  begin
+    LogAction(' ');
+    LogAction('[ Account Settings ]');
 
-  // Set Caption for "window"
-  labelAccountTitle.HTML := '<i class="fa-duotone fa-fw fa-xl fa-cat Swap me-2"></i>'+User_Firstname+' '+User_MiddleName+' '+User_LastName;
-  editAccountName.Text := User_Account;
-  editFirstName.Text := User_Firstname;
-  editMiddleName.Text := User_MiddleName;
-  editLastName.Text := User_LastName;
-  editEMail.Text := User_EMail;
+    // Set Caption for "window"
+    labelAccountTitle.HTML := '<i class="fa-duotone fa-fw fa-xl fa-cat Swap me-2"></i>'+User_Firstname+' '+User_MiddleName+' '+User_LastName;
+    editAccountName.Text := User_Account;
+    editFirstName.Text := User_Firstname;
+    editMiddleName.Text := User_MiddleName;
+    editLastName.Text := User_LastName;
+    editEMail.Text := User_EMail;
 
-  // Make sure first row is selected
-  pcAccount.TabIndex := 0;
-  pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
-  asm
-    this.tabAccountOptions.deselectRow();
-    this.tabAccountOptions.selectRow([0]);
+    // Make sure first row is selected
+    pcAccount.TabIndex := 0;
+    pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
+    asm
+      this.tabAccountOptions.deselectRow();
+      this.tabAccountOptions.selectRow([0]);
+    end;
   end;
 
   // Reset Change PAssword fields
@@ -1311,9 +1404,6 @@ begin
   editCurrentPassword.Text := '';
   editNewPassword.Text := '';
   editConfirmPassword.Text := '';
-
-  // Configure Activity Log
-  btnActivityLogReloadClick(Sender);
 
   // Show window with shade
   divShade.Visible := True;
@@ -1327,13 +1417,13 @@ begin
   begin
     asm
       var data = JSON.parse(ResponseString);
-      divAccountPhoto.innerHTML = data['Photo']
+      divAccountPhoto.innerHTML = data['Photo'];
       this.tabAccountHistory.setData(data['RecentLogins']);
-      this.tabAccountHistory.redraw(true);
-      console.log(data['RecentLogins']);
 
-//      console.log(data);
-
+      for (var i = 0; i < data['RecentActions'].length; i++) {
+        SessionTimestamp.push(data['RecentActions'][i].session_start);
+        SessionID.push(data['RecentActions'][i].session_id);
+      }
 
 //      var email = -1;
 //      var phone = -1;
@@ -1381,24 +1471,38 @@ begin
 //      }
 //      tableContacts.innerHTML = tablerows;
 //
-//      tableHistory.style.setProperty('max-height','525px');
-//      tableHistory.style.setProperty('border-bottom-left-radius','var(--custom-rounding)');
-//      tableHistory.style.setProperty('border-bottom-right-radius','var(--custom-rounding)');
-//      var tabHistory = new Tabulator("#tableHistory",{
-//        data: data['RecentLogins'],
-//        layout: "fitColumns",
-//        selectable: 1,
-//        columns: [
-//          { title: "Logged In", field: "logged_in", formatter: function(cell, formatterParams, onRendered) {
-//            return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
-//          }},
-//          { title: "IP Address", field: "ip_address" }
-//        ]
-//      });
-
-
     end;
   end;
+
+  // Configure Activity History List
+  comboActivityLog.LookupValues.Clear;
+  comboActivityLog.LookupValues.AddPair('Current', 'Current Session');
+  i := 0;
+  while i < Length(SessionTimestamp) do
+  begin
+    if btnActivityLogTimeZone.Tag = 0 then
+    begin
+      comboActivityLog.LookupValues.AddPair(SessionID[i], SessionTimestamp[i]+' UTC');
+    end
+    else
+    begin
+      OldDate := EncodeDateTime(
+        StrToInt(Copy(SessionTimestamp[i],1,4)),
+        StrToInt(Copy(SessionTimestamp[i],6,2)),
+        StrToInt(Copy(SessionTimeStamp[i],9,2)),
+        StrToInt(Copy(SessionTimestamp[i],12,2)),
+        StrToInt(Copy(SessionTimestamp[i],15,2)),
+        StrToInt(Copy(SessionTimestamp[i],18,2)),
+        StrToInt(Copy(SessionTimestamp[i],21,3))
+      );
+      NewDate := IncMinute(OldDate, - App_TZOffset);
+      comboActivityLog.LookupValues.AddPair(SessionID[i], FormatDateTime(App_LogDateTimeFormat, NewDate));
+    end;
+    i := i + 1;
+  end;
+
+  // Configure Activity Log
+  btnActivityLogReloadClick(Sender);
 end;
 
 procedure TForm1.btnBlogClick(Sender: TObject);
@@ -1460,6 +1564,73 @@ procedure TForm1.btnUsernameClick(Sender: TObject);
 begin
   editUsername.Text := '';
   editUsername.SetFocus;
+end;
+
+procedure TForm1.comboActivityLogChange(Sender: TObject);
+var
+  Response: String;
+  RemoteActionLog: TStringList;
+  LocalActionLog: TStringList;
+  LogLine: String;
+  OldDate: TDateTime;
+  NewDate: TDateTime;
+  i: Integer;
+begin
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+  // Reload current session data
+  if comboActivityLog.Value = 'Current' then
+  begin
+    btnActivityLogReloadClick(Sender);
+  end
+  else
+  begin
+
+    Response := await(JSONRequest('IPersonService.ActionLog',[User_ID, comboActivityLog.Value]));
+    asm
+      var resp = JSON.parse(Response);
+      Response = resp['ActionsLog'][0].actions;
+    end;
+    RemoteActionLog := TStringList.Create;
+    RemoteActionLog.Text := Response;
+
+    if btnActivityLogTimezone.Tag = 1 then
+    begin
+      LocalActionLog := TStringList.Create;
+      i := 0;
+      while i < RemoteActionLog.Count do
+      begin
+        LogLine := RemoteActionLog[i];
+
+        if Copy(LogLine,24,5) = ' UTC ' then
+        begin
+          OldDate := EncodeDateTime(
+            StrToInt(Copy(LogLine,1,4)),
+            StrToInt(Copy(LogLine,6,2)),
+            StrToInt(Copy(LogLine,9,2)),
+            StrToInt(Copy(LogLine,12,2)),
+            StrToInt(Copy(LogLine,15,2)),
+            StrToInt(Copy(LogLine,18,2)),
+            StrToInt(Copy(LogLine,21,3))
+          );
+          NewDate := IncMinute(OldDate, - App_TZOffset);
+          LogLine := FormatDateTime(App_LogDateTimeFormat, NewDate)+Copy(LogLine,28,length(LogLine));
+        end;
+
+        LocalActionLog.Add(LogLine);
+        i := i + 1;
+      end;
+      divActionLog.HTML.Text := '<pre style="overflow-x: hidden; font-size: 10px; color: var(--bl-color-input">'+LocalActionLog.Text+'</pre>';
+    end
+    else
+    begin
+      divActionLog.HTML.Text := '<pre style="overflow-x: hidden; font-size: 10px; color: var(--bl-color-input">'+RemoteActionLog.Text+'</pre>';
+    end;
+  end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+
 end;
 
 procedure TForm1.btnThemeClick(Sender: TObject);
@@ -1542,6 +1713,15 @@ begin
   end;
 end;
 
+procedure TForm1.FinalRequest;
+begin
+  LogAction(' ');
+  LogAction('Browser closed.');
+  LogAction('Session Duration: '+FormatDateTime('h"h "m"m "s"s"', Now - App_Start));
+  LoggedIn := False;
+  tmrJWTRenewalTimer(nil);
+end;
+
 procedure TForm1.btnLoginCancelClick(Sender: TObject);
 begin
   divShade.ElementHandle.style.setProperty('opacity','0.0');
@@ -1561,6 +1741,18 @@ begin
   divShade.Visible := False;
   divAccount.Visible := False;
   LogAction('[ Account Settings Closed ]');
+
+  await(tmrJWTRenewalTimer(Sender));
+end;
+
+procedure TForm1.btnAccountRefreshClick(Sender: TObject);
+begin
+  LogAction('[ Account Settings Refresh ]');
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin Swap fa-xl"></i>';
+  await(btnAccountClick(Sender));
+  LogAction('Account Settings Refreshed');
+  btnActivityLogReloadClick(Sender);
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 
@@ -1572,7 +1764,6 @@ var
   OldDate: TDateTime;
   NewDate: TDateTime;
 begin
-  comboActivityLog.Text := 'Current Session';
   comboActivityLog.ItemIndex := 0;
 
   if btnActivityLogTimezone.Tag = 1 then
@@ -1601,11 +1792,11 @@ begin
       LocalActionLog.Add(LogLine);
       i := i + 1;
     end;
-    divActionLog.HTML.Text := '<pre style="overflow-x:hidden; font-size:12px; color: var(--bl-color-input">'+LocalActionLog.Text+'</pre>';
+    divActionLog.HTML.Text := '<pre style="overflow-x: hidden; font-size: 10px; color: var(--bl-color-input">'+LocalActionLog.Text+'</pre>';
   end
   else
   begin
-    divActionLog.HTML.Text := '<pre style="overflow-x:hidden; font-size:12px; color: var(--bl-color-input">'+ActionLog.Text+'</pre>';
+    divActionLog.HTML.Text := '<pre style="overflow-x: hidden; font-size: 10px; color: var(--bl-color-input">'+ActionLog.Text+'</pre>';
   end;
 end;
 
@@ -1615,7 +1806,7 @@ begin
   if btnActivityLogTimezone.Tag = 0 then
   begin
     btnActivityLogTimezone.Tag := 1;
-    btnActivityLogTimezone.Caption := '<i class="fa-duotone fa-location-dot fa-lg Swap"></i>';
+    btnActivityLogTimezone.Caption := '<i class="fa-duotone fa-clock-desk fa-lg Swap"></i>';
   end
   else
   begin
@@ -1623,7 +1814,7 @@ begin
     btnActivityLogTimezone.Caption := '<i class="fa-duotone fa-globe fa-lg Swap"></i>';
   end;
 
-  btnActivityLogReloadClick(Sender);
+  btnAccountRefreshClick(Sender);
 end;
 
 procedure TForm1.WebFormKeyDown(Sender: TObject; var Key: Word;
@@ -1661,6 +1852,12 @@ begin
 
 end;
 
+
+procedure TForm1.tmrLogoutTimer(Sender: TObject);
+begin
+  tmrLogout.Enabled := False;
+  window.location.reload(true);
+end;
 
 function TForm1.SHA256(Text2Encode: String): String;
 var

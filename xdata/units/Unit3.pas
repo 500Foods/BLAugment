@@ -317,7 +317,7 @@ begin
     ex := ex + 1;
   end;
 
-  Result := UnixToDateTime(Trunc(i));
+  Result := UnixToDateTime(Trunc(i/1000))+(i - 1000*(Trunc(i/1000)))/86400000;
 
 end;
 

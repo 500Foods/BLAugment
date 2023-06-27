@@ -34,11 +34,123 @@ type
   private
     function Directory(Format: String): TStream;
     function Profile: TStream;
+    function ActionLog(Person: Integer; Session: String): TStream;
+
   end;
 
 implementation
 
 uses Unit1, Unit2, Unit3, TZDB;
+
+function TPersonService.ActionLog(Person: Integer; Session: String): TStream;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+  User: IUserIdentity;
+  JWT: String;
+  ResultJSON: TJSONObject;
+  ResultArray: TJSONArray;
+begin
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  // Time this event
+  ElapsedTime := Now;
+
+  // Get data from the JWT
+  User := TXDataOperationContext.Current.Request.User;
+  JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');
+  if (User = nil) then raise EXDataHttpUnauthorized.Create('Missing authentication');
+
+  // Setup DB connection and query
+  try
+    DatabaseName := User.Claims.Find('dbn').AsString;
+    DatabaseEngine := User.Claims.Find('dbe').AsString;
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Check if we've got a valid JWT (one that has not been revoked)
+  try
+    {$Include sql\system\token_check\token_check.inc}
+    Query1.ParamByName('TOKENHASH').AsString := DBSupport.HashThis(JWT);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+    end;
+  end;
+  if Query1.RecordCount <> 1 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('JWT was not validated');
+  end;
+
+
+  // Create object to be returned
+  ResultJSON := TJSONObject.Create;
+
+  // Get a specific action log
+  try
+    {$Include sql\person\actions_log\actions_log.inc}
+    Query1.ParamByName('PERSONID').AsInteger := Person;
+    Query1.ParamByName('SESSIONID').AsString := Session;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: LoginRecent');
+    end;
+  end;
+  ResultArray := TJSONObject.ParseJSONValue(DBSupport.QueryToJSON(Query1)) as TJSONArray;
+  ResultJSON.AddPair('ActionsLog', ResultArray);
+
+  // Not sure if there is another version of this that is more direct?
+  Result := TStringStream.Create(ResultJSON.ToString);
+
+  // Cleanup
+  ResultJSON.Free;
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('ENDPOINT').AsString := 'PersonService.ActionsLog';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := User.Claims.Find('app').AsString;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+IntToStr(Person)+' / '+Session+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
 
 function TPersonService.Directory(Format: String): TStream;
 var
@@ -265,6 +377,20 @@ begin
   end;
   ResultArray := TJSONObject.ParseJSONValue(DBSupport.QueryToJSON(Query1)) as TJSONArray;
   ResultJSON.AddPair('RecentLogins', ResultArray);
+
+  // Get Recent Action Logs
+  try
+    {$Include sql\person\actions_recent\actions_recent.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: LoginRecent');
+    end;
+  end;
+  ResultArray := TJSONObject.ParseJSONValue(DBSupport.QueryToJSON(Query1)) as TJSONArray;
+  ResultJSON.AddPair('RecentActions', ResultArray);
 
   // Add photo
   try

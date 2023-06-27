@@ -135,7 +135,7 @@ html[theme="red"] .BLTooltip {
 #divAdd {
   min-width: 350px;
   max-width: 1000px;
-  min-height: 403px;
+  min-height: 435px;
   max-height: 1000px;
 }
 
@@ -157,7 +157,7 @@ html[theme="red"] .BLTooltip {
   color: var(--bl-color-input);
   top: 2px !important;
   left: 2px !important;
-  width: calc(100% - 4px) !important;
+  width: calc(100% - 34px) !important;
   height: 40px !important;
   position: absolute;
   font-family: Cairo;
@@ -167,7 +167,7 @@ html[theme="red"] .BLTooltip {
   border-top-right-radius: 6px;
 }
 #divAccountOptions {
-  height: calc(100% - 42px) !important;
+  height: calc(100% - 2rem - 42px) !important;
   border-right: var(--bl-border) !important;
 }
 
@@ -246,7 +246,20 @@ button > svg > g > path {
   pointer-events: none;
   transition: background 1s, border 1s;
 }
+.ContainerBGPadded {
+  width: calc(100% - 2rem) !important;
+  height: calc(100% - 2rem) !important;
+  border: var(--bl-border);
+  border-radius: var(--bl-radius);
+  background: var(--bl-background);
+  opacity: 0.5;
+  filter: var(--bl-shadow);
+  pointer-events: none;
+  transition: background 1s, border 1s;
+}
 .ContainerFG {
+  width: calc(100% - 2rem) !important;
+  height: calc(100% - 2rem) !important;
   border: var(--bl-border);
   border-radius: var(--bl-radius);
   background: transparent;
@@ -317,8 +330,8 @@ button > svg > g > path {
 #pcAccount {
   left: 152px !important;
   top: 42px !important;
-  width: calc(100% - 154px) !important;
-  height: calc(100% - 41px) !important;
+  width: calc(100% - 2rem - 154px) !important;
+  height: calc(100% - 2rem - 41px) !important;
   background: transparent;
 }
 
@@ -331,6 +344,7 @@ button > svg > g > path {
   overflow-x: hidden !important;
   opacity: 0;
   transition: opacity 200ms;
+  margin: 1rem;
 }
 
 /* Tabulator - used for lists */
@@ -426,6 +440,9 @@ button > svg > g > path {
 }
 .simplebar-scrollbar {
   min-height: 22px;
+}
+.simplebar-mask {
+  bottom: 3px;
 }
 
 /* Dunno why Bootstrap only declares 1-5? */

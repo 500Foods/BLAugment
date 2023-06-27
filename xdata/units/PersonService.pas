@@ -38,6 +38,19 @@ type
     ///  </remarks>
     [Authorize] [HttpGet] function Profile: TStream;
 
+    ///  <summary>
+    ///    Return a specific Action Log.
+    ///  </summary>
+    ///  <remarks>
+    ///    This returns the composite action log for a given person and session.
+    ///    The session id can be found in the Profile data.  Composite refers to
+    ///    how the action_history table stores multiple records for each session.
+    ///    This endpoint returns them combined into one text block.
+    ///    Note that if the Person doesn't match the JWT, then access may be
+    ///    denied unless a role permitting such access has been granted.
+    ///  </remarks>
+    [Authorize] [HttpGet] function ActionLog(Person: Integer; Session: String): TStream;
+
   end;
 
 implementation

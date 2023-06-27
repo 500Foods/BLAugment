@@ -198,7 +198,7 @@ object Form1: TForm1
         Width = 121
         Height = 22
         ChildOrder = 2
-        ElementClassName = 'mb-1 '
+        ElementClassName = 'mb-1 DropShadow'
         ElementID = 'editSearch'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -2693,7 +2693,7 @@ object Form1: TForm1
       '  <i class="fa-duotone fa-sun fa-3x"></i>'
       '  <i class="fa-duotone fa-moon fa-3x"></i>'
       '  <i class="fa-duotone fa-heart fa-3x"></i>'
-      '  <i class="fa-duotone fa-location-dot fa-lg Swap"></i>'
+      '  <i class="fa-duotone fa-clock-desk fa-lg Swap"></i>'
       '  <i class="fa-duotone fa-globe fa-lg Swap"></i>'
       
         '  <img src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/ic' +
@@ -2714,9 +2714,9 @@ object Form1: TForm1
   object divAccount: TWebHTMLDiv
     Left = 8
     Top = 342
-    Width = 600
+    Width = 615
     Height = 450
-    ElementClassName = 'resize-drag overflow-hidden'
+    ElementClassName = 'resize-drag overflow-hidden p-2'
     ElementID = 'divAccount'
     ChildOrder = 4
     ElementFont = efCSS
@@ -2728,7 +2728,7 @@ object Form1: TForm1
       Width = 30
       Height = 41
       Cursor = crHandPoint
-      ElementClassName = 'ContainerBG position-absolute'
+      ElementClassName = 'ContainerBGPadded position-absolute m-2'
       ElementID = 'divAccountBG'
       HeightStyle = ssPercent
       WidthStyle = ssPercent
@@ -2741,9 +2741,7 @@ object Form1: TForm1
       Top = 3
       Width = 442
       Height = 40
-      ElementClassName = 
-        'Header d-flex flex-row justify-content-between align-items-cente' +
-        'r'
+      ElementClassName = 'm-3 Header d-flex flex-row  align-items-center'
       ElementID = 'divAccountTitle'
       ChildOrder = 1
       ElementFont = efCSS
@@ -2754,8 +2752,7 @@ object Form1: TForm1
         Width = 98
         Height = 35
         AutoSize = False
-        ChildOrder = 1
-        ElementClassName = 'mx-2 DropShadow'
+        ElementClassName = 'mx-2 DropShadow flex-grow-1'
         ElementID = 'labelAccountName'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -2765,14 +2762,31 @@ object Form1: TForm1
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
       end
+      object btnAccountRefresh: TWebButton
+        Left = 260
+        Top = -3
+        Width = 50
+        Height = 50
+        Hint = 'Refresh'
+        Caption = '<i class="fa-duotone fa-rotate Swap fa-xl"></i>'
+        ChildOrder = 2
+        ElementClassName = 'btn btn-link'
+        ElementID = 'btnAccountRefresh'
+        ElementFont = efCSS
+        ElementPosition = epRelative
+        HeightStyle = ssAuto
+        HeightPercent = 100.000000000000000000
+        WidthPercent = 100.000000000000000000
+        OnClick = btnAccountRefreshClick
+      end
       object btnAccountClose: TWebButton
-        Left = 240
-        Top = -9
+        Left = 316
+        Top = -3
         Width = 50
         Height = 50
         Hint = 'Close'
         Caption = '<i class="fa-duotone fa-xmark Swap fa-2x"></i>'
-        ChildOrder = 2
+        ChildOrder = 3
         ElementClassName = 'btn btn-link'
         ElementID = 'btnAccountClose'
         ElementFont = efCSS
@@ -2782,13 +2796,30 @@ object Form1: TForm1
         WidthPercent = 100.000000000000000000
         OnClick = btnAccountCloseClick
       end
+      object btnAccountChange: TWebButton
+        Left = 204
+        Top = -3
+        Width = 50
+        Height = 50
+        Hint = 'Change Account'
+        Caption = '<i class="fa-duotone fa-user-secret Swap fa-xl"></i>'
+        ChildOrder = 1
+        ElementClassName = 'btn btn-link'
+        ElementID = 'btnAccountChange'
+        ElementFont = efCSS
+        ElementPosition = epRelative
+        HeightStyle = ssAuto
+        HeightPercent = 100.000000000000000000
+        WidthPercent = 100.000000000000000000
+        OnClick = btnAccountChangeClick
+      end
     end
     object pcAccount: TWebPageControl
       Left = 158
       Top = 47
       Width = 400
       Height = 407
-      ElementClassName = 'nav nav-tabs'
+      ElementClassName = 'nav nav-tabs m-2'
       ElementID = 'pcAccount'
       ChildOrder = 3
       ElementTabClassName = 'nav-link'
@@ -3411,8 +3442,8 @@ object Form1: TForm1
           Width = 397
           Height = 46
           ElementClassName = 
-            'nointeract mt-2 ms-2 pe-5 position-fixed d-flex flex-wrap flex-r' +
-            'ow gap-1 '
+            'nointeract mt-2 ms-4 me-2 pe-5 position-fixed d-flex flex-wrap f' +
+            'lex-row gap-1 '
           ElementID = 'divActivityLogHeader'
           HeightStyle = ssAuto
           WidthStyle = ssAuto
@@ -3467,28 +3498,9 @@ object Form1: TForm1
             ElementPosition = epIgnore
             HeightStyle = ssAuto
             HeightPercent = 100.000000000000000000
+            Visible = False
             WidthPercent = 100.000000000000000000
             OnClick = btnActivityLogReloadClick
-          end
-          object comboActivityLog: TWebComboBox
-            Left = 196
-            Top = 8
-            Width = 121
-            Height = 21
-            ChildOrder = 3
-            ElementClassName = 'flex-grow-1 ComboUtility flex-fill'
-            ElementID = 'comboActivityLog'
-            ElementFont = efCSS
-            ElementPosition = epRelative
-            HeightStyle = ssAuto
-            HeightPercent = 100.000000000000000000
-            Text = 'Current Session'
-            WidthStyle = ssAuto
-            WidthPercent = 100.000000000000000000
-            ItemIndex = -1
-            Items.Strings = (
-              'Current Session'
-              '')
           end
           object btnActivityLogPrint: TWebButton
             Left = 95
@@ -3507,13 +3519,31 @@ object Form1: TForm1
             WidthPercent = 100.000000000000000000
             OnClick = btnActivityLogPrintClick
           end
+          object comboActivityLog: TWebLookupComboBox
+            Left = 187
+            Top = 7
+            Width = 145
+            Height = 22
+            ChildOrder = 4
+            ElementClassName = 'flex-grow-1 ComboUtility flex-fill'
+            ElementID = 'comboActivityLog'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnChange = comboActivityLogChange
+            ItemIndex = -1
+            LookupValues = <>
+          end
         end
         object divActionLog: TWebHTMLDiv
           Left = 0
           Top = 87
           Width = 179
           Height = 41
-          ElementClassName = 'mt-2 ps-2 pe-5 mb-2 pt-5'
+          ElementClassName = 'mt-2 ps-2 mb-2 pt-5 nointeract'
           ElementID = 'divActionLog'
           HeightStyle = ssAuto
           WidthStyle = ssAuto
@@ -3737,7 +3767,8 @@ object Form1: TForm1
       Top = 41
       Width = 150
       Height = 405
-      ElementClassName = 'border-0'
+      Cursor = crHandPoint
+      ElementClassName = 'border-0 m-3 nointeract'
       ElementID = 'divAccountOptions'
       ChildOrder = 2
       ElementFont = efCSS
@@ -3749,7 +3780,7 @@ object Form1: TForm1
       Width = 30
       Height = 41
       Cursor = crHandPoint
-      ElementClassName = 'ContainerFG position-absolute'
+      ElementClassName = 'ContainerFG position-absolute m-2'
       ElementID = 'divAccountFG'
       HeightStyle = ssPercent
       WidthStyle = ssPercent
@@ -3773,5 +3804,12 @@ object Form1: TForm1
     OnTimer = tmrJWTRenewalTimer
     Left = 992
     Top = 112
+  end
+  object tmrLogout: TWebTimer
+    Enabled = False
+    Interval = 2000
+    OnTimer = tmrLogoutTimer
+    Left = 1000
+    Top = 192
   end
 end

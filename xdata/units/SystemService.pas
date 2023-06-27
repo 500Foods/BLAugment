@@ -84,6 +84,21 @@ type
     [HttpPost] function Logout(ActionSession: String; ActionLog: String):TStream;
 
     ///  <summary>
+    ///    Logout - revoke all tokens corresponding to the currently logged in account.
+    ///  </summary>
+    ///  <remarks>
+    ///    This is used when the user wishes to logout of all accounts simultaneously.  This may
+    ///    be useful if unauthorized access or other suspicious activity has been detected.
+    ///  </remarks>
+    ///  <param name="ActionSession">
+    ///    Session identifier unique to the user - just an encoded Unix timestamp.
+    ///  </param>
+    ///  <param name="ActionLog">
+    ///    Client action log. Just a text log.
+    ///  </param>
+    [HttpPost] function LogoutAll(ActionSession: String; ActionLog: String):TStream;
+
+    ///  <summary>
     ///    Renew a previously issued JWT.
     ///  </summary>
     ///  <remarks>
