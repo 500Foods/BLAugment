@@ -267,6 +267,7 @@ type
     btnAccountChange: TWebButton;
     comboActivityLog: TWebLookupComboBox;
     tmrLogout: TWebTimer;
+    WebHTMLDiv3: TWebHTMLDiv;
     procedure FinalRequest;
     procedure btnThemeClick(Sender: TObject);
     [async] procedure WebFormCreate(Sender: TObject);
@@ -764,16 +765,19 @@ begin
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
             formatter: function(cell, formatterParams, onRendered) {
               var browser = JSON.parse(cell.getValue());
-              var icon = '';
+              var icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-duotone fa-browser"></i>';
               var title = browser[0]+' '+browser[1];
               if (browser[0] == 'Chrome') {
                 icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-chrome"></i>';
               }
               else if (browser[0] == 'Firefox') {
-                icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-firefox"></i>';
+                icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-firefox-browser"></i>';
               }
               else if (browser[0] == 'Safari') {
                 icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-safari"></i>';
+              }
+              else if (browser[0] == 'Edge') {
+                icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-edge"></i>';
               }
               return '<div title="'+title+'">'+icon+'</div>';
             }
@@ -784,34 +788,34 @@ begin
               var icon = '';
               var title = browser[2]+' '+browser[3];
               if (browser[2] == 'Windows') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-windows"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-windows"></i>';
               }
               else if (browser[2] == 'Mac OS') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-apple"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-apple"></i>';
               }
               else if (browser[2] == 'Fedora') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-fedora"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-fedora"></i>';
               }
               else if (browser[2] == 'Ubuntu') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-ubuntu"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-ubuntu"></i>';
               }
               else if (browser[2] == 'Redhat') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-redhat"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-redhat"></i>';
               }
               else if (browser[2] == 'SUSE') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-suse"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-suse"></i>';
               }
               else if (browser[2] == 'CentOS') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-centos></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-centos></i>';
               }
               else if (browser[2] == 'Android') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-android"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-android"></i>';
               }
               else if (browser[2] == 'Linux') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-brands fa-linux"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-brands fa-linux"></i>';
               }
               else {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-display"></i>';
+                icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-duotone fa-display"></i>';
               }
               return '<div title="'+title+'">'+icon+'</div>';
             }
@@ -863,8 +867,10 @@ begin
         listeners: {
           move (event) {
             var target = event.target
-            var x = (parseFloat(target.getAttribute('data-x')) || -target.getBoundingClientRect().width/2)
-            var y = (parseFloat(target.getAttribute('data-y')) || -target.getBoundingClientRect().height/2)
+            var x = (parseFloat(target.getAttribute('data-x')) || 0)
+            var y = (parseFloat(target.getAttribute('data-y')) || 0)
+//            var x = (parseFloat(target.getAttribute('data-x')) || -target.getBoundingClientRect().width/2)
+//            var y = (parseFloat(target.getAttribute('data-y')) || -target.getBoundingClientRect().height/2)
             target.style.width = event.rect.width + 'px'
             target.style.height = event.rect.height + 'px'
             x += event.deltaRect.left
@@ -886,8 +892,10 @@ begin
 
     function dragMoveListener (event) {
       var target = event.target
-      var x = (parseFloat(target.getAttribute('data-x')) || -target.getBoundingClientRect().width/2) + event.dx
-      var y = (parseFloat(target.getAttribute('data-y')) || -target.getBoundingClientRect().height/2) + event.dy
+      var x = (parseFloat(target.getAttribute('data-x')) || 0 ) + event.dx
+      var y = (parseFloat(target.getAttribute('data-y')) || 0 ) + event.dy
+//      var x = (parseFloat(target.getAttribute('data-x')) || -target.getBoundingClientRect().width/2) + event.dx
+//      var y = (parseFloat(target.getAttribute('data-y')) || -target.getBoundingClientRect().height/2) + event.dy
       target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
       target.setAttribute('data-x', x)
       target.setAttribute('data-y', y)
@@ -947,6 +955,18 @@ begin
       pas.Unit1.Form1.FinalRequest();
     });
   end;
+
+  // Disable edit scrolling
+  asm
+    document.querySelectorAll('.Edit').forEach(function(item){
+      item.addEventListener('wheel', preventScroll, {passive: false});
+    });
+    function preventScroll(e) {
+      e.preventDefault();
+      e.target.parentElement.parentElement.parentElement.scrollTop += e.deltaY;
+      return false;
+    }
+  end;
 end;
 
 function TForm1.JSONRequest(Endpoint: String; Params: array of JSValue): String;
@@ -1004,6 +1024,8 @@ begin
   if LoggedIn then
   begin
     LoggedIn := False;
+    TWebLocalStorage.RemoveKey('Login.JWT');
+    TWebLocalStorage.RemoveKey('Login.Expiry');
 
     // We'll do our best to logout cleanly, but if anything is amiss, we still want to logout
     tmrLogout.Enabled := True;
@@ -1035,8 +1057,7 @@ begin
 
     // This effectively ends the current session
     JWT := '';
-    TWebLocalStorage.RemoveKey('Login.JWT');
-    TWebLocalStorage.RemoveKey('Login.Expiry');
+
 
   end;
 end;
@@ -1251,6 +1272,12 @@ begin
       pas.Unit1.Form1.tabAccountHistory.redraw(true);
     end;
   end;
+
+  if pcAccount.ActivePage.Name = 'pageAccountActivity' then
+  begin
+    divActivityLogHeader.ElementHandle.classList.add('position-fixed');
+  end;
+
 end;
 
 procedure TForm1.tmrJWTRenewalTimer(Sender: TObject);
@@ -1340,6 +1367,10 @@ begin
   TWebLocalStorage.RemoveKey('Login.JWT');
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Top');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Left');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Width');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Height');
   await(Logout('All', True));
 end;
 
@@ -1351,6 +1382,10 @@ begin
   TWebLocalStorage.RemoveKey('Login.JWT');
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Top');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Left');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Width');
+  TWebLocalStorage.RemoveKey('Window.Accounts.Height');
   await(Logout('Clean', False));
 end;
 
@@ -1396,9 +1431,10 @@ begin
       this.tabAccountOptions.deselectRow();
       this.tabAccountOptions.selectRow([0]);
     end;
+
   end;
 
-  // Reset Change PAssword fields
+  // Reset Change Password fields
   btnChangePAssword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
   divChangePassword.ElementHandle.classList.Add('pe-none');
   editCurrentPassword.Text := '';
@@ -1410,6 +1446,30 @@ begin
   divAccount.Visible := True;
   divShade.ElementHandle.style.setProperty('opacity','0.7');
   divAccount.ElementHandle.style.setProperty('opacity','1.0');
+
+  divAccount.ElementHandle.removeAttribute('data-x');
+  divAccount.ElementHandle.removeAttribute('data-y');
+  divAccount.ElementHandle.style.setProperty('transform', 'translateZ(0)');
+
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccount) then
+  begin
+    // Positioning
+    if TWebLocalStorage.getValue('Window.Accounts.Top') <> '' then
+    begin
+      divAccount.ElementHandle.style.setProperty('top',TWebLocalStorage.getValue('Window.Accounts.Top')+'px');
+      divAccount.ElementHandle.style.setProperty('left',TWebLocalStorage.getValue('Window.Accounts.Left')+'px');
+      divAccount.ElementHandle.style.setProperty('width',TWebLocalStorage.getValue('Window.Accounts.Width')+'px');
+      divAccount.ElementHandle.style.setProperty('height',TWebLocalStorage.getValue('Window.Accounts.Height')+'px');
+    end
+    else
+    begin
+      divAccount.ElementHandle.style.setProperty('top','calc(50% - 225px)');
+      divAccount.ElementHandle.style.setProperty('left','calc(50% - 315px)');
+      divAccount.ElementHandle.style.setProperty('width','630px');
+      divAccount.ElementHandle.style.setProperty('height','450px');
+    end;
+
+  end;
 
   // Get other Account Information
   ResponseString := await(JSONRequest('IPersonService.Profile',[]));
@@ -1733,13 +1793,21 @@ end;
 
 procedure TForm1.btnAccountCloseClick(Sender: TObject);
 begin
+  TWebLocalStorage.SetValue('Window.Accounts.Top',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.top));
+  TWebLocalStorage.SetValue('Window.Accounts.Left',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.left));
+  TWebLocalStorage.SetValue('Window.Accounts.Width',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.width));
+  TWebLocalStorage.SetValue('Window.Accounts.Height',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.height));
+
   divShade.ElementHandle.style.setProperty('opacity','0.0');
   divAccount.ElementHandle.style.setProperty('opacity','0.0');
-  divAccount.Width := Trunc(divAccount.ElementHandle.getBoundingClientRect.Width);
-  divAccount.Height := Trunc(divAccount.ElementHandle.getBoundingClientRect.Height);
-  asm await sleep(500); end;
+
+  asm await sleep(1000); end;
   divShade.Visible := False;
   divAccount.Visible := False;
+  divAccount.ElementHandle.removeAttribute('data-x');
+  divAccount.ElementHandle.removeAttribute('data-y');
+  divAccount.ElementHandle.style.removeProperty('transform');
+
   LogAction('[ Account Settings Closed ]');
 
   await(tmrJWTRenewalTimer(Sender));

@@ -33,15 +33,15 @@ object Form1: TForm1
         '        style="position:absolute; width:100%; height:100%;">'
         '</div>'
         
-          '<div class="py-2 d-flex flex-column justiy-content-center align-' +
-          'items-center" '
+          '<div class="py-2 d-flex flex-column justify-content-center align' +
+          '-items-center" '
         
           '          style="position: relative; padding-left: 34px; padding' +
           '-right: 34px;">'
         
           '  <a style="text-decoration: none; cursor: pointer;" href="https' +
           '://www.blaugment.com">'
-        '    <div class="DropShadow" '
+        '    <div class="DropShadow2" '
         
           '            style="font-size: 36px; font-weight: bold; color: va' +
           'r(--bl-color-one); font-family: Cairo;">'
@@ -198,7 +198,7 @@ object Form1: TForm1
         Width = 121
         Height = 22
         ChildOrder = 2
-        ElementClassName = 'mb-1 DropShadow'
+        ElementClassName = 'mb-1 DropShadow2'
         ElementID = 'editSearch'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -2547,33 +2547,42 @@ object Form1: TForm1
   end
   object divLogin: TWebHTMLDiv
     Left = 83
-    Top = 258
+    Top = 263
     Width = 350
-    Height = 90
+    Height = 200
     ElementID = 'divLogin'
     ChildOrder = 2
     ElementFont = efCSS
     Role = ''
     Visible = False
+    object divLoginMessage: TWebHTMLDiv
+      Left = 3
+      Top = 55
+      Width = 344
+      Height = 145
+      ElementClassName = 'd-none justify-content-center align-items-center'
+      ElementID = 'divLoginMessage'
+      ChildOrder = 5
+      ElementFont = efCSS
+      Role = ''
+      Visible = False
+    end
     object divLoginBG: TWebHTMLDiv
-      Left = 64
-      Top = 31
-      Width = 78
-      Height = 22
+      Left = 3
+      Top = 55
+      Width = 344
+      Height = 145
       Cursor = crHandPoint
       ElementClassName = 'ContainerBG position-absolute'
       ElementID = 'divLoginBG'
-      HeightStyle = ssPercent
-      WidthStyle = ssPercent
-      ElementPosition = epIgnore
       ElementFont = efCSS
       Role = ''
     end
     object editUsername: TWebEdit
-      Left = 60
-      Top = 8
-      Width = 230
-      Height = 30
+      Left = 80
+      Top = 80
+      Width = 190
+      Height = 45
       AutoCompletion = acUserName
       ChildOrder = 3
       ElementID = 'editUsername'
@@ -2584,10 +2593,10 @@ object Form1: TForm1
       WidthPercent = 100.000000000000000000
     end
     object editPassword: TWebEdit
-      Left = 60
-      Top = 48
-      Width = 230
-      Height = 30
+      Left = 80
+      Top = 130
+      Width = 190
+      Height = 45
       AutoCompletion = acCurrentPassword
       ChildOrder = 4
       ElementID = 'editPassword'
@@ -2596,16 +2605,15 @@ object Form1: TForm1
       PasswordChar = '*'
       SpellCheck = False
       TextHint = 'Password'
-      WidthStyle = ssPercent
       WidthPercent = 100.000000000000000000
     end
     object btnUsername: TWebButton
-      Left = 0
-      Top = 0
+      Left = 5
+      Top = 60
       Width = 50
       Height = 50
       Hint = 'Search'
-      Caption = '<i class="fa-duotone fa-shield-cat fa-2x"></i>'
+      Caption = '<i class="fa-duotone fa-shield-cat fa-3x"></i>'
       ChildOrder = 1
       ElementClassName = 'btn btn-link'
       ElementID = 'btnUsername'
@@ -2615,12 +2623,12 @@ object Form1: TForm1
       OnClick = btnUsernameClick
     end
     object btnPassword: TWebButton
-      Left = 0
-      Top = 40
+      Left = 5
+      Top = 135
       Width = 50
       Height = 50
       Hint = 'Search'
-      Caption = '<i class="fa-duotone fa-shield-keyhole fa-2x"></i>'
+      Caption = '<i class="fa-duotone fa-shield-keyhole fa-3x"></i>'
       ChildOrder = 2
       ElementClassName = 'btn btn-link'
       ElementID = 'btnPassword'
@@ -2629,28 +2637,13 @@ object Form1: TForm1
       WidthPercent = 100.000000000000000000
       OnClick = btnPasswordClick
     end
-    object divLoginMessage: TWebHTMLDiv
-      Left = 184
-      Top = 31
-      Width = 78
-      Height = 22
-      ElementClassName = 'd-none justify-content-center align-items-center'
-      ElementID = 'divLoginMessage'
-      HeightStyle = ssPercent
-      WidthStyle = ssPercent
-      ChildOrder = 5
-      ElementPosition = epIgnore
-      ElementFont = efCSS
-      Role = ''
-      Visible = False
-    end
     object btnLoginOK: TWebButton
-      Left = 292
-      Top = 0
+      Left = 274
+      Top = 60
       Width = 50
       Height = 50
-      Hint = 'Search'
-      Caption = '<i class="fa-duotone fa-shield-check fa-2x"></i>'
+      Hint = 'Login'
+      Caption = '<i class="fa-duotone fa-shield-check fa-3x"></i>'
       ChildOrder = 1
       ElementClassName = 'btn btn-link'
       ElementID = 'btnLoginOK'
@@ -2660,19 +2653,46 @@ object Form1: TForm1
       OnClick = btnLoginOKClick
     end
     object btnLoginCancel: TWebButton
-      Left = 292
-      Top = 40
+      Left = 274
+      Top = 135
       Width = 50
       Height = 50
-      Hint = 'Search'
-      Caption = '<i class="fa-duotone fa-shield-xmark fa-2x"></i>'
+      Hint = 'Cancel'
+      Caption = '<i class="fa-duotone fa-shield-xmark fa-3x"></i>'
       ChildOrder = 2
       ElementClassName = 'btn btn-link'
-      ElementID = 'blnLoginCancel'
+      ElementID = 'btnLoginCancel'
       ElementFont = efCSS
       HeightPercent = 100.000000000000000000
       WidthPercent = 100.000000000000000000
       OnClick = btnLoginCancelClick
+    end
+    object WebHTMLDiv3: TWebHTMLDiv
+      Left = 80
+      Top = 5
+      Width = 190
+      Height = 50
+      ElementClassName = 'overflow-hidden'
+      ElementID = 'divLogo'
+      ChildOrder = 8
+      ElementFont = efCSS
+      HTML.Strings = (
+        '<div class="ContainerBGLogin" '
+        '        style="position: absolute; width:100%; height:100%;">'
+        '</div>'
+        
+          '<div class="h-100 d-flex justify-content-center align-items-cent' +
+          'er" '
+        '        style="position: relative;">'
+        '  <div class="DropShadow2" '
+        
+          '          style="font-size: 32px; padding-bottom: 6px; font-weig' +
+          'ht: bold; color: var(--bl-color-one); font-family: Cairo;">'
+        '    bl<span style="color: var(--bl-color-two)">augment</span>'
+        '  </div>'
+        '</div>'
+        '')
+      Role = ''
     end
   end
   object divShade: TWebHTMLDiv
@@ -2713,8 +2733,8 @@ object Form1: TForm1
   end
   object divAccount: TWebHTMLDiv
     Left = 8
-    Top = 342
-    Width = 615
+    Top = 494
+    Width = 625
     Height = 450
     ElementClassName = 'resize-drag overflow-hidden p-2'
     ElementID = 'divAccount'
@@ -2768,7 +2788,7 @@ object Form1: TForm1
         Width = 50
         Height = 50
         Hint = 'Refresh'
-        Caption = '<i class="fa-duotone fa-rotate Swap fa-xl"></i>'
+        Caption = '<i class="fa-duotone fa-rotate fa-xl"></i>'
         ChildOrder = 2
         ElementClassName = 'btn btn-link'
         ElementID = 'btnAccountRefresh'
@@ -2826,7 +2846,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 0
+      TabIndex = 10
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3441,9 +3461,7 @@ object Form1: TForm1
           Top = 3
           Width = 397
           Height = 46
-          ElementClassName = 
-            'nointeract mt-2 ms-4 me-2 pe-5 position-fixed d-flex flex-wrap f' +
-            'lex-row gap-1 '
+          ElementClassName = 'nointeract d-flex flex-wrap flex-row gap-1 '
           ElementID = 'divActivityLogHeader'
           HeightStyle = ssAuto
           WidthStyle = ssAuto
