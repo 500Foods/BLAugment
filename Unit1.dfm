@@ -2846,7 +2846,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 10
+      TabIndex = 2
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3255,7 +3255,7 @@ object Form1: TForm1
             AutoSize = False
             Caption = 'Enter Current Password'
             ChildOrder = 2
-            ElementClassName = 'LabelAlt my-2 ps-2 pe-5 pb-1 w-100'
+            ElementClassName = 'LabelAlt my-2 ps-1 pe-5 pb-1 w-100 text-wrap'
             ElementID = 'labelChangePassword'
             ElementFont = efCSS
             ElementPosition = epRelative

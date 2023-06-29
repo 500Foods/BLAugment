@@ -4,6 +4,7 @@ interface
 
 uses
   System.Classes,
+  XData.Security.Attributes,
   XData.Service.Common;
 
 type
@@ -111,7 +112,7 @@ type
     ///  <param name="ActionLog">
     ///    Client action log. Just a text log.
     ///  </param>
-    [HttpPost] function Renew(ActionSession: String; ActionLog: String):TStream;
+    [Authorize] [HttpPost] function Renew(ActionSession: String; ActionLog: String):TStream;
 
     ///  <summary>
     ///    List of Icon Sets that are available for search and retrieval
@@ -145,7 +146,27 @@ type
     ///  </param>
     [HttpGet] function SearchIconSets(SearchTerms: String; SearchSets:String; Results:Integer):TStream;
 
+
     [HttpGet] function SearchFontAwesome(Query: String):TStream;
+
+
+    ///  <summary>
+    ///    Allow user to change password
+    ///  </summary>
+    ///  <remarks>
+    ///    Changes the password hash for the ID corresponding to the JWT
+    ///  </remarks>
+    ///  <param name="OldPassword">
+    ///    Must match existing password on server.
+    ///  </param>
+    ///  <param name="NewPassword">
+    ///    Complexity check done on client, so here just a character length check is done.
+    ///  </param>
+    ///  <param name="PasswordTest">
+    ///    A calculation intended to discourage changing passwords via the Swagger interface.
+    ///  </param>
+
+    [Authorize] [HttpGet] function ChangePassword(OldPassword: String; NewPassword: String; PasswordTest: String):String;
 
   end;
 

@@ -292,10 +292,11 @@ type
     [async] procedure btnLogoutCleanClick(Sender: TObject);
     [async] procedure btnLogoutAllClick(Sender: TObject);
     procedure editCurrentPasswordChange(Sender: TObject);
-    procedure btnChangePasswordClick(Sender: TObject);
+    [async] procedure btnChangePasswordClick(Sender: TObject);
     [async] procedure Logout(Reason: String; LogoutAll: Boolean);
     [async] procedure tmrJWTRenewalTimer(Sender: TObject);
     [async] function JSONRequest(Endpoint: String; Params: array of JSValue): String;
+    [async] function StringRequest(Endpoint: String; Params: array of JSValue): String;
     procedure ProcessLogin;
     function SHA256(Text2Encode: String): String;
     procedure XDataConnRequest(Args: TXDataWebConnectionRequest);
@@ -989,6 +990,7 @@ begin
       ClientConn := TXDataWebClient.Create(nil);
       ClientConn.Connection := XDataConn;
       Response := await(ClientConn.RawInvokeAsync(Endpoint, Params));
+      console.log(response);
 
       Blob := Response.Result;
       asm Result = await Blob.text(); end;
@@ -1015,6 +1017,50 @@ begin
 
   LogAction('Responded: '+Endpoint+' ('+IntToStr(MillisecondsBetween(Now, Elapsed))+'ms)');
   PreventCompilerHint(Blob);
+end;
+
+function TForm1.StringRequest(Endpoint: String; Params: array of JSValue): String;
+var
+  ClientConn: TXDataWebClient;
+  Response: TXDataClientResponse;
+  ErrorCode: String;
+  ErrorMessage: String;
+  Elapsed: TDateTime;
+begin
+  Elapsed := Now;
+  Result := '';
+  LogAction('Requested: '+Endpoint);
+
+  await(XDataConnect);
+  if (XdataConn.Connected) then
+  begin
+    try
+      ClientConn := TXDataWebClient.Create(nil);
+      ClientConn.Connection := XDataConn;
+      Response := await(ClientConn.RawInvokeAsync(Endpoint, Params));
+      Result := string(TJSObject(Response.Result)['value']);
+
+    except on E: Exception do
+      begin
+        // Get the error message we created in XData
+        asm {
+          var ErrorDetail = JSON.parse( await E.FErrorResult.FResponse.$o.FXhr.response.text() );
+          ErrorCode = ErrorDetail.error.code;
+          ErrorMessage = ErrorDetail.error.message;
+        } end;
+
+        // Log the error, but leave out the URI (because it includes the password)
+        LogAction('ERROR Request Exception Received From'+Endpoint);
+        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
+        LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
+        LogAction(' -- '+ErrorCode);
+        LogAction(' -- '+ErrorMessage);
+      end;
+    end;
+  end;
+
+  LogAction('Responded: '+Endpoint+' ('+IntToStr(MillisecondsBetween(Now, Elapsed))+'ms)');
 end;
 
 procedure TForm1.Logout(Reason: String; LogoutAll: Boolean);
@@ -1435,7 +1481,7 @@ begin
   end;
 
   // Reset Change Password fields
-  btnChangePAssword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
+  btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
   divChangePassword.ElementHandle.classList.Add('pe-none');
   editCurrentPassword.Text := '';
   editNewPassword.Text := '';
@@ -1579,9 +1625,25 @@ begin
 end;
 
 procedure TForm1.btnChangePasswordClick(Sender: TObject);
+var
+  RequestResponse: String;
 begin
   // Change Password
+  RequestResponse := await(StringRequest('ISystemService.ChangePassword',[
+    editCurrentPassword.Text,
+    editNewPassword.Text,
+    SHA256(editCurrentPassword.Text+'-TEST-'+editNewPassword.Text)
+  ]));
 
+  if RequestResponse = 'Success' then
+  begin
+    labelChangePassword.ElementHandle.innerHTML := 'Password Change Accepted.';
+  end
+  else
+  begin
+    btnChangePAssword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
+    labelChangePassword.ElementHandle.innerHTML := RequestResponse;
+  end;
 end;
 
 procedure TForm1.btnLoginClick(Sender: TObject);
@@ -1734,42 +1796,90 @@ begin
 end;
 
 procedure TForm1.editCurrentPasswordChange(Sender: TObject);
+var
+  ComplexTest: String;
+  ComplexText: String;
+
+  function IsComplex(pass: String):String;
+  var
+    i: Integer;
+    fail: Integer;
+  const
+    Nums: array[0..9] of String = ('0','1','2','3','4','5','6','7','8','9');
+    Syms: array[0..28] of String = ('!','@','#','$','%','^','&','*','(',')','-','+','=',',','.','<','>','/','?','`','~','[',']','{','}','\','|',';',':');
+  begin
+    Result := '';
+
+    // Must have at least 8 characters
+    if Length(Trim(pass)) < 8 then Result := Result + 'L';
+
+    // Must have upper + lower case characters
+    if UpperCase(pass) = LowerCase(pass) then Result := Result + 'C';
+
+    // Must have a number
+    fail := 0;
+    for i := 0 to 9 do
+      if Pos(Nums[i], pass) = 0 then fail := fail + 1;
+    if fail = 10 then Result := Result + 'N';
+
+    // Must have a symbol
+    fail := 0;
+    for i := 0 to 28 do
+      if Pos(Syms[i], pass) = 0 then fail := fail + 1;
+    if fail = 29 then Result := Result + 'S';
+
+  end;
+
 begin
+  ComplexTest := IsComplex(editNewPassword.Text);
+
   if (Trim(editCurrentPassword.Text) = '') then
   begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
-    labelChangePassword.Caption := 'Enter Current Password';
+    labelChangePassword.ElementHandle.innerHTML := 'Enter Current Password';
   end
   else if (SHA256('XData-Password:'+Trim(editCurrentPassword.Text)) <> PasswordCheck)  then
   begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
-    labelChangePassword.Caption := 'Current Password Does Not Match Login Password';
+    labelChangePassword.ElementHandle.innerHTML := 'Current Password Does Not Match Login Password';
   end
   else if Trim(editNewPassword.Text) = '' then
   begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
-    labelChangePassword.Caption := 'Enter New Password';
+    labelChangePassword.ElementHandle.innerHTML := 'Enter New Password';
+  end
+  else if ComplexTest <> '' then
+  begin
+    btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    divChangePassword.ElementHandle.classList.Add('pe-none');
+    ComplexText := 'New Password is not complex enough:';
+    if Pos('L', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Minimum of 8 characters';
+    if Pos('C', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Mix of uppercase and lowercase';
+    if Pos('N', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - At least one number';
+    if Pos('S', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - At least one symbol';
+    labelChangePassword.ElementHandle.innerHTML := ComplexText;
+    console.log(ComplexText);
   end
   else if Trim(editConfirmPassword.Text) = '' then
   begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
-    labelChangePassword.Caption := 'Confirm New Password';
+    labelChangePassword.ElementHandle.innerHTML := 'Confirm New Password';
   end
   else if Trim(editNewPassword.Text) <> Trim(editConfirmPassword.Text) then
   begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
-    labelChangePassword.Caption := 'New Password and Confirmation Password Do Not Match';
+    labelChangePassword.ElementHandle.innerHTML := 'New Password and Confirm Password Do Not Match';
   end
   else
   begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-check Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.remove('pe-none');
-    labelChangePassword.Caption := 'Save New Password';
+    labelChangePassword.ElementHandle.innerHTML := 'Save New Password';
   end;
 end;
 
