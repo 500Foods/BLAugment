@@ -1,4 +1,4 @@
-// [query] person_password_check
+// [query] change_password
 
 if (DatabaseEngine = 'sqlite') then
 begin
@@ -7,16 +7,12 @@ begin
   begin
 
     SQL.Clear;
-    SQL.Add('select '+
-            '  first_name, '+
-            '  middle_name, '+
-            '  last_name, '+
-            '  account_name '+
-            'from '+
+    SQL.Add('update '+
             '  person '+
+            'set '+
+            '  password_hash = :PASSWORDHASH '+
             'where '+
-            '  (person_id = :PERSONID) '+
-            '  and (password_hash = :PASSWORDHASH);'
+            '  (person_id = :PERSONID) '
            );
 
   end;

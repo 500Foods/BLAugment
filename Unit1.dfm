@@ -2846,7 +2846,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 2
+      TabIndex = 0
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3263,7 +3263,6 @@ object Form1: TForm1
             HeightPercent = 100.000000000000000000
             WordWrap = True
             WidthPercent = 100.000000000000000000
-            OnClick = btnChangePasswordClick
           end
           object btnChangePassword: TWebButton
             Left = 3
@@ -3278,7 +3277,6 @@ object Form1: TForm1
             ElementPosition = epRelative
             HeightPercent = 100.000000000000000000
             WidthPercent = 100.000000000000000000
-            OnClick = btnChangePasswordClick
           end
           object divChangePasswordBG: TWebHTMLDiv
             Left = 213

@@ -705,7 +705,7 @@ begin
     var dataAO = [
       { ID:  0, Name: "Contact Info",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-cat Swap'></i>"           },
       { ID:  1, Name: "Photo / Avatar",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-camera Swap'></i>"        },
-      { ID:  2, Name: "Set Passowrd",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-shield-keyhole'></i>"     },
+      { ID:  2, Name: "Set Password",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-shield-keyhole'></i>"     },
       { ID:  3, Name: "Assigned Roles",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-chess-knight Swap'></i>"  },
       { ID:  4, Name: "Categories",      Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-sitemap Swap'></i>"       },
       { ID:  5, Name: "Favorite Blogs",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-star'></i>"               },
@@ -1044,7 +1044,7 @@ begin
       begin
         // Get the error message we created in XData
         asm {
-          var ErrorDetail = JSON.parse( await E.FErrorResult.FResponse.$o.FXhr.response.text() );
+          var ErrorDetail = JSON.parse(await E.FErrorResult.FResponse.$o.FXhr.responseText );
           ErrorCode = ErrorDetail.error.code;
           ErrorMessage = ErrorDetail.error.message;
         } end;
@@ -1056,6 +1056,7 @@ begin
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
         LogAction(' -- '+ErrorCode);
         LogAction(' -- '+ErrorMessage);
+        Result := ErrorMessage;
       end;
     end;
   end;
@@ -1312,14 +1313,21 @@ begin
   pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
   LogAction('- Account Settings: '+pcAccount.ActivePage.Name);
 
-  if pcAccount.ActivePage.Name = 'pageAccountHistory' then
+  if pcAccount.ActivePage.Name = 'pageAccountName' then
+  begin
+    editAccountName.SetFocus;
+  end
+  else if pcAccount.ActivePage.Name = 'pageAccountPassword' then
+  begin
+    editCurrentPassword.SetFocus;
+  end
+  else if pcAccount.ActivePage.Name = 'pageAccountHistory' then
   begin
     asm
       pas.Unit1.Form1.tabAccountHistory.redraw(true);
     end;
-  end;
-
-  if pcAccount.ActivePage.Name = 'pageAccountActivity' then
+  end
+  else if pcAccount.ActivePage.Name = 'pageAccountActivity' then
   begin
     divActivityLogHeader.ElementHandle.classList.add('position-fixed');
   end;
@@ -1486,6 +1494,7 @@ begin
   editCurrentPassword.Text := '';
   editNewPassword.Text := '';
   editConfirmPassword.Text := '';
+  editCurrentPasswordChange(Sender);
 
   // Show window with shade
   divShade.Visible := True;
@@ -1629,6 +1638,9 @@ var
   RequestResponse: String;
 begin
   // Change Password
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+  divChangePassword.ElementHandle.classList.Add('pe-none');
+
   RequestResponse := await(StringRequest('ISystemService.ChangePassword',[
     editCurrentPassword.Text,
     editNewPassword.Text,
@@ -1638,12 +1650,20 @@ begin
   if RequestResponse = 'Success' then
   begin
     labelChangePassword.ElementHandle.innerHTML := 'Password Change Accepted.';
+    PasswordCheck := SHA256('XData-Password:'+Trim(editNewPassword.Text));
+    editCurrentPassword.Text := '';
+    editNewPassword.Text := '';
+    editConfirmPassword.Text := '';
+    TWebLocalStorage.SetValue('Login.PasswordHash', PasswordCheck);
+    editCurrentPassword.SetFocus;
   end
   else
   begin
     btnChangePAssword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
     labelChangePassword.ElementHandle.innerHTML := RequestResponse;
   end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 procedure TForm1.btnLoginClick(Sender: TObject);
@@ -1814,7 +1834,7 @@ var
     if Length(Trim(pass)) < 8 then Result := Result + 'L';
 
     // Must have upper + lower case characters
-    if UpperCase(pass) = LowerCase(pass) then Result := Result + 'C';
+    if (CompareStr(pass, LowerCase(pass)) = 0) or (CompareStr(pass, UpperCase(pass)) = 0) then Result := Result + 'C';
 
     // Must have a number
     fail := 0;
@@ -1856,6 +1876,7 @@ begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
     ComplexText := 'New Password is not complex enough:';
+    console.log(ComplexTest);
     if Pos('L', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Minimum of 8 characters';
     if Pos('C', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Mix of uppercase and lowercase';
     if Pos('N', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - At least one number';
@@ -2020,12 +2041,13 @@ begin
       btnLoginCancelClick(Sender);
     end;
   end
-  else
+  else if (divLogin.Visible = False) and (Key = VK_RETURN) and (LoggedIn = False) then
   begin
-    if (divLogin.Visible = False) and (Key = VK_RETURN) and (LoggedIn = False) then
-    begin
-      btnLoginClick(Sender);
-    end;
+    btnLoginClick(Sender);
+  end
+  else if (divAccount.Visible) and (pcAccount.ActivePage.Name = 'pageAccountPassword') and not(divChangePassword.ElementHandle.classList.contains('pe-none')) then
+  begin
+    btnChangePasswordClick(Sender);
   end;
 
 end;

@@ -90,7 +90,7 @@ begin
 
   // See if request passes our test
   if PasswordTest <>  DBSupport.HashThis(OldPassword+'-TEST-'+NewPassword)
-  then EXDataHttpUnauthorized.Create('Authentication Error: Test Failed');
+  then raise EXDataHttpUnauthorized.Create('Authentication Error: Test Failed');
 
 
   // Get data from the JWT
@@ -129,7 +129,7 @@ begin
   end;
 
 
-  // Finally, let's check the actual passowrd.
+  // Finally, let's check the current password matches
   PersonID := User.Claims.Find('usr').AsInteger;
   PasswordHash := DBSupport.HashThis('XData-Password:'+Trim(OldPassword));
   try
@@ -150,10 +150,28 @@ begin
     raise EXDataHttpUnauthorized.Create('Authentication error: Current Password does not match Server pasword');
   end;
 
+  // All good, so let's update the password
+  PasswordHash := DBSupport.HashThis('XData-Password:'+Trim(NewPassword));
+  try
+    {$Include sql\system\change_password\change_password.inc}
+    Query1.ParamByName('PERSONID').AsInteger := PersonID;
+    Query1.ParamByName('PASSWORDHASH').AsString := PasswordHash;
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: PPC');
+    end;
+  end;
+  if Query1.RowsAffected <> 1 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('Internal Error: CP');
+  end;
 
   // All done.
   Result := 'Success';
-
 
   // Keep track of endpoint history
   try
@@ -167,7 +185,7 @@ begin
     Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
     Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
     Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
-    Query1.ParamByName('DETAILS').AsString := '[ '+IntToStr(PersonID)+' ]';
+    Query1.ParamByName('DETAILS').AsString := '[ '+IntToStr(PersonID)+': '+Result+' ]';
     Query1.ExecSQL;
   except on E: Exception do
     begin
