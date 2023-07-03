@@ -1060,6 +1060,10 @@ begin
       This.UpdateAccountLinks();
       This.LogAction('[ Reordered Account Links ]');
     });
+    this.tabAccountLinks.on('cellEditing', function(cell){
+      pas.Unit1.Form1.tabAccountLinks.deselectRow();
+      pas.Unit1.Form1.tabAccountLinks.selectRow([cell.getRow()]);
+    });
     this.tabAccountLinks.on('cellEdited', function(cell){
       if (cell.getField() == 'Link') {
         var This = pas.Unit1.Form1;
@@ -2018,7 +2022,7 @@ begin
     labelChangeAccountEMail.ElementHandle.innerHTML := 'Confirmation Code Not Sent:<br>'+RequestResponse;
     btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangeAccountEMail.ElementHandle.classList.add('pe-none');
-    LogAction('Confirmation Code Not Sent: ');
+    LogAction('Confirmation Code Not Sent:');
     LogAction(RequestResponse);
   end;
 
@@ -2047,7 +2051,8 @@ begin
   begin
     btnChangeAccountName.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
     labelChangeAccountName.ElementHandle.innerHTML := RequestResponse;
-    LogAction('Account Name Change Failed: '+RequestResponse);
+    LogAction('Account Name Change Failed:');
+    LogAction(RequestResponse);
   end;
 
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
@@ -2084,7 +2089,8 @@ begin
   begin
     btnChangePAssword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
     labelChangePassword.ElementHandle.innerHTML := RequestResponse;
-    LogAction('Password Change Unsuccessful: '+RequestResponse);
+    LogAction('Password Change Failed:');
+    LogAction(RequestResponse);
   end;
 
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
@@ -2122,6 +2128,8 @@ begin
   else
   begin
     btnDescriptionCancelClick(Sender);
+    LogAction('Description Update Failed:');
+    LogAction(RequestResponse);
   end;
 
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
@@ -2171,6 +2179,8 @@ begin
   else
   begin
     btnFirstNameCancelClick(Sender);
+    LogAction('Person Update Failed:');
+    LogAction(RequestResponse);
   end;
 
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
@@ -2704,20 +2714,21 @@ begin
 
   if RequestResponse = 'Success' then
   begin
-    btnLinkSave.Enabled := False;
-    btnLinkCancel.Enabled := False;
     asm
+      btnLinkSave.setAttribute('disabled','');
+      btnLinkCancel.setAttribute('disabled','');
       this.LinksDataBackup = JSON.parse(LinkSave);
     end;
   end
   else
   begin
     btnLinkCancelClick(Sender);
+    LogAction('Update Account Links Failed:');
+    LogAction(RequestResponse);
   end;
 
   HideTooltips;
   divAccountLinks.SetFocus();
-
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
