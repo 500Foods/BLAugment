@@ -336,7 +336,7 @@ type
     procedure ProcessLogin;
     function SHA256(Text2Encode: String): String;
     procedure XDataConnRequest(Args: TXDataWebConnectionRequest);
-    procedure btnActivityLogEMailClick(Sender: TObject);
+    [async] procedure btnActivityLogEMailClick(Sender: TObject);
     procedure btnActivityLogReloadClick(Sender: TObject);
     procedure btnActivityLogTimezoneClick(Sender: TObject);
     procedure btnActivityLogPrintClick(Sender: TObject);
@@ -477,9 +477,49 @@ begin
 end;
 
 procedure TForm1.btnActivityLogEMailClick(Sender: TObject);
+var
+  RequestResponse: String;
+  LogStamp: String;
+  LogMessage: String;
 begin
+  // Change Account Name
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+  divChangeAccountName.ElementHandle.classList.Add('pe-none');
   LogAction('[ E-Mail Activity Log ]');
 
+  LogMessage :=
+      '<p>Hello!</p>'+
+      '<p>A request was just made by '+User_Account+' at <a href="'+App_URLLink+'">'+App_Short+'</a> for this activity log.</p>'+
+      divActionLog.ElementHandle.innerHTML+
+      '<p>Warmest Regards,<br >'+
+      'The '+App_Short+' Conciege<br >'+
+      '<a href="'+App_URLLink+'">'+App_URL+'</a><br /></p><br />'+
+      '<p><pre style="font-size:smallest;">'+
+        'Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+App_TZ+'<br />'+
+        'Ref &raquo; '+App_OS_Short+'/'+App_Browser_short+'/'+App_IPAddress+'/'+App_Session+'<br />'+
+        'Res &raquo; '+App_Country+'/'+App_Region+'/'+App_City+
+      '</pre></p>';
+
+  if comboActivityLog.DisplayText = 'Current Session'
+  then LogStamp := 'Current Session: '+FormatDateTime('yyyy-mmm-dd hh:nn:ss',App_Start)
+  else LogStamp := comboActivityLog.DisplayText;
+
+  RequestResponse := await(StringRequest('IPersonService.SendActionLog',[
+    LogMessage,
+    LogStamp
+  ]));
+
+  if RequestResponse = 'Success' then
+  begin
+    LogAction('Activity Log E-Mail Sent');
+  end
+  else
+  begin
+    LogAction('Activity Log E-Mail Failed:');
+    LogAction(RequestResponse);
+  end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 procedure TForm1.btnActivityLogPrintClick(Sender: TObject);
@@ -1006,7 +1046,14 @@ begin
               return '<img title="'+clientlanguage+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+JSON.parse(cell.getValue())[6].slice(0,2).toLowerCase()+'.svg">';
             }
         },
-        { title: "IP Address", field: "ip_address" }
+        { title: "IP Address", field: "ip_address", width: 125, minWidth: 100 },
+        { title: "Location", field: "ip_location", minWidth: 150,
+            formatter: function(cell, formatterParams, onRendered) {
+              var locndata = JSON.parse(cell.getValue());
+              var clientlocation = locndata[3]+', '+locndata[2]+', '+locndata[1];
+              return clientlocation;
+            }
+        }
       ]
     });
     this.tabAccountHistory.on('rowClick', function(e, row){

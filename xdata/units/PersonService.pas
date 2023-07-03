@@ -72,6 +72,17 @@ type
 
     [Authorize] [HttpPost] function UpdatePersonLinks(PersonID: Integer; Links: String):String;
 
+
+    ///  <summary>
+    ///    Sends an e-mail to the JWT account containing the action log, supplied by the client.
+    ///  </summary>
+    ///  <remarks>
+    ///    Having the client include the log saves us the trouble of having to deal with the
+    ///    options for which log and which timezone.  Just send whatever they're looking at.
+    ///  </remarks>
+
+    [Authorize] [HttpPost] function SendActionLog(LogText: String; LogStamp: String):String;
+
   end;
 
 

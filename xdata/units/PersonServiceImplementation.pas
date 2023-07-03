@@ -19,6 +19,23 @@ uses
   Bcl.Jose.Core.JWT,
   Bcl.Jose.Core.Builder,
 
+  IdStack,
+  IdBaseComponent,
+  IdComponent,
+  IdTCPConnection,
+  IdTCPClient,
+  IdExplicitTLSClientServerBase,
+  IdMessageClient,
+  IdMessage,
+  IdMessageBuilder,
+  IdAttachment,
+  IdMessageParts,
+  IdEMailAddress,
+  IdAttachmentFile,
+  IdSMTPBase,
+  IdSMTP,
+  IdAttachmentMemory,
+
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
   FireDAC.Stan.Param,
@@ -38,6 +55,7 @@ type
     function ActionLog(Person: Integer; Session: String): TStream;
     function UpdatePerson(PersonID: Integer; FirstName, MiddleName, LastName, Birthdate, Description: String):String;
     function UpdatePersonLinks(PersonID: Integer; Links: String):String;
+    function SendActionLog(LogText: String; LogStamp: String):String;
   end;
 
 implementation
@@ -426,6 +444,144 @@ begin
     Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
     Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
     Query1.ParamByName('DETAILS').AsString := '['+User.Claims.Find('anm').AsString+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
+
+function TPersonService.SendActionLog(LogText: String; LogStamp: String): String;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+
+  User: IUserIdentity;
+  JWT: String;
+
+  SMTP1: TIdSMTP;
+  Msg1: TIdMessage;
+  Addr1: TIdEmailAddressItem;
+  Addr2: TidEMailAddressItem;
+  Html1: TIdMessageBuilderHtml;
+  SMTPResult: WideString;
+
+begin
+  // Time this event
+  ElapsedTime := Now;
+
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  if not(MainForm.MailServerAvailable)
+  then raise EXDataHttpUnauthorized.Create('Mail Services Not Configured');
+
+  // Get data from the JWT
+  User := TXDataOperationContext.Current.Request.User;
+  JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');
+  if (User = nil) then raise EXDataHttpUnauthorized.Create('Missing authentication');
+
+  // Setup DB connection and query
+  DatabaseName := MainForm.DatabaseName;
+  DatabaseEngine := MainForm.DatabaseEngine;
+  try
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Send the email
+  Msg1  := nil;
+  Addr1 := nil;
+  SMTP1 := TIdSMTP.Create(nil);
+  SMTP1.Host     := MainForm.MailServerHost;
+  SMTP1.Port     := MainForm.MailServerPort;
+  SMTP1.Username := MainForm.MailServerUser;
+  SMTP1.Password := MainForm.MailServerPass;
+
+  try
+    Html1 := TIdMessageBuilderHtml.Create;
+    try
+      Html1.Html.Add('<html>');
+      Html1.Html.Add('<head>');
+      Html1.Html.Add('</head>');
+      Html1.Html.Add('<body>');
+      Html1.Html.Add(LogText);
+      Html1.Html.Add('</body>');
+      Html1.Html.Add('</html>');
+      Html1.HtmlCharSet := 'utf-8';
+
+      Msg1 := Html1.NewMessage(nil);
+      Msg1.Subject := '[blaugment/'+User.Claims.Find('anm').AsString+'] Activity Log for '+LogStamp;
+      Msg1.From.Text := MainForm.MailServerFrom;
+      Msg1.From.Name := MainForm.MailServerName;
+
+      Addr1 := Msg1.Recipients.Add;
+      Addr1.Address := User.Claims.Find('eml').AsString;
+
+      Addr2 := Msg1.BCCList.Add;
+      Addr2.Address := MainForm.MailServerFrom;
+
+      SMTP1.Connect;
+      try
+        try
+          SMTP1.Send(Msg1);
+        except on E: Exception do
+          begin
+            SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+          end;
+        end;
+      finally
+        SMTP1.Disconnect();
+      end;
+    finally
+      Addr1.Free;  // Shouldn't have to free this?
+      Msg1.Free;   // Shouldn't have to free this?
+      Html1.Free;  // Should have to free this!
+    end;
+  except on E: Exception do
+    begin
+      SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+    end;
+  end;
+  SMTP1.Free; // Should have to free this!
+
+  if SMTPResult = ''
+  then Result := 'Sent'
+  else Result := 'Send Failed: '+SMTPResult;
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('ENDPOINT').AsString := 'PersonService.SendActionLog';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := User.Claims.Find('app').AsString;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '[]';
     Query1.ExecSQL;
   except on E: Exception do
     begin
