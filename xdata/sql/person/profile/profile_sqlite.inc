@@ -15,6 +15,7 @@ begin
             '  p.account_name, '+
             '  p.last_modified, '+
             '  p.last_modifier, '+
+            '  p.description, '+
             '  m.account_name last_modifier_account '+
             'FROM '+
             '  person p '+

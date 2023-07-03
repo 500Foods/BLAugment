@@ -67,7 +67,20 @@ type
     ///    - EST
     ///    - PST8PDT
     ///  </param>
-    [HttpGet] function Login(Login_ID: String; Password: String; API_Key: String; TZ: String; IPAddress:String; IPLocation: String; DeviceInfo: String; BrowserInfo: String):TStream;
+    ///  <param name="IPAddress">
+    ///    Client public IP Address.
+    ///  </param>
+    ///  <param name="IPLocation">
+    ///    Client geolocation based on IP.
+    ///  </param>
+    ///  <param name="DeviceInfo">
+    ///    UA-supplied client device.
+    ///  </param>
+    ///  <param name="BrowserInfo">
+    ///    UA-supplied client browser.
+    ///  </param>
+
+    [HttpGet] function Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo: String):TStream;
 
     ///  <summary>
     ///    Logout - revoke the JWT.
@@ -167,6 +180,85 @@ type
     ///  </param>
 
     [Authorize] [HttpGet] function ChangePassword(OldPassword: String; NewPassword: String; PasswordTest: String):String;
+
+    ///  <summary>
+    ///    Allow user to change account name
+    ///  </summary>
+    ///  <remarks>
+    ///    Changes the account name in the person and contact tables.
+    ///  </remarks>
+    ///  <param name="AccountName">
+    ///    Must be uppercase.
+    ///  </param>
+
+    [Authorize] [HttpGet] function ChangeAccount(AccountName: String):String;
+
+    ///  <summary>
+    ///    Checks if an account is unique.  Used when registering or updating account information.
+    ///  </summary>
+    ///  <remarks>
+    ///    Just returns true or false based on whether the account name is available.
+    ///  </remarks>
+    ///  <param name="UniqueAccount">
+    ///    Typically between 4-32 characters, all uppercase, no symbols, must not start with a number, etc.
+    ///  </param>
+
+    [Authorize] [HttpGet] function CheckUnique(UniqueAccount: String):Boolean;
+
+    ///  <summary>
+    ///    Sends a six-digit confirmation code to an E-Mail address to help with E-Mail validation.
+    ///  </summary>
+    ///  <remarks>
+    ///    This requires no authorization so that it can be used also during registration validation.
+    ///  </remarks>
+    ///  <param name="Reason">
+    ///    Why is this being sent?  Change E-Mail?  New Registration? Something else?
+    ///  </param>
+    ///  <param name="EMailAddress">
+    ///    Where we're sending the confirmation
+    ///  </param>
+    ///  <param name="EMailSubject">
+    ///    Where we're sending the confirmation
+    ///  </param>
+    ///  <param name="EMailBody">
+    ///    Where we're sending the confirmation
+    ///  </param>
+    ///  <param name="SessionCode">
+    ///    Used to generate a unique hash.  Must be the same code used to verify.
+    ///  </param>
+    ///  <param name="APIKey">
+    ///    Intended to prevent casual use of this, where it could in theory be abused, sending out
+    ///    confirmation E-Mails to random accounts.
+    ///  </param>
+
+    [HttpGet] function SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String):String;
+
+    ///  <summary>
+    ///    Checks if the six-digit confirmation code is one that has been sent to the same e-mail address recently.
+    ///  </summary>
+    ///  <remarks>
+    ///    This requires no authorization so that it can be used also during registration validation.
+    ///  </remarks>
+    ///  <param name="EMailAddress">
+    ///    Where the confirmation code was sent.
+    ///  </param>
+    ///  <param name="SessionCode">
+    ///    Used to generate a unique hash.  Must be the same code used to send request.
+    ///  </param>
+    ///  <param name="ConfirmationCode">
+    ///    The code to check.
+    ///  </param>
+    ///  <param name="APIKey">
+    ///    Intended to prevent casual use of this, where it could in theory be abused, sending out
+    ///    confirmation E-Mails to random accounts.
+    ///  </param>
+    ///  <param name="Reason">
+    ///    After confirmation, is there anything else we want to do immediately?
+    ///      EMAIL-ID - Update email address for this ID
+    ///  </param>
+
+
+    [HttpGet] function VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String):String;
 
   end;
 

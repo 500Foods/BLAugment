@@ -63,6 +63,14 @@ type
     AppIcons: TJSONArray;
     AppIconSets: String;
 
+    MailServerAvailable: Boolean;
+    MailServerHost: String;
+    MailServerPort: Integer;
+    MailServerUser: String;
+    MailServerPass: String;
+    MailServerFrom: String;
+    MailServerName: String;
+
     DatabaseName: String;
     DatabaseAlias: String;
     DatabaseEngine: String;
@@ -327,11 +335,34 @@ begin
     AppConfiguration := TJSONObject.Create;
     AppConfiguration.AddPair('BaseURL','http://+:44444/tms/xdata');
   end;
+
+  if AppConfiguration.GetValue('BaseURL') <> nil
+  then ServerContainer.XDataServer.BaseURL := (AppConfiguration.getValue('BaseURL') as TJSONString).Value
+  else ServerContainer.XDataServer.BaseURL := 'http://+:44444/tms/xdata';
+  mmInfo.Lines.Add('...Server BaseURL: '+ServerContainer.XDataServer.BaseURL);
+
+  // Get Mail Configuration
+  MailServerAvailable := False;
+  if AppConfiguration.GetValue('Mail Services') <> nil then
+  begin
+    MailServerAvailable := True;
+    MailServerHost := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Host') as TJSONString).Value;
+    MailServerPort := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Port') as TJSONNumber).AsInt;
+    MailServerUser := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP User') as TJSONString).Value;
+    MailServerPass := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Pass') as TJSONString).Value;
+    MailServerFrom := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP From') as TJSONString).Value;
+    MailServerName := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Name') as TJSONString).Value;
+    mmInfo.Lines.Add('...SMTP Mail Server: '+MailServerHost+' / '+IntToStr(MailServerPort));
+  end
+  else
+  begin
+    mmInfo.Lines.Add('...SMTP Mail Server: Unavailable');
+  end;
+
   mmInfo.Lines.Add('Done.');
   mmInfo.Lines.Add('');
   Application.ProcessMessages;
 
-  ServerContainer.XDataServer.BaseURL := (AppConfiguration.getValue('BaseURL') as TJSONString).Value;
 
   tmrStart.Enabled := True;
 
@@ -471,6 +502,11 @@ begin
   Application.ProcessMessages;
   {$Include ddl\imageai_history\imageai_history.inc}
   Application.ProcessMessages;
+
+  // Tables added for Blaugment project
+  {$Include ddl\authcode\authcode.inc}
+  Application.ProcessMessages;
+
 
   mmInfo.Lines.Add('Done.');
   mmInfo.Lines.Add('');
@@ -623,6 +659,7 @@ begin
 
 
   mmInfo.Lines.Add('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
+
   mmInfo.Lines.Add('Done.');
   mmInfo.Lines.Add('');
 

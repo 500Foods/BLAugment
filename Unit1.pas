@@ -25,7 +25,8 @@ uses
   WEBLib.WebCtrls,
   Vcl.StdCtrls,
   WEBLib.StdCtrls,
-  WEBLib.ComCtrls, WEBLib.ExtCtrls;
+  WEBLib.ComCtrls,
+  WEBLib.ExtCtrls;
 
 type
   TForm1 = class(TWebForm)
@@ -36,7 +37,7 @@ type
     divSearchBG: TWebHTMLDiv;
     editSearch: TWebEdit;
     divMainMenuBG: TWebHTMLDiv;
-    btnTheme: TWebButton;
+    btnThemeDark: TWebButton;
     btnRegister: TWebButton;
     btnLogin: TWebButton;
     divBlogTypes: TWebHTMLDiv;
@@ -204,14 +205,13 @@ type
     pageAccountName: TWebTabSheet;
     pageAccountPhoto: TWebTabSheet;
     pageAccountHistory: TWebTabSheet;
-    pageAccountSponsor: TWebTabSheet;
+    pageAccountPromotion: TWebTabSheet;
     pageAccountDonate: TWebTabSheet;
     pageAccountNotify: TWebTabSheet;
     pageAccountBlogs: TWebTabSheet;
     labelAccountTitle: TWebLabel;
     divAccountOptions: TWebHTMLDiv;
     labelFirstName: TWebLabel;
-    editFirstName: TWebEdit;
     pageAccountLogout: TWebTabSheet;
     labelMiddleName: TWebLabel;
     editMiddleName: TWebEdit;
@@ -268,8 +268,44 @@ type
     comboActivityLog: TWebLookupComboBox;
     tmrLogout: TWebTimer;
     WebHTMLDiv3: TWebHTMLDiv;
+    divChangeAccountName: TWebHTMLDiv;
+    labelChangeAccountName: TWebLabel;
+    btnChangeAccountName: TWebButton;
+    WebHTMLDiv5: TWebHTMLDiv;
+    divChangeAccountEMail: TWebHTMLDiv;
+    labelChangeAccountEMail: TWebLabel;
+    btnChangeAccountEMail: TWebButton;
+    WebHTMLDiv7: TWebHTMLDiv;
+    editEMailCode: TWebEdit;
+    btnThemeLight: TWebButton;
+    btnThemeRed: TWebButton;
+    pageAccountAuthor: TWebTabSheet;
+    WebLabel3: TWebLabel;
+    divAuthorProfileHolder: TWebHTMLDiv;
+    divAuthorProfileDescription: TWebHTMLDiv;
+    divAuthorProfileTop: TWebHTMLDiv;
+    divAuthorProfilePhoto: TWebHTMLDiv;
+    divAuthorProfileRight: TWebHTMLDiv;
+    divAuthorProfileName: TWebHTMLDiv;
+    divAuthorProfileLinks: TWebHTMLDiv;
+    divAccountLinks: TWebHTMLDiv;
+    divAccountLinksNav: TWebHTMLDiv;
+    WebLabel4: TWebLabel;
+    WebHTMLDiv4: TWebHTMLDiv;
+    btnLinkInsert: TWebButton;
+    btnLinkDelete: TWebButton;
+    btnLinkSave: TWebButton;
+    btnLinkCancel: TWebButton;
+    WebHTMLDiv6: TWebHTMLDiv;
+    editFirstName: TWebEdit;
+    btnFirstNameCancel: TWebButton;
+    btnFirstNameSave: TWebButton;
+    WebHTMLDiv8: TWebHTMLDiv;
+    btnDescriptionCancel: TWebButton;
+    btnDescriptionSave: TWebButton;
+    memoAuthorDescription: TWebMemo;
     procedure FinalRequest;
-    procedure btnThemeClick(Sender: TObject);
+    procedure btnThemeDarkClick(Sender: TObject);
     [async] procedure WebFormCreate(Sender: TObject);
     procedure btnBlogClick(Sender: TObject);
     procedure ConfigureTooltip(Button: TWebButton);
@@ -308,6 +344,23 @@ type
     procedure btnAccountChangeClick(Sender: TObject);
     [async] procedure comboActivityLogChange(Sender: TObject);
     procedure tmrLogoutTimer(Sender: TObject);
+    [async] procedure editAccountNameChange(Sender: TObject);
+    [async] procedure btnChangeAccountNameClick(Sender: TObject);
+    procedure editEMailChange(Sender: TObject);
+    [async] procedure btnChangeAccountEMailClick(Sender: TObject);
+    [async] procedure editEMailCodeChange(Sender: TObject);
+    procedure memoAuthorDescriptionChange(Sender: TObject);
+    procedure UpdateAccountLinks;
+    procedure btnLinkDeleteClick(Sender: TObject);
+    procedure btnLinkInsertClick(Sender: TObject);
+    procedure HideToolTips;
+    [async] procedure btnLinkSaveClick(Sender: TObject);
+    [async] procedure btnLinkCancelClick(Sender: TObject);
+    procedure editFirstNameChange(Sender: TObject);
+    procedure btnFirstNameCancelClick(Sender: TObject);
+    [async] procedure btnFirstNameSaveClick(Sender: TObject);
+    [async] procedure btnDescriptionSaveClick(Sender: TObject);
+    procedure btnDescriptionCancelClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -315,6 +368,7 @@ type
     Theme: String;
     LoggedIn: Boolean;
     Server_URL: String;
+    LastAction: String;
 
     JWT: String;
     JWT_Expiry: TDateTime;
@@ -327,6 +381,9 @@ type
     App_Start: TDateTime;
     App_Start_UTC: TDateTime;
     App_Session: String;
+    App_APIKey: String;
+    App_URL: String;
+    App_URLLink: String;
 
     App_TZ: String;
     App_TZOffset: Integer;
@@ -341,6 +398,11 @@ type
     App_Location: String;
     App_Device: String;
     App_Browser: String;
+    App_Browser_Short: String;
+    App_OS_Short: String;
+    App_Country: String;
+    App_Region: String;
+    App_City: String;
 
     ActionLog: TStringList;
     ActionLogCurrent: TStringList;
@@ -348,7 +410,11 @@ type
     User_FirstName: String;
     User_MiddleName: String;
     User_LastName: String;
+    User_Birthdate: String;
+    User_Description: String;
+    User_Name: String;
     User_EMail: String;
+
     User_Photo: String;
     User_Account: String;
     User_ID: Integer;
@@ -357,16 +423,21 @@ type
     tabAccountOptions: JSValue;
     tabAccountRoles: JSValue;
     tabAccountHistory: JSValue;
+    tabAccountLinks: JSValue;
+    LinksData: JSValue;
+    LinksDataBackup: JSValue;
 
     // Simplebar References
     scrollAccountName: JSValue;
-    scrollAccountPhoto: JSValue;
     scrollAccountPassword: JSValue;
+    scrollAccountAuthor: JSValue;
+    scrollAccountProfile: JSValue;
+    scrollAccountPhoto: JSValue;
     scrollAccountRoles: JSValue;
     scrollAccountCategories: JSValue;
     scrollAccountBlogs: JSValue;
     scrollAccountNotify: JSValue;
-    scrollAccountSponsor: JSValue;
+    scrollAccountPromotion: JSValue;
 //    scrollAccountDonate: JSValue;
     scrollAccountHistory: JSValue;
     scrollAccountActivity: JSValue;
@@ -387,15 +458,83 @@ implementation
 
 {$R *.dfm}
 
+procedure TForm1.HideToolTips;
+begin
+  asm
+    setTimeout(function() {
+      var badtooltips = document.getElementsByClassName('bs-tooltip-auto');
+      if (badtooltips.length > 0) {
+        for (var i = 0; i < badtooltips.length; i++) {
+          badtooltips[i].style.setProperty('opacity','0');
+          var x = badtooltips[i];
+          setTimeout(function() {
+            x.remove()
+          }, 500);
+        }
+      }
+    },500);
+  end;
+end;
+
 procedure TForm1.btnActivityLogEMailClick(Sender: TObject);
 begin
-//
+  LogAction('[ E-Mail Activity Log ]');
+
 end;
 
 procedure TForm1.btnActivityLogPrintClick(Sender: TObject);
 begin
-//
+  LogAction('[ Print Activity Log ]');
 
+end;
+
+procedure TForm1.UpdateAccountLinks;
+begin
+  asm
+    divAuthorProfileLinks.innerHTML = '';
+    for (var i = 1; i <= this.tabAccountLinks.getDataCount(); i++) {
+      var row = this.tabAccountLinks.getRowFromPosition(i);
+      try {
+        var domain = (new URL(row.getCell('Link').getValue())).hostname.replace('www.','');
+      } catch {
+        var domain = 'blaugment.com';
+      }
+      var image =  '<img class="DropShadow" style="object-fit:contain; border-radius: 4px; width:100%;" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=128">';
+      divAuthorProfileLinks.innerHTML +=
+        '<div title="'+domain+'" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" style="border-radius: 8px; width: 28px;">'+
+          '<a target="_blank" style="text-decoration: none;" href="'+row.getCell('Link').getValue()+'">'+
+            image+
+         '</a>'+
+       '</div>';
+    }
+
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    // Also update navigator buttons
+    var This = pas.Unit1.Form1;
+    var tab = This.tabAccountLinks;
+    var rowcount = tab.getDataCount();
+
+    if (JSON.stringify(tab.getData()) != JSON.stringify(This.LinksDataBackup)) {
+      btnLinkSave.removeAttribute('disabled');
+      btnLinkCancel.removeAttribute('disabled');
+    } else {
+      btnLinkSave.setAttribute('disabled','');
+      btnLinkCancel.setAttribute('disabled','');
+    }
+
+    if (rowcount == 0) {
+      btnLinkDelete.setAttribute('disabled','');
+    } else {
+      btnLinkDelete.removeAttribute('disabled');
+      if (tab.getSelectedRows().length == 0) {
+        tab.selectRow(tab.getRowFromPosition(1));
+      }
+    }
+
+  end;
 end;
 
 procedure TForm1.WebFormCreate(Sender: TObject);
@@ -413,9 +552,9 @@ begin
      (Theme <> 'red'   ) then Theme := 'dark';
   TWebLocalStorage.SetValue('Theme',Theme);
 
-  if      Theme = 'dark'  then btnTheme.Caption := '<i class="fa-duotone fa-moon fa-3x"></i>'
-  else if Theme = 'light' then btnTheme.Caption := '<i class="fa-duotone fa-sun fa-3x"></i>'
-  else if Theme = 'red'   then btnTheme.Caption := '<i class="fa-duotone fa-heart fa-3x"></i>';
+  if      Theme = 'dark'  then btnThemeDark.ElementHandle.style.setProperty('opacity','1')
+  else if Theme = 'light' then btnThemeLight.ElementHandle.style.setProperty('opacity','1')
+  else if Theme = 'red'   then btnThemeRed.ElementHandle.style.setProperty('opacity','1');
 
   document.documentElement.setAttribute('theme', Theme);
 
@@ -424,9 +563,12 @@ begin
 
   // Application Information
   App_Name := 'blaugment';
-  App_Short := 'Template';
+  App_Short := 'Blaugment';
+  App_URL := 'www.blaugment.com';
+  App_URLLink := 'https://www.blaugment.com';
   App_Version := '1.0';
   App_Release := '2023-Jun-23';
+  App_APIKey := '{2DF239F0-8A9D-4531-9BC2-AB911CB40C4E}';
   App_Start := Now();
   App_Start_UTC := TTimeZone.Local.ToUniversalTime(Now);
 
@@ -468,6 +610,7 @@ begin
   User_FirstName := '';
   User_MiddleName :=  '';
   User_LastName := '';
+  User_Name := '';
   User_EMail := '';
   User_Account := '';
   User_id := 0;
@@ -511,6 +654,10 @@ begin
     browser.push(uap.browser.version);
     browser.push(uap.os.name);
     browser.push(uap.os.version);
+
+    this.App_Country = ipdata['country_name'];
+    this.App_Region = ipdata['region']
+    this.App_City = ipdata['city']
 
     locn.push(ipdata['country']);
     locn.push(ipdata['country_name']);
@@ -568,6 +715,8 @@ begin
     this.LogAction(' ----- Version: '+brw[1]);
     this.LogAction(' ----- OS: '+brw[2]);
     this.LogAction(' ----- Version: '+brw[3]);
+    this.App_Browser_Short = brw[0];
+    this.App_OS_Short = brw[2];
   end;
   LogAction('============================================================');
   LogAction(' ');
@@ -616,7 +765,7 @@ begin
   ConfigureTooltip(btnAdd);
   ConfigureTooltip(btnAccount);
   ConfigureTooltip(btnLogin);
-  ConfigureTooltip(btnTheme);
+  ConfigureTooltip(btnThemeDark);
 
   ConfigureTooltip(btnBlogArchitecture);
   ConfigureTooltip(btnBlogArt);
@@ -666,6 +815,12 @@ begin
   ConfigureTooltip(btnBlogWellness);
   ConfigureTooltip(btnBlogWriting);
 
+  ConfigureTooltip(btnLinkInsert);
+  ConfigureTooltip(btnLinkDelete);
+  ConfigureTooltip(btnLinkSave);
+  ConfigureTooltip(btnLinkCancel);
+
+
   // Convert all tooltips to Bootstrap tooltips
   asm
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -704,17 +859,18 @@ begin
   asm
     var dataAO = [
       { ID:  0, Name: "Contact Info",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-cat Swap'></i>"           },
-      { ID:  1, Name: "Photo / Avatar",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-camera Swap'></i>"        },
-      { ID:  2, Name: "Set Password",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-shield-keyhole'></i>"     },
-      { ID:  3, Name: "Assigned Roles",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-chess-knight Swap'></i>"  },
-      { ID:  4, Name: "Categories",      Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-sitemap Swap'></i>"       },
-      { ID:  5, Name: "Favorite Blogs",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-star'></i>"               },
-      { ID:  6, Name: "Notifications",   Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-bell'></i>"               },
-      { ID:  7, Name: "Sponsor",         Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-chart-mixed'></i>"        },
-      { ID:  8, Name: "Donate",          Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-gift'></i>"               },
-      { ID:  9, Name: "Login History",   Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-clock'></i>"              },
-      { ID: 10, Name: "Activity Log",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-scroll'></i>"             },
-      { ID: 11, Name: "Logout",          Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-right-from-bracket'></i>" }
+      { ID:  1, Name: "Set Password",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-shield-keyhole'></i>"     },
+      { ID:  2, Name: "Photo / Avatar",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-camera Swap'></i>"        },
+      { ID:  3, Name: "Author Profile",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-address-card'></i>"       },
+      { ID:  4, Name: "Assigned Roles",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-chess-knight Swap'></i>"  },
+      { ID:  5, Name: "Categories",      Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-sitemap Swap'></i>"       },
+      { ID:  6, Name: "Favorite Blogs",  Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-star'></i>"               },
+      { ID:  7, Name: "Notifications",   Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-bell'></i>"               },
+      { ID:  8, Name: "Promotion",       Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-chart-mixed'></i>"        },
+      { ID:  9, Name: "Donate",          Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-gift'></i>"               },
+      { ID: 10, Name: "Login History",   Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-clock'></i>"              },
+      { ID: 11, Name: "Activity Log",    Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-scroll'></i>"             },
+      { ID: 12, Name: "Logout",          Icon: "<i class='fa-duotone DropShadow fa-fw fa-xl fa-right-from-bracket'></i>" }
     ];
 
     this.tabAccountOptions = new Tabulator("#divAccountOptions", {
@@ -858,6 +1014,61 @@ begin
     });
   end;
 
+  // Account links
+  asm
+    this.tabAccountLinks = new Tabulator("#divAccountLinks", {
+      index: "ID",
+      layout: "fitColumns",
+      selectable: 1,
+      rowHeight: 32,
+      movableRows: true,
+      columnDefaults:{
+        resizable: false,
+        headerSort: false
+      },
+      columns: [
+        { title: "ID", field: "ID", visible: false },
+        { title: "", field: "Sort", width: 30, minWidth:30, formatter: "handle", sorter: "number", rowHandle: true },
+        { title: "", field: "Link", hozAlign: "center", formatter: "html", width: 40,
+            formatter: function(cell, formatterParams, onRendered) {
+              try {
+                var domain = (new URL(cell.getValue())).hostname.replace('www.','');
+              } catch {
+                var domain = 'blaugment.com';
+              }
+              return '<img title="'+domain+'" style="width:24px; border-radius:4px;" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=128 ">';
+            }
+        },
+        { title: "", field: "Link", editor: true, cssClass: "Links" }
+      ]
+    });
+    this.tabAccountLinks.on('tableBuilt', function() {
+      var el = document.getElementsByClassName('Links')[0];
+      el.firstElementChild.firstElementChild.firstElementChild.innerHTML = '';
+      el.firstElementChild.style.setProperty('padding-top','0px');
+      el.firstElementChild.firstElementChild.firstElementChild.appendChild(divAccountLinksNav);
+    });
+    this.tabAccountLinks.on('rowClick', function(e, row){
+      pas.Unit1.Form1.tabAccountLinks.selectRow([row]);
+    });
+    this.tabAccountLinks.on('rowMoved', function(row){
+      var This = pas.Unit1.Form1;
+      var tab = This.tabAccountLinks;
+      for (var i = 1; i <= tab.getDataCount(); i++) {
+        tab.getRowFromPosition(i).getCell('Sort').setValue(i);
+      }
+      This.UpdateAccountLinks();
+      This.LogAction('[ Reordered Account Links ]');
+    });
+    this.tabAccountLinks.on('cellEdited', function(cell){
+      if (cell.getField() == 'Link') {
+        var This = pas.Unit1.Form1;
+        This.tabAccountLinks.redraw(true);
+        This.UpdateAccountLinks();
+        This.LogAction('[ Edited Account Link: '+cell.getValue()+' ]');
+      }
+    });
+  end;
 
   // This is used to adjust the size and position of "windows"
   asm
@@ -891,6 +1102,36 @@ begin
         ignoreFrom: '.nointeract'
       });
 
+    interact('.resize')
+      .resizable({
+        edges: { left: false, right: true, bottom: true, top: false },
+        margin: 10, // size of resizing boundary interaction area
+        listeners: {
+          move (event) {
+            var target = event.target
+            var x = (parseFloat(target.getAttribute('data-x')) || 0)
+            var y = (parseFloat(target.getAttribute('data-y')) || 0)
+//            var x = (parseFloat(target.getAttribute('data-x')) || -target.getBoundingClientRect().width/2)
+//            var y = (parseFloat(target.getAttribute('data-y')) || -target.getBoundingClientRect().height/2)
+            target.style.width = event.rect.width + 'px'
+            target.style.height = event.rect.height + 'px'
+            x += event.deltaRect.left
+            y += event.deltaRect.top
+            target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+          }
+        },
+        ignoreFrom: '.nointeractresize .simplebar-scrollbar'
+      })
+//      .draggable({
+//        listeners: { move: dragMoveListener },
+//        ignoreFrom: '.nointeract'
+//      })
+      .pointerEvents({
+        ignoreFrom: '.nointeractresize .simplebar-scrollbar'
+      });
+
     function dragMoveListener (event) {
       var target = event.target
       var x = (parseFloat(target.getAttribute('data-x')) || 0 ) + event.dx
@@ -907,13 +1148,15 @@ begin
   // Enable Simplebar on Options pages
   asm
     this.scrollAccountName       = new SimpleBar(document.getElementById('pageAccountName'        ), { forceVisible: 'y', autoHide: false });
-    this.scrollAccountPhoto      = new SimpleBar(document.getElementById('pageAccountPhoto'       ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountPassword   = new SimpleBar(document.getElementById('pageAccountPassword'    ), { forceVisible: 'y', autoHide: false });
+    this.scrollAccountAuthor     = new SimpleBar(document.getElementById('pageAccountAuthor'      ), { forceVisible: 'y', autoHide: false });
+    this.scrollAccountProfile    = new SimpleBar(document.getElementById('divAuthorProfileHolder' ), { forceVisible: 'n', autoHide: true  });
+    this.scrollAccountPhoto      = new SimpleBar(document.getElementById('pageAccountPhoto'       ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountRoles      = new SimpleBar(document.getElementById('pageAccountRoles'       ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountCategories = new SimpleBar(document.getElementById('pageAccountCategories'  ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountBlogs      = new SimpleBar(document.getElementById('pageAccountBlogs'       ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountNotify     = new SimpleBar(document.getElementById('pageAccountNotify'      ), { forceVisible: 'y', autoHide: false });
-    this.scrollAccountSponsor    = new SimpleBar(document.getElementById('pageAccountSponsor'     ), { forceVisible: 'y', autoHide: false });
+    this.scrollAccountPromotion  = new SimpleBar(document.getElementById('pageAccountPromotion'   ), { forceVisible: 'y', autoHide: false });
 //    this.scrollAccountDonate     = new SimpleBar(document.getElementById('pageAccountDonate'      ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountHistory    = new SimpleBar(document.getElementById('pageAccountHistory'     ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountActivity   = new SimpleBar(document.getElementById('pageAccountActivity'    ), { forceVisible: 'y', autoHide: false });
@@ -968,6 +1211,30 @@ begin
       return false;
     }
   end;
+
+  // TWebMemo auto resizing
+  asm
+    // https://stephanwagner.me/auto-resizing-textarea-with-vanilla-javascript
+    function addAutoResize() {
+      document.querySelectorAll('[data-autoresize]').forEach(function (element) {
+        element.style.boxSizing = 'border-box';
+        var offset = element.offsetHeight - element.clientHeight;
+        element.addEventListener('input', function (event) {
+          event.target.style.height = 'auto';
+          event.target.style.height = event.target.scrollHeight + offset + 'px';
+          event.target.parentElement.style.height = event.target.scrollHeight + offset + 4 + 'px';
+          pas.Unit1.Form1.scrollAccountAuthor.recalculate();
+        });
+        element.removeAttribute('data-autoresize');
+      });
+    }
+    memoAuthorDescription.setAttribute('data-autoresize','');
+    memoAuthorDescription.setAttribute('rows','1');
+    memoAuthorDescription.setAttribute('maxlength','5000');
+
+    addAutoResize();
+  end;
+
 end;
 
 function TForm1.JSONRequest(Endpoint: String; Params: array of JSValue): String;
@@ -990,7 +1257,6 @@ begin
       ClientConn := TXDataWebClient.Create(nil);
       ClientConn.Connection := XDataConn;
       Response := await(ClientConn.RawInvokeAsync(Endpoint, Params));
-      console.log(response);
 
       Blob := Response.Result;
       asm Result = await Blob.text(); end;
@@ -1044,9 +1310,15 @@ begin
       begin
         // Get the error message we created in XData
         asm {
-          var ErrorDetail = JSON.parse(await E.FErrorResult.FResponse.$o.FXhr.responseText );
-          ErrorCode = ErrorDetail.error.code;
-          ErrorMessage = ErrorDetail.error.message;
+          try {
+            var ErrorDetail = JSON.parse(await E.FErrorResult.FResponse.$o.FXhr.responseText );
+            ErrorCode = ErrorDetail.error.code;
+            ErrorMessage = ErrorDetail.error.message;
+          }
+          catch {
+            ErrorCode = 'Configuration Error';
+            ErrorMessage = 'Endpoint Call Failed';
+          }
         } end;
 
         // Log the error, but leave out the URI (because it includes the password)
@@ -1109,6 +1381,31 @@ begin
   end;
 end;
 
+procedure TForm1.memoAuthorDescriptionChange(Sender: TObject);
+var
+  displaytext: String;
+  i: Integer;
+begin
+  i := 0;
+  while i < memoAuthorDescription.Lines.Count do
+  begin
+    displaytext := displaytext+memoAuthorDescription.Lines[i]+'<br />';
+    i := i + 1;
+  end;
+  divAuthorProfileDescription.ElementHandle.innerHTML := '<div class="DropShadow text-wrap" style="color: var(--bl-color-input); line-height: 1.25; font-size: 12px; overflow: hidden; text-overflow: ellipsis;">'+displaytext+'</div>';
+
+  if User_Description = memoAuthorDescription.Lines.Text then
+  begin
+    btnDescriptionSave.Enabled := False;
+    btnDescriptionCancel.Enabled := False;
+  end
+  else
+  begin
+    btnDescriptionSave.Enabled := True;
+    btnDescriptionCancel.Enabled := True;
+  end;
+end;
+
 procedure TForm1.XDataConnect;
 var
   ElapsedTime: TDateTime;
@@ -1149,12 +1446,17 @@ begin
   FilterAction := StringReplace(FilterAction, chr(13), '', [rfReplaceAll]);
   FilterAction := StringReplace(FilterAction, '"', '''', [rfReplaceAll]);
 
-  // Log the action to a TStringList
-  ActionLog.Add(FormatDateTime(App_LogDateTimeFormat,  TTimeZone.Local.ToUniversalTime(Now))+' UTC  '+FilterAction);
-  ActionLogCurrent.Add(FormatDateTime(App_LogDateTimeFormat,  TTimeZone.Local.ToUniversalTime(Now))+' UTC  '+FilterAction);
+  if (Trim(FilterAction) <> Trim(LastAction)) then
+  begin
+    LastAction := FilterAction;
 
-  // Log to Console
-//  console.Log(FilterAction);
+    // Log the action to a TStringList
+    ActionLog.Add(FormatDateTime(App_LogDateTimeFormat,  TTimeZone.Local.ToUniversalTime(Now))+' UTC  '+FilterAction);
+    ActionLogCurrent.Add(FormatDateTime(App_LogDateTimeFormat,  TTimeZone.Local.ToUniversalTime(Now))+' UTC  '+FilterAction);
+
+    // Log to Console
+//    console.Log(FilterAction);
+  end;
 
 end;
 
@@ -1189,7 +1491,7 @@ begin
       Response := await(ClientConn.RawInvokeAsync('ISystemService.Login', [
         Username,
         Password,
-        '{2DF239F0-8A9D-4531-9BC2-AB911CB40C4E}', // API_KEY
+        App_APIKey,
         App_TZ,
         App_IPAddress,
         App_Location,
@@ -1257,6 +1559,7 @@ begin
   User_FirstName :=  (JWTClaims.GetValue('fnm') as TJSONString).Value;
   User_MiddleName :=  (JWTClaims.GetValue('mnm') as TJSONString).Value;
   User_LastName :=  (JWTClaims.GetValue('lnm') as TJSONString).Value;
+  User_Name := StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]);
   User_EMail :=  (JWTClaims.GetValue('eml') as TJSONString).Value;
   User_Account := (JWTClaims.GetValue('anm') as TJSONString).Value;
   User_ID := (JWTClaims.GetValue('usr') as TJSONNumber).AsInt;
@@ -1285,6 +1588,7 @@ begin
 
   LogAction('Processing Token:');
   LogAction(' -- Name: '+StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]));
+  LogAction(' -- Account: '+User_Account);
   LogAction(' -- EMail: '+User_Email);
   LogAction(' -- Roles: '+User_Roles.CommaText);
   LogAction(' -- Expires: '+(JWTClaims.GetValue('unt') as TJSONString).Value);
@@ -1302,6 +1606,8 @@ end;
 
 procedure TForm1.SelectAccountOption(OptionID: Integer);
 begin
+  HideTooltips;
+
   // Fade In/Out between pages
   if (pcAccount.TabIndex <> OptionID) then
   begin
@@ -1311,11 +1617,12 @@ begin
 
   pcAccount.TabIndex := OptionID;
   pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
-  LogAction('- Account Settings: '+pcAccount.ActivePage.Name);
+  LogAction('[ Account Settings: '+StringReplace(pcAccount.ActivePage.Name,'pageAccount','',[])+' ]');
 
   if pcAccount.ActivePage.Name = 'pageAccountName' then
   begin
     editAccountName.SetFocus;
+    editEMailChange(nil);
   end
   else if pcAccount.ActivePage.Name = 'pageAccountPassword' then
   begin
@@ -1330,8 +1637,15 @@ begin
   else if pcAccount.ActivePage.Name = 'pageAccountActivity' then
   begin
     divActivityLogHeader.ElementHandle.classList.add('position-fixed');
+    btnAccountRefreshClick(nil);
+  end
+  else if pcAccount.ActivePage.Name = 'pageAccountAuthor' then
+  begin
+    asm
+      pas.Unit1.Form1.tabAccountLinks.redraw(true);
+      memoAuthorDescription.dispatchEvent(new Event('input'));
+    end;
   end;
-
 end;
 
 procedure TForm1.tmrJWTRenewalTimer(Sender: TObject);
@@ -1355,6 +1669,7 @@ begin
   begin
     await(ProcessJWT(ResponseString));
     LogAction('JWT Renewed');
+    LogAction(' ');
   end
   else
   begin
@@ -1453,6 +1768,7 @@ procedure TForm1.btnAccountChangeClick(Sender: TObject);
 begin
   // Manage different Account
 
+
 end;
 
 procedure TForm1.btnAccountClick(Sender: TObject);
@@ -1464,6 +1780,8 @@ var
   OldDate: TDateTime;
   NewDate: TDateTime;
 begin
+  HideTooltips;
+
   // Account Information
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccount) then
   begin
@@ -1477,6 +1795,9 @@ begin
     editMiddleName.Text := User_MiddleName;
     editLastName.Text := User_LastName;
     editEMail.Text := User_EMail;
+
+    btnFirstNameSave.Enabled := False;
+    btnFirstNameCancel.Enabled := False;
 
     // Make sure first row is selected
     pcAccount.TabIndex := 0;
@@ -1526,6 +1847,9 @@ begin
 
   end;
 
+  // Author Profile
+  divAuthorProfileName.ElementHandle.innerHTML := '<div class="LabelAlt DropShadow ps-1 pe-5" style="width: auto; overflow: hidden; text-overflow: ellipsis;">'+User_Name+'</div>';
+
   // Get other Account Information
   ResponseString := await(JSONRequest('IPersonService.Profile',[]));
   if ResponseString <> '' then
@@ -1533,15 +1857,16 @@ begin
     asm
       var data = JSON.parse(ResponseString);
       divAccountPhoto.innerHTML = data['Photo'];
+      divAuthorProfilePhoto.innerHTML = data['Photo'];
       this.tabAccountHistory.setData(data['RecentLogins']);
+      this.User_Birthdate = data['Profile'][0]['birthdate'] || '1900-01-01';
+      this.User_Description = data['Profile'][0]['description'] || '';
 
       for (var i = 0; i < data['RecentActions'].length; i++) {
         SessionTimestamp.push(data['RecentActions'][i].session_start);
         SessionID.push(data['RecentActions'][i].session_id);
       }
 
-//      var email = -1;
-//      var phone = -1;
 //      for (var i = 0; i < data['Contact'].length; i++) {
 //        if (data['Contact'][i]['list_contact'] == 1) {
 //          if (email == -1) {
@@ -1562,7 +1887,7 @@ begin
 //      if (phone !== -1) {
 //        labelPhone.innerHTML = '<a title="'+data['Contact'][phone]['value']+'" href="tel:'+data['Contact'][phone]['value']+'">'+data['Contact'][phone]['value']+'</a>';
 //      }
-
+//
 //      var lastlogin = luxon.DateTime.fromISO(data['RecentLogins'][0]['logged_in'].split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
 //      iconLastLogin.innerHTML = icon['Login'];
 //      labelLastLogin.innerHTML = '<span title="'+lastlogin+'">'+lastlogin+'</span>';
@@ -1571,21 +1896,22 @@ begin
 //      labelRecentLogins.innerHTML = data['RecentLogins'].length+' <small class="text-secondary me-3"> 7d </small> '+data['Logins'][0]['logins']+' <small class="text-secondary"> All </small>';
 //
 //
-//      titleContacts.innerHTML = icon['AddressBook']+'<span class="ms-2">Contacts for '+data['Profile'][0]['first_name']+' '+data['Profile'][0]['last_name']+'</span>';
-//      var tablerows = '';
-//      for (var i = 0; i < data['Contact'].length; i++) {
-//        tablerows += '<tr>'
-//        var contact_icon = data['Contact'][i]['contact_attributes'];
-//        if (contact_icon.indexOf(':') == 0) {
-//          contact_icon = icon[contact_icon.replace(':','')];
-//        }
-//        tablerows += '<td>'+contact_icon+'</td>';
-//        tablerows += '<td>'+data['Contact'][i]['contact_type']+'</td>';
-//        tablerows += '<td>'+data['Contact'][i]['value']+'</td>';
-//        tablerows += '</tr>'
-//      }
-//      tableContacts.innerHTML = tablerows;
-//
+      this.LinksData = [];
+      this.LinksDataBackup = [];
+      var linkindex = 0;
+      for (var i = 0; i < data['Contact'].length; i++) {
+        if (data['Contact'][i]['contact_type'] == 'Social Media Link') {
+          this.LinksData.push({
+           "ID": linkindex,
+           "Sort": linkindex + 1,
+           "Link": data['Contact'][i]['value'],
+          });
+          linkindex += 1;
+        }
+      }
+      this.tabAccountLinks.setData(this.LinksData);
+      this.LinksDataBackup = JSON.parse(JSON.stringify(this.LinksData));
+      this.UpdateAccountLinks();
     end;
   end;
 
@@ -1616,6 +1942,10 @@ begin
     i := i + 1;
   end;
 
+  // Author Page
+  memoAuthorDescription.Lines.Text := User_Description;
+
+
   // Configure Activity Log
   btnActivityLogReloadClick(Sender);
 end;
@@ -1633,6 +1963,97 @@ begin
 
 end;
 
+procedure TForm1.btnChangeAccountEMailClick(Sender: TObject);
+var
+  RequestResponse: String;
+begin
+  // Change EMail
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+  divChangeAccountEMail.ElementHandle.classList.Add('pe-none');
+
+  // Send Confirmation EMail
+  if editEMailCode.Visible
+  then labelChangeAccountEMail.ElementHandle.innerHTML := 'Resending...'
+  else labelChangeAccountEMail.ElementHandle.innerHTML := 'Sending...';
+  asm await sleep(1000); end;
+
+  RequestResponse := await(StringRequest('ISystemService.SendConfirmationCode',[
+    'Change EMail Address',
+    editEMail.Text,
+    '[ '+App_Short+' ] E-Mail Change Confirmation Code: {AUTHORIZATION_CODE}',
+    '<p>Hello!</p>'+
+      '<p>A request was just made to change the <a href="'+App_URLLink+'">'+App_Short+'</a> e-mail address linked to the '+User_Account+' account.</p>'+
+      '<p>The current e-mail address for this account is <a href="mailto:'+User_EMail+'">'+User_EMail+'</a>.</p>'+
+      '<p>To confirm this request, please use the following Confirmation Code:</p>'+
+      '<p><br /><span style="font-size:20px; font-style:bold;padding-left: 20px;">{AUTHORIZATION_CODE}</span><br /><br /></p>'+
+      '<p>Additional information:<ul>'+
+        '<li>This code is only valid for 10 minutes.</li>'+
+        '<li>You can use Copy & Paste to enter this code.</li>'+
+        '<li>If you did not make this request, please disregard.</li>'+
+      '</ul></p><br />'+
+      '<p>Warmest Regards,<br >'+
+      'The '+App_Short+' Conciege<br >'+
+      '<a href="'+App_URLLink+'">'+App_URL+'</a><br /></p><br />'+
+      '<p><pre style="font-size:smallest;">'+
+        'Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+App_TZ+'<br />'+
+        'Ref &raquo; '+App_OS_Short+'/'+App_Browser_short+'/'+App_IPAddress+'/'+App_Session+'<br />'+
+        'Res &raquo; '+App_Country+'/'+App_Region+'/'+App_City+
+      '</pre></p>',
+    App_Session,
+    App_APIKey
+  ]));
+
+  if RequestResponse = 'Sent' then
+  begin
+    divChangeAccountEMail.ElementHandle.classList.remove('pe-none');
+    editEMailCode.Text := '';
+    editEMailCode.Visible := True;
+    editEMailCode.SetFocus;
+    labelChangeAccountEMail.ElementHandle.innerHTML := 'Enter Confirmation Code';
+    btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-key Swap fa-2x"></i>';
+    LogAction('Confirmation Code E-Mail sent');
+  end
+  else
+  begin
+    labelChangeAccountEMail.ElementHandle.innerHTML := 'Confirmation Code Not Sent:<br>'+RequestResponse;
+    btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    divChangeAccountEMail.ElementHandle.classList.add('pe-none');
+    LogAction('Confirmation Code Not Sent: ');
+    LogAction(RequestResponse);
+  end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+end;
+
+procedure TForm1.btnChangeAccountNameClick(Sender: TObject);
+var
+  RequestResponse: String;
+begin
+  // Change Account Name
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+  divChangeAccountName.ElementHandle.classList.Add('pe-none');
+
+  RequestResponse := await(StringRequest('ISystemService.ChangeAccount',[
+    editAccountName.Text
+  ]));
+
+  if RequestResponse = 'Success' then
+  begin
+    labelChangeAccountName.ElementHandle.innerHTML := 'Account Name Updated';
+    LogAction('Account Name Changed: '+editAccountName.Text);
+    tmrJWTRenewalTimer(Sender);
+  end
+  else
+  begin
+    btnChangeAccountName.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
+    labelChangeAccountName.ElementHandle.innerHTML := RequestResponse;
+    LogAction('Account Name Change Failed: '+RequestResponse);
+  end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+end;
+
+
 procedure TForm1.btnChangePasswordClick(Sender: TObject);
 var
   RequestResponse: String;
@@ -1649,18 +2070,107 @@ begin
 
   if RequestResponse = 'Success' then
   begin
-    labelChangePassword.ElementHandle.innerHTML := 'Password Change Accepted.';
+    labelChangePassword.ElementHandle.innerHTML := 'Password Updated.';
     PasswordCheck := SHA256('XData-Password:'+Trim(editNewPassword.Text));
     editCurrentPassword.Text := '';
     editNewPassword.Text := '';
     editConfirmPassword.Text := '';
     TWebLocalStorage.SetValue('Login.PasswordHash', PasswordCheck);
     editCurrentPassword.SetFocus;
+    LogAction('Password Changed Successfully.');
+    tmrJWTRenewalTimer(Sender);
   end
   else
   begin
     btnChangePAssword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
     labelChangePassword.ElementHandle.innerHTML := RequestResponse;
+    LogAction('Password Change Unsuccessful: '+RequestResponse);
+  end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+end;
+
+procedure TForm1.btnDescriptionCancelClick(Sender: TObject);
+begin
+  memoAuthorDescription.Lines.Text  := User_Description;
+end;
+
+procedure TForm1.btnDescriptionSaveClick(Sender: TObject);
+var
+  RequestResponse: String;
+  Description: String;
+begin
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+  Description := memoAuthorDescription.Lines.Text;
+
+  LogAction('[ Saving Account Description ]');
+  RequestResponse := await(StringRequest('IPersonService.UpdatePerson',[
+    User_ID,
+    User_FirstName,
+    User_MiddleName,
+    User_LastName,
+    User_Birthdate,
+    Description
+  ]));
+
+  if RequestResponse = 'Success' then
+  begin
+    btnDescriptionSave.Enabled := False;
+    btnDescriptionCancel.Enabled := False;
+    User_Description := memoAuthorDescription.Lines.Text;
+  end
+  else
+  begin
+    btnDescriptionCancelClick(Sender);
+  end;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+end;
+
+procedure TForm1.btnFirstNameCancelClick(Sender: TObject);
+begin
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnFirstNameCancel)
+  then LogAction('[ Reverting Account Names ]');
+
+  editFirstName.Text := User_FirstName;
+  editMiddleName.Text := User_MiddleName;
+  editLastName.Text := User_LastName;
+
+  btnFirstNameSave.Enabled := False;
+  btnFirstNameCancel.Enabled := False;
+end;
+
+procedure TForm1.btnFirstNameSaveClick(Sender: TObject);
+var
+  RequestResponse: String;
+begin
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+  LogAction('[ Saving Account Names ]');
+  RequestResponse := await(StringRequest('IPersonService.UpdatePerson',[
+    User_ID,
+    Trim(editFirstName.Text),
+    Trim(editMiddleName.Text),
+    Trim(editLastName.Text),
+    User_Birthdate,
+    User_Description
+  ]));
+
+  if RequestResponse = 'Success' then
+  begin
+    User_FirstName := Trim(editFirstName.Text);
+    User_MiddleName := Trim(editMiddleName.Text);
+    User_LastName := Trim(editLastName.Text);
+    User_Name := StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]);
+
+    btnFirstNameSave.Enabled := False;
+    btnFirstNameCancel.Enabled := False;
+
+    tmrJWTRenewalTimer(Sender);
+  end
+  else
+  begin
+    btnFirstNameCancelClick(Sender);
   end;
 
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
@@ -1775,23 +2285,26 @@ begin
 
 end;
 
-procedure TForm1.btnThemeClick(Sender: TObject);
+procedure TForm1.btnThemeDarkClick(Sender: TObject);
 begin
   // Switch Themes - only 'dark' and 'light' for now
   if Theme = 'dark' then
   begin
+    btnThemeDark.ElementHandle.style.setProperty('opacity','0');
+    btnThemeRed.ElementHandle.style.setProperty('opacity','1');
     Theme := 'red';
-    btnTheme.Caption := '<i class="fa-duotone fa-heart fa-3x"></i>';
   end
   else if Theme = 'red' then
   begin
+    btnThemeRed.ElementHandle.style.setProperty('opacity','0');
+    btnThemeLight.ElementHandle.style.setProperty('opacity','1');
     Theme := 'light';
-    btnTheme.Caption := '<i class="fa-duotone fa-sun fa-3x"></i>';
   end
-  else
+  else if Theme = 'light' then
   begin
+    btnThemeLight.ElementHandle.style.setProperty('opacity','0');
+    btnThemeDark.ElementHandle.style.setProperty('opacity','1');
     Theme := 'dark';
-    btnTheme.Caption := '<i class="fa-duotone fa-moon fa-3x"></i>';
   end;
 
   // If Font Awesome Pro is not available, switch to the free version
@@ -1809,10 +2322,89 @@ begin
 
   Button.ElementHandle.setAttribute('title',Button.Hint);
   Button.ElementHandle.setAttribute('data-bs-toggle','tooltip');
+  Button.ElementHandle.setAttribute('data-bs-trigger','hover');
   Button.ElementHandle.setAttribute('data-bs-placement','bottom');
-  Button.ElementHandle.setAttribute('data-bs-delay','{"show": 1000, "hide": 0}');
+  Button.ElementHandle.setAttribute('data-bs-delay','{"show": 1000, "hide": 100}');
   Button.ElementHandle.setAttribute('data-bs-custom-class','BLTooltip');
 
+end;
+
+procedure TForm1.editAccountNameChange(Sender: TObject);
+var
+  ValidTest: String;
+  ValidText: String;
+
+  [async] function IsValid(acct: String):String;
+  var
+    i: Integer;
+    fail: Integer;
+    RequestResponse: String;
+  const
+    Nums: array[0..9] of String = ('0','1','2','3','4','5','6','7','8','9');
+    // removed hyphen, dot, and forward slash
+    Syms: array[0..25] of String = ('!','@','#','$','%','^','&','*','(',')','+','=',',','<','>','?','`','~','[',']','{','}','\','|',';',':');
+  begin
+    Result := '';
+
+    // Must have 4-32 characters
+    if (Length(Trim(acct)) < 4) or (Length(Trim(acct)) > 32) then Result := Result + 'L';
+
+    // Must not have any blank spaces
+    if Pos(' ',acct) > 0 then Result := Result + 'B';
+
+    // Must not start with a number
+//    fail := 0;
+//    for i := 0 to 9 do
+//      if Pos(Nums[i], acct) = 1 then fail := fail + 1;
+//    if fail > 0 then Result := Result + 'N';
+
+    // Must not have a symbol
+    fail := 0;
+    for i := 0 to 25 do
+      if Pos(Syms[i], acct) = 0 then fail := fail + 1;
+    if fail <> 26 then Result := Result + 'S';
+
+    // Must be unique - only check this when everything else passes
+    if Result = '' then
+    begin
+      btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+      RequestResponse := await(StringRequest('ISystemService.CheckUnique',[
+        acct
+      ]));
+      if RequestResponse = 'false' then Result := Result + 'U';
+      btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+
+    end;
+  end;
+
+begin
+  ValidTest := await(IsValid(editAccountName.Text));
+
+  if (Trim(editAccountName.Text) = '') or (Trim(editAccountName.Text) = User_Account) then
+  begin
+    btnChangeAccountName.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    divChangeAccountName.ElementHandle.classList.Add('pe-none');
+    labelChangePassword.ElementHandle.innerHTML := 'Enter New Account Name';
+  end
+  else if ValidTest <> '' then
+  begin
+    btnChangeAccountName.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    divChangeAccountName.ElementHandle.classList.Add('pe-none');
+    ValidText := 'Invalid Account Name:';
+    if Pos('L', ValidTest) > 0 then ValidText := ValidText + '<br> - Between 4 and 32 characters';
+    if Pos('B', ValidTest) > 0 then ValidText := ValidText + '<br> - No spaces';
+//    if Pos('N', ValidTest) > 0 then ValidText := ValidText + '<br> - Must not start with a number';
+    if Pos('S', ValidTest) > 0 then ValidText := ValidText + '<br> - No symbols except - . /';
+    if Pos('U', ValidTest) > 0 then ValidText := ValidText + '<br> - Not Available';
+    labelChangeAccountName.ElementHandle.innerHTML := ValidText;
+  end
+  else
+  begin
+    btnChangeAccountName.Caption := '<i class="fa-duotone fa-check Swap fa-2x"></i>';
+    divChangeAccountName.ElementHandle.classList.remove('pe-none');
+    labelChangeAccountName.ElementHandle.innerHTML := 'Save New Account Name';
+  end;
 end;
 
 procedure TForm1.editCurrentPasswordChange(Sender: TObject);
@@ -1831,7 +2423,7 @@ var
     Result := '';
 
     // Must have at least 8 characters
-    if Length(Trim(pass)) < 8 then Result := Result + 'L';
+    if (Length(Trim(pass)) < 8) or (Length(Trim(pass)) > 50) then Result := Result + 'L';
 
     // Must have upper + lower case characters
     if (CompareStr(pass, LowerCase(pass)) = 0) or (CompareStr(pass, UpperCase(pass)) = 0) then Result := Result + 'C';
@@ -1876,13 +2468,11 @@ begin
     btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangePassword.ElementHandle.classList.Add('pe-none');
     ComplexText := 'New Password is not complex enough:';
-    console.log(ComplexTest);
-    if Pos('L', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Minimum of 8 characters';
+    if Pos('L', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Between 8 and 50 characters';
     if Pos('C', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - Mix of uppercase and lowercase';
     if Pos('N', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - At least one number';
     if Pos('S', ComplexTest) > 0 then ComplexText := ComplexText + '<br> - At least one symbol';
     labelChangePassword.ElementHandle.innerHTML := ComplexText;
-    console.log(ComplexText);
   end
   else if Trim(editConfirmPassword.Text) = '' then
   begin
@@ -1904,6 +2494,116 @@ begin
   end;
 end;
 
+procedure TForm1.editEMailChange(Sender: TObject);
+var
+  EMailValid: Boolean;
+
+  function IsValidEMail(EMail: String):Boolean;
+  begin
+    asm
+      // https://www.regextester.com/115911
+      var validformat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+      if (EMail.match(validformat)) {
+        Result = true;
+      } else {
+        Result = false;
+      }
+    end;
+  end;
+
+begin
+  editEMailCode.Visible := False;
+  EMailValid := IsValidEmail(editEMail.Text);
+  if (Trim(editEMail.Text) = '') or (Trim(editEMail.Text) = User_EMail) then
+  begin
+    divChangeAccountEMail.ElementHandle.classList.add('pe-none');
+    btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    labelChangeAccountEMail.ElementHandle.innerHTML := 'Enter New E-Mail Address';
+  end
+  else if (EmailValid) then
+  begin
+    divChangeAccountEMail.ElementHandle.classList.remove('pe-none');
+    btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-paper-plane Swap fa-2x"></i>';
+    labelChangeAccountEMail.ElementHandle.innerHTML := 'Send Confirmation Code';
+  end
+  else
+  begin
+    divChangeAccountEMail.ElementHandle.classList.add('pe-none');
+    btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    labelChangeAccountEMail.ElementHandle.innerHTML := 'Enter Valid E-Mail Address';
+  end;
+end;
+
+procedure TForm1.editEMailCodeChange(Sender: TObject);
+var
+  RequestResponse: String;
+begin
+  if Length(Trim(editEMailCode.Text)) = 6 then
+  begin
+    btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+    RequestResponse := await(StringRequest('ISystemService.VerifyConfirmationCode',[
+      editEMail.Text,
+      App_Session,
+      editEMailCode.Text,
+      App_APIKey,
+      'EMAIL-'+IntToStr(User_ID)
+    ]));
+
+    if RequestResponse = 'Success' then
+    begin
+      divChangeAccountEMail.ElementHandle.classList.add('pe-none');
+      btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-check Swap fa-2x"></i>';
+      labelChangeAccountEMail.ElementHandle.innerHTML := 'Code Cofirmed';
+      editEMailCode.Visible := False;
+
+      asm await sleep(1000); end;
+
+      labelChangeAccountEMail.ElementHandle.innerHTML := 'E-Mail Address Updated';
+      LogAction('E-Mail Address Updated');
+      User_EMail := editEMail.text;
+      tmrJWTRenewalTimer(Sender);
+    end
+    else if RequestResponse = 'Invalid' then
+    begin
+      labelChangeAccountEMail.ElementHandle.innerHTML := 'Code Invalid - Try Again.';
+      editEMailCode.Text := '';
+      LogAction('E-Mail Address Confirmation Code Invalid');
+    end
+    else
+    begin
+      divChangeAccountEMail.ElementHandle.classList.add('pe-none');
+      labelChangeAccountEMail.ElementHandle.innerHTML := 'E-Mail Update Failed: <br>'+RequestResponse;
+      editEMailCode.Visible := False;
+      LogAction('E-Mail Address Update Failed:');
+      LogAction(RequestResponse);
+    end;
+
+    btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+
+  end;
+end;
+
+procedure TForm1.editFirstNameChange(Sender: TObject);
+var
+  Change: Boolean;
+  ValidChange: Boolean;
+begin
+
+  if (Trim(editFirstName.Text) <> User_FirstName) or
+     (Trim(editMiddleName.Text) <> User_MiddleName) or
+     (Trim(editLastName.Text) <> User_MiddleName)
+  then btnFirstNameCancel.Enabled := True
+  else btnFirstNameCancel.Enabled := False;
+
+  if (Trim(editFirstName.Text) <> '') and
+     (Trim(editLastName.Text) <> '') and
+     (btnFirstNameCancel.Enabled = True)
+  then btnFirstNameSave.Enabled := True
+  else btnFirstNameSave.Enabled := False;
+
+end;
+
 procedure TForm1.FinalRequest;
 begin
   LogAction(' ');
@@ -1911,6 +2611,114 @@ begin
   LogAction('Session Duration: '+FormatDateTime('h"h "m"m "s"s"', Now - App_Start));
   LoggedIn := False;
   tmrJWTRenewalTimer(nil);
+end;
+
+procedure TForm1.btnLinkCancelClick(Sender: TObject);
+begin
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnLinkCancel)
+  then LogAction('[ Revert Account Links ]')
+  else LogAction('Reverting Account Links');
+
+  asm
+    var This = pas.Unit1.Form1;
+    var tab = This.tabAccountLinks;
+    This.LinksData = JSON.parse(JSON.stringify(This.LinksDataBackup));
+    tab.setData(This.LinksData);
+  end;
+  HideTooltips;
+  UpdateAccountLInks;
+  divAccountLinks.SetFocus();
+end;
+
+procedure TForm1.btnLinkDeleteClick(Sender: TObject);
+var
+  Link: String;
+begin
+  Link := 'not defined';
+  asm
+    var This = pas.Unit1.Form1;
+    var tab = This.tabAccountLinks;
+    var rows = tab.getSelectedRows();
+    tab.deselectRow();
+    if (rows.length == 1) {
+      var rowcount = tab.getDataCount();
+      var rowpos = tab.getRowPosition(rows[0]);
+      // If more than one row, select a new row
+      if (rowcount > 1) {
+        if (rowpos == rowcount) {
+          tab.selectRow(tab.getRowFromPosition(rowpos - 1));
+        } else {
+          tab.selectRow(tab.getRowFromPosition(rowpos + 1));
+        }
+      }
+      Link = rows[0].getCell('Link').getValue();
+      rows[0].delete();
+    }
+  end;
+
+  HideTooltips;
+  UpdateAccountLinks;
+  divAccountLinks.SetFocus();
+  LogAction('[ Delete Account Link: '+Link+' ]');
+end;
+
+procedure TForm1.btnLinkInsertClick(Sender: TObject);
+var
+  RowCount: Integer;
+begin
+  RowCount := -1;
+  asm
+    var This = pas.Unit1.Form1;
+    var newid = This.tabAccountLinks.getDataCount();
+    This.tabAccountLinks.addRow({
+      "ID": newid,
+      "Sort": newid,
+      "Link": "https://www.blaugment.com"
+    });
+    RowCount = newid;
+  end;
+
+  HideTooltips;
+  UpdateAccountLinks();
+  divAccountLinks.SetFocus();
+  LogAction('[ Insert Account Link: '+IntToStr(RowCount)+' ]');
+end;
+
+procedure TForm1.btnLinkSaveClick(Sender: TObject);
+var
+  RequestResponse: String;
+  LinkSave: String;
+begin
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+  LinkSave := '';
+  asm
+    LinkSave = JSON.stringify(pas.Unit1.Form1.tabAccountLinks.getData());
+  end;
+
+  LogAction('[ Saving Account Links ]');
+  RequestResponse := await(StringRequest('IPersonService.UpdatePersonLinks',[
+    User_ID,
+    LinkSave
+  ]));
+
+  if RequestResponse = 'Success' then
+  begin
+    btnLinkSave.Enabled := False;
+    btnLinkCancel.Enabled := False;
+    asm
+      this.LinksDataBackup = JSON.parse(LinkSave);
+    end;
+  end
+  else
+  begin
+    btnLinkCancelClick(Sender);
+  end;
+
+  HideTooltips;
+  divAccountLinks.SetFocus();
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 procedure TForm1.btnLoginCancelClick(Sender: TObject);
@@ -1924,6 +2732,8 @@ end;
 
 procedure TForm1.btnAccountCloseClick(Sender: TObject);
 begin
+  HideTooltips;
+
   TWebLocalStorage.SetValue('Window.Accounts.Top',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.top));
   TWebLocalStorage.SetValue('Window.Accounts.Left',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.left));
   TWebLocalStorage.SetValue('Window.Accounts.Width',FloatToStr(divAccount.ElementHandle.getBoundingClientRect.width));
@@ -1946,11 +2756,16 @@ end;
 
 procedure TForm1.btnAccountRefreshClick(Sender: TObject);
 begin
-  LogAction('[ Account Settings Refresh ]');
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin Swap fa-xl"></i>';
+
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccountRefresh)
+  then LogAction('[ Account Settings Refresh ]')
+  else LogAction('Refreshing Account Settings');
+
   await(btnAccountClick(Sender));
   LogAction('Account Settings Refreshed');
   btnActivityLogReloadClick(Sender);
+
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
@@ -2006,11 +2821,13 @@ begin
   begin
     btnActivityLogTimezone.Tag := 1;
     btnActivityLogTimezone.Caption := '<i class="fa-duotone fa-clock-desk fa-lg Swap"></i>';
+    LogAction('[ Timezone: Local ]');
   end
   else
   begin
     btnActivityLogTimezone.Tag := 0;
     btnActivityLogTimezone.Caption := '<i class="fa-duotone fa-globe fa-lg Swap"></i>';
+    LogAction('[ Timezone: UTC ]');
   end;
 
   btnAccountRefreshClick(Sender);

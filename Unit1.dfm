@@ -1,6 +1,6 @@
 object Form1: TForm1
   Width = 1129
-  Height = 896
+  Height = 1091
   Caption = 'blaugment'
   CSSLibrary = cssBootstrap
   ElementClassName = 'overflow-hidden Background d-flex flex-column  align-items-start'
@@ -44,8 +44,10 @@ object Form1: TForm1
         '    <div class="DropShadow2" '
         
           '            style="font-size: 36px; font-weight: bold; color: va' +
-          'r(--bl-color-one); font-family: Cairo;">'
-        '      bl<span style="color: var(--bl-color-two)">augment</span>'
+          'r(--bl-color-one); font-family: Cairo; transition: all 1s;">'
+        
+          '      bl<span style="color: var(--bl-color-two); transition: all' +
+          ' 1s;">augment</span>'
         '    </div>'
         '  </a>'
         '</div>'
@@ -53,9 +55,9 @@ object Form1: TForm1
       Role = ''
     end
     object divMainMenu: TWebHTMLDiv
-      Left = 677
+      Left = 566
       Top = 3
-      Width = 409
+      Width = 520
       Height = 75
       ElementClassName = 'd-flex flex-row flex-shrink-0 align-items-center'
       ElementID = 'divMainMenu'
@@ -79,7 +81,7 @@ object Form1: TForm1
         ElementFont = efCSS
         Role = ''
       end
-      object btnTheme: TWebButton
+      object btnThemeDark: TWebButton
         Left = 331
         Top = 3
         Width = 75
@@ -88,12 +90,12 @@ object Form1: TForm1
         Caption = '<i class="fa-duotone fa-moon fa-3x"></i>'
         ChildOrder = 5
         ElementClassName = 'btn btn-link me-3'
-        ElementID = 'btnTheme'
+        ElementID = 'btnThemeDark'
         ElementFont = efCSS
         ElementPosition = epRelative
         HeightPercent = 100.000000000000000000
         WidthPercent = 100.000000000000000000
-        OnClick = btnThemeClick
+        OnClick = btnThemeDarkClick
       end
       object btnRegister: TWebButton
         Left = 181
@@ -119,7 +121,7 @@ object Form1: TForm1
         Hint = 'Login'
         Caption = '<i class="fa-duotone fa-right-to-bracket fa-3x"></i>'
         ChildOrder = 4
-        ElementClassName = 'btn btn-link mx-3'
+        ElementClassName = 'btn btn-link mx-2'
         ElementID = 'btnLogin'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -135,7 +137,7 @@ object Form1: TForm1
         Hint = 'Account'
         Caption = '<i class="fa-duotone fa-cat fa-3x Swap"></i>'
         ChildOrder = 2
-        ElementClassName = 'btn btn-link mx-3'
+        ElementClassName = 'btn btn-link mx-2'
         ElementID = 'btnAccount'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -160,6 +162,42 @@ object Form1: TForm1
         Visible = False
         WidthPercent = 100.000000000000000000
         OnClick = btnRegisterClick
+      end
+      object btnThemeLight: TWebButton
+        Left = 363
+        Top = 3
+        Width = 75
+        Height = 65
+        Hint = 'Theme'
+        Caption = '<i class="fa-duotone fa-sun fa-3x"></i>'
+        ChildOrder = 5
+        ElementClassName = 'btn btn-link me-3'
+        ElementID = 'btnThemeLight'
+        ElementFont = efCSS
+        ElementPosition = epRelative
+        HeightStyle = ssAuto
+        HeightPercent = 100.000000000000000000
+        WidthStyle = ssAuto
+        WidthPercent = 100.000000000000000000
+        OnClick = btnThemeDarkClick
+      end
+      object btnThemeRed: TWebButton
+        Left = 412
+        Top = 3
+        Width = 75
+        Height = 65
+        Hint = 'Theme'
+        Caption = '<i class="fa-duotone fa-heart fa-3x"></i>'
+        ChildOrder = 5
+        ElementClassName = 'btn btn-link me-3'
+        ElementID = 'btnThemeRed'
+        ElementFont = efCSS
+        ElementPosition = epRelative
+        HeightStyle = ssAuto
+        HeightPercent = 100.000000000000000000
+        WidthStyle = ssAuto
+        WidthPercent = 100.000000000000000000
+        OnClick = btnThemeDarkClick
       end
     end
     object divSearch: TWebHTMLDiv
@@ -2584,10 +2622,12 @@ object Form1: TForm1
       Width = 190
       Height = 45
       AutoCompletion = acUserName
+      CharCase = wecUpperCase
       ChildOrder = 3
       ElementID = 'editUsername'
       ElementFont = efCSS
       HeightPercent = 100.000000000000000000
+      MaxLength = 32
       SpellCheck = False
       TextHint = 'Username'
       WidthPercent = 100.000000000000000000
@@ -2602,6 +2642,7 @@ object Form1: TForm1
       ElementID = 'editPassword'
       ElementFont = efCSS
       HeightPercent = 100.000000000000000000
+      MaxLength = 50
       PasswordChar = '*'
       SpellCheck = False
       TextHint = 'Password'
@@ -2735,7 +2776,7 @@ object Form1: TForm1
     Left = 8
     Top = 494
     Width = 625
-    Height = 450
+    Height = 555
     ElementClassName = 'resize-drag overflow-hidden p-2'
     ElementID = 'divAccount'
     ChildOrder = 4
@@ -2836,9 +2877,9 @@ object Form1: TForm1
     end
     object pcAccount: TWebPageControl
       Left = 158
-      Top = 47
+      Top = 46
       Width = 400
-      Height = 407
+      Height = 506
       ElementClassName = 'nav nav-tabs m-2'
       ElementID = 'pcAccount'
       ChildOrder = 3
@@ -2853,21 +2894,20 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountName'
         Caption = 'NM'
         ElementBodyClassName = 'd-flex flex-column gap-2 nointeract'
         ElementFont = efCSS
         object labelFirstName: TWebLabel
-          Left = 10
-          Top = 70
+          Left = 3
+          Top = 6
           Width = 200
           Height = 26
           AutoSize = False
           Caption = 'First Name *'
-          ChildOrder = 2
-          ElementClassName = 'mx-2 Label order-2'
+          ElementClassName = 'order-0 mx-2 Label mt-1'
           ElementID = 'labelFirstName'
           ElementFont = efCSS
           ElementPosition = epRelative
@@ -2876,14 +2916,14 @@ object Form1: TForm1
           WidthPercent = 100.000000000000000000
         end
         object labelMiddleName: TWebLabel
-          Left = 10
-          Top = 130
+          Left = 8
+          Top = 66
           Width = 200
           Height = 26
           AutoSize = False
           Caption = 'Middle Name(s)'
-          ChildOrder = 4
-          ElementClassName = 'mx-2 Label order-4'
+          ChildOrder = 2
+          ElementClassName = 'order-2 mx-2 Label '
           ElementID = 'labelMiddleName'
           ElementFont = efCSS
           ElementPosition = epRelative
@@ -2892,14 +2932,14 @@ object Form1: TForm1
           WidthPercent = 100.000000000000000000
         end
         object WebLabel2: TWebLabel
-          Left = 10
-          Top = 190
+          Left = 8
+          Top = 126
           Width = 200
           Height = 26
           AutoSize = False
           Caption = 'Last Name *'
-          ChildOrder = 6
-          ElementClassName = 'mx-2 Label order-6'
+          ChildOrder = 4
+          ElementClassName = 'order-4 mx-2 Label'
           ElementID = 'labelLastName'
           ElementFont = efCSS
           ElementPosition = epRelative
@@ -2908,14 +2948,14 @@ object Form1: TForm1
           WidthPercent = 100.000000000000000000
         end
         object labelEMail: TWebLabel
-          Left = 10
-          Top = 250
+          Left = 8
+          Top = 186
           Width = 200
           Height = 26
           AutoSize = False
           Caption = 'E-Mail Address *'
-          ChildOrder = 8
-          ElementClassName = 'mx-2 Label order-8'
+          ChildOrder = 6
+          ElementClassName = 'order-6 mx-2 Label'
           ElementID = 'labelEMail'
           ElementFont = efCSS
           ElementPosition = epRelative
@@ -2924,13 +2964,14 @@ object Form1: TForm1
           WidthPercent = 100.000000000000000000
         end
         object labelAccountName: TWebLabel
-          Left = 4
-          Top = 3
+          Left = 3
+          Top = 311
           Width = 200
           Height = 26
           AutoSize = False
           Caption = 'Account Name *'
-          ElementClassName = 'mx-2 Label order-0 mt-1'
+          ChildOrder = 8
+          ElementClassName = 'order-9 mx-2 Label mt-1'
           ElementID = 'labelAccountName'
           ElementFont = efCSS
           ElementPosition = epRelative
@@ -2938,97 +2979,497 @@ object Form1: TForm1
           HeightPercent = 100.000000000000000000
           WidthPercent = 100.000000000000000000
         end
-        object editFirstName: TWebEdit
-          Left = 10
-          Top = 90
-          Width = 200
-          Height = 30
-          AutoCompletion = acGivenName
-          ChildOrder = 3
-          ElementClassName = 'Edit ms-2 me-5 order-3'
-          ElementID = 'editFirstName'
-          ElementFont = efCSS
-          ElementPosition = epRelative
-          HeightStyle = ssAuto
-          HeightPercent = 100.000000000000000000
-          SpellCheck = False
-          WidthStyle = ssAuto
-          WidthPercent = 100.000000000000000000
-        end
         object editMiddleName: TWebEdit
-          Left = 10
-          Top = 150
+          Left = 8
+          Top = 86
           Width = 200
           Height = 30
           AutoCompletion = acAdditionalName
-          ChildOrder = 5
-          ElementClassName = 'Edit ms-2 me-5 order-5'
+          ChildOrder = 3
+          ElementClassName = 'order-3 Edit ms-2 me-5'
           ElementID = 'editMiddleName'
           ElementFont = efCSS
           ElementPosition = epRelative
           HeightStyle = ssAuto
           HeightPercent = 100.000000000000000000
+          MaxLength = 50
+          ShowFocus = False
           SpellCheck = False
+          TabOrder = 101
           WidthStyle = ssAuto
           WidthPercent = 100.000000000000000000
+          OnChange = editFirstNameChange
         end
         object editLastName: TWebEdit
-          Left = 10
-          Top = 210
+          Left = 8
+          Top = 146
           Width = 200
           Height = 30
           AutoCompletion = acFamilyName
-          ChildOrder = 7
-          ElementClassName = 'Edit ms-2 me-5 order-7'
+          ChildOrder = 5
+          ElementClassName = 'order-5 Edit ms-2 me-5'
           ElementID = 'editLastName'
           ElementFont = efCSS
           ElementPosition = epRelative
           HeightStyle = ssAuto
           HeightPercent = 100.000000000000000000
+          MaxLength = 50
+          ShowFocus = False
           SpellCheck = False
+          TabOrder = 102
           WidthStyle = ssAuto
           WidthPercent = 100.000000000000000000
+          OnChange = editFirstNameChange
         end
         object editEMail: TWebEdit
-          Left = 10
-          Top = 270
+          Left = 8
+          Top = 206
           Width = 200
           Height = 30
-          AutoCompletion = acEmail
-          ChildOrder = 9
-          ElementClassName = 'Edit ms-2 me-5 order-9 mb-3'
+          AutoCompletion = acNope
+          ChildOrder = 7
+          ElementClassName = 'order-7 Edit ms-2 me-5 '
           ElementID = 'editEMail'
           ElementFont = efCSS
           ElementPosition = epRelative
           HeightStyle = ssAuto
           HeightPercent = 100.000000000000000000
+          MaxLength = 50
+          ShowFocus = False
           SpellCheck = False
+          TabOrder = 103
           WidthStyle = ssAuto
           WidthPercent = 100.000000000000000000
+          OnChange = editEMailChange
         end
         object editAccountName: TWebEdit
-          Left = 10
-          Top = 30
+          Left = 3
+          Top = 338
           Width = 200
           Height = 30
-          AutoCompletion = acUserName
-          ChildOrder = 1
-          ElementClassName = 'Edit ms-2 mx-5 order-1 '
+          AutoCompletion = acNope
+          CharCase = wecUpperCase
+          ChildOrder = 9
+          ElementClassName = 'order-10 Edit ms-2 mx-5'
           ElementID = 'editAccountName'
           ElementFont = efCSS
           ElementPosition = epRelative
           HeightStyle = ssAuto
           HeightPercent = 100.000000000000000000
+          MaxLength = 32
+          ShowFocus = False
+          SpellCheck = False
+          TabOrder = 104
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnChange = editAccountNameChange
+        end
+        object divChangeAccountName: TWebHTMLDiv
+          Left = 3
+          Top = 374
+          Width = 249
+          Height = 57
+          ElementClassName = 
+            'order-11 mb-3 ms-2 me-5 mt-1 d-flex flex-row align-items-center ' +
+            'pe-none'
+          ElementID = 'divChangeAccountName'
+          HeightStyle = ssAuto
+          WidthStyle = ssAuto
+          ChildOrder = 6
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+          OnClick = btnChangeAccountNameClick
+          object labelChangeAccountName: TWebLabel
+            Left = 69
+            Top = 15
+            Width = 229
+            Height = 25
+            Cursor = crHandPoint
+            AutoSize = False
+            Caption = 'Enter New Account Name'
+            ChildOrder = 2
+            ElementClassName = 'LabelAlt my-2 ps-1 pe-5 pb-1 w-100 text-wrap'
+            ElementID = 'labelChangeAccountName'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            WordWrap = True
+            WidthPercent = 100.000000000000000000
+          end
+          object btnChangeAccountName: TWebButton
+            Left = 3
+            Top = 4
+            Width = 50
+            Height = 50
+            Caption = '<i class="fa-duotone fa-xmark Swap fa-2x"></i>'
+            ChildOrder = 1
+            ElementClassName = 'btn btn-link'
+            ElementID = 'btnChangeAccountName'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            TabStop = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+          end
+          object WebHTMLDiv5: TWebHTMLDiv
+            Left = 216
+            Top = 13
+            Width = 30
+            Height = 20
+            ElementClassName = 'ContainerBlog position-absolute'
+            ElementID = 'divChangePasswordBG'
+            HeightStyle = ssPercent
+            WidthStyle = ssPercent
+            ElementPosition = epRelative
+            ElementFont = efCSS
+            Role = ''
+          end
+        end
+        object divChangeAccountEMail: TWebHTMLDiv
+          Left = 3
+          Top = 246
+          Width = 249
+          Height = 57
+          ElementClassName = 
+            'order-8 ms-2 me-5 mt-1 d-flex flex-row align-items-center pe-non' +
+            'e'
+          ElementID = 'divChangeAccountEMail'
+          HeightStyle = ssAuto
+          WidthStyle = ssAuto
+          ChildOrder = 6
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+          object labelChangeAccountEMail: TWebLabel
+            Left = 69
+            Top = 15
+            Width = 229
+            Height = 25
+            Cursor = crHandPoint
+            AutoSize = False
+            Caption = 'Enter New E-Mail Address'
+            ChildOrder = 2
+            ElementClassName = 'LabelAlt my-2 ps-1 pe-5 pb-1 w-100 text-wrap'
+            ElementID = 'labelChangeAccountEMail'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            WordWrap = True
+            WidthPercent = 100.000000000000000000
+            OnClick = btnChangeAccountEMailClick
+          end
+          object btnChangeAccountEMail: TWebButton
+            Left = 3
+            Top = 3
+            Width = 50
+            Height = 50
+            Caption = '<i class="fa-duotone fa-xmark Swap fa-2x"></i>'
+            ChildOrder = 1
+            ElementClassName = 'btn btn-link'
+            ElementID = 'btnChangeAccountEMail'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            TabStop = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnChangeAccountEMailClick
+          end
+          object WebHTMLDiv7: TWebHTMLDiv
+            Left = 216
+            Top = 7
+            Width = 30
+            Height = 20
+            ElementClassName = 'ContainerBlog position-absolute'
+            ElementID = 'divChangePasswordBG'
+            HeightStyle = ssPercent
+            WidthStyle = ssPercent
+            ElementPosition = epRelative
+            ElementFont = efCSS
+            Role = ''
+          end
+          object editEMailCode: TWebEdit
+            Left = 152
+            Top = 24
+            Width = 75
+            Height = 30
+            AutoCompletion = acNope
+            ChildOrder = 3
+            EditType = weNumeric
+            ElementClassName = 'order-7 Edit ms-2 me-5 '
+            ElementID = 'editEMailCode'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            MaxLength = 6
+            ShowFocus = False
+            SpellCheck = False
+            TabOrder = 103
+            Visible = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnChange = editEMailCodeChange
+          end
+        end
+        object WebHTMLDiv6: TWebHTMLDiv
+          Left = 3
+          Top = 25
+          Width = 321
+          Height = 41
+          ElementClassName = 'order-1 ms-2 me-5'
+          HeightStyle = ssAuto
+          WidthStyle = ssAuto
+          ChildOrder = 12
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+          object editFirstName: TWebEdit
+            Left = 3
+            Top = 5
+            Width = 200
+            Height = 30
+            AutoCompletion = acGivenName
+            ElementClassName = 'Edit'
+            ElementID = 'editFirstName'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            MaxLength = 50
+            ShowFocus = False
+            SpellCheck = False
+            TabOrder = 100
+            WidthStyle = ssPercent
+            WidthPercent = 100.000000000000000000
+            OnChange = editFirstNameChange
+          end
+          object btnFirstNameCancel: TWebButton
+            Left = 263
+            Top = 3
+            Width = 30
+            Height = 30
+            Caption = '<i class="fa-duotone fa-xmark Swap fa-xl"></i>'
+            ChildOrder = 2
+            ElementClassName = 'btn btn-link NavButton ButtonR2'
+            ElementID = 'btnFirstNameCancel'
+            ElementFont = efCSS
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            TabStop = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnFirstNameCancelClick
+          end
+          object btnFirstNameSave: TWebButton
+            Left = 227
+            Top = 3
+            Width = 30
+            Height = 30
+            Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
+            ChildOrder = 1
+            ElementClassName = 'btn btn-link NavButton ButtonR1'
+            ElementID = 'btnFirstNameSave'
+            ElementFont = efCSS
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            TabStop = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnFirstNameSaveClick
+          end
+        end
+      end
+      object pageAccountPassword: TWebTabSheet
+        Left = 0
+        Top = 20
+        Width = 400
+        Height = 486
+        ElementClassName = 'bg-none Page'
+        ElementID = 'pageAccountPassword'
+        Caption = 'PW'
+        ChildOrder = 8
+        ElementBodyClassName = 'd-flex flex-column gap-2 nointeract'
+        ElementFont = efCSS
+        object labelCurrentPassword: TWebLabel
+          Left = 12
+          Top = 11
+          Width = 200
+          Height = 26
+          AutoSize = False
+          Caption = 'Current Password *'
+          ElementClassName = 'mx-2 Label order-0 mt-1'
+          ElementID = 'labelCurrentPassword'
+          ElementFont = efCSS
+          ElementPosition = epRelative
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthPercent = 100.000000000000000000
+        end
+        object labelNewPassword: TWebLabel
+          Left = 18
+          Top = 78
+          Width = 200
+          Height = 26
+          AutoSize = False
+          Caption = 'New Password *'
+          ChildOrder = 2
+          ElementClassName = 'mx-2 Label order-2'
+          ElementID = 'labelNewPassword'
+          ElementFont = efCSS
+          ElementPosition = epRelative
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthPercent = 100.000000000000000000
+        end
+        object labelConfirmPassword: TWebLabel
+          Left = 18
+          Top = 134
+          Width = 200
+          Height = 26
+          AutoSize = False
+          Caption = 'Confirm Password *'
+          ChildOrder = 4
+          ElementClassName = 'mx-2 Label order-4'
+          ElementID = 'labelConfirmPassword'
+          ElementFont = efCSS
+          ElementPosition = epRelative
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthPercent = 100.000000000000000000
+        end
+        object editCurrentPassword: TWebEdit
+          Left = 18
+          Top = 38
+          Width = 200
+          Height = 30
+          AutoCompletion = acCurrentPassword
+          ChildOrder = 1
+          ElementClassName = 'Edit ms-2 me-5 order-1'
+          ElementID = 'editCurrentPassword'
+          ElementFont = efCSS
+          ElementPosition = epRelative
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          MaxLength = 50
+          PasswordChar = '*'
           SpellCheck = False
           WidthStyle = ssAuto
           WidthPercent = 100.000000000000000000
+          OnChange = editCurrentPasswordChange
+        end
+        object editNewPassword: TWebEdit
+          Left = 18
+          Top = 98
+          Width = 200
+          Height = 30
+          AutoCompletion = acNewPassword
+          ChildOrder = 3
+          ElementClassName = 'Edit ms-2 me-5 order-3'
+          ElementID = 'editNewPassword'
+          ElementFont = efCSS
+          ElementPosition = epRelative
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          MaxLength = 50
+          PasswordChar = '*'
+          SpellCheck = False
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnChange = editCurrentPasswordChange
+        end
+        object editConfirmPassword: TWebEdit
+          Left = 18
+          Top = 154
+          Width = 200
+          Height = 30
+          AutoCompletion = acNewPassword
+          ChildOrder = 5
+          ElementClassName = 'Edit ms-2 me-5 order-5'
+          ElementID = 'editConfirmPassword'
+          ElementFont = efCSS
+          ElementPosition = epRelative
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          MaxLength = 50
+          PasswordChar = '*'
+          SpellCheck = False
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnChange = editCurrentPasswordChange
+        end
+        object divChangePassword: TWebHTMLDiv
+          Left = 3
+          Top = 207
+          Width = 249
+          Height = 57
+          ElementClassName = 'order-6 ms-2 me-5 mt-2 d-flex flex-row align-items-center'
+          ElementID = 'divChangePassword'
+          HeightStyle = ssAuto
+          WidthStyle = ssAuto
+          ChildOrder = 6
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+          OnClick = btnChangePasswordClick
+          object labelChangePassword: TWebLabel
+            Left = 69
+            Top = 15
+            Width = 229
+            Height = 25
+            Cursor = crHandPoint
+            AutoSize = False
+            Caption = 'Enter Current Password'
+            ChildOrder = 2
+            ElementClassName = 'LabelAlt my-2 ps-1 pe-5 pb-1 w-100 text-wrap'
+            ElementID = 'labelChangePassword'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            WordWrap = True
+            WidthPercent = 100.000000000000000000
+          end
+          object btnChangePassword: TWebButton
+            Left = 3
+            Top = 4
+            Width = 50
+            Height = 50
+            Caption = '<i class="fa-duotone fa-xmark Swap fa-2x"></i>'
+            ChildOrder = 1
+            ElementClassName = 'btn btn-link'
+            ElementID = 'btnChangePassword'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightPercent = 100.000000000000000000
+            WidthPercent = 100.000000000000000000
+          end
+          object divChangePasswordBG: TWebHTMLDiv
+            Left = 213
+            Top = 13
+            Width = 30
+            Height = 20
+            ElementClassName = 'ContainerBlog position-absolute'
+            ElementID = 'divChangePasswordBG'
+            HeightStyle = ssPercent
+            WidthStyle = ssPercent
+            ElementPosition = epRelative
+            ElementFont = efCSS
+            Role = ''
+          end
         end
       end
       object pageAccountPhoto: TWebTabSheet
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountPhoto'
         Caption = 'PH'
@@ -3117,179 +3558,320 @@ object Form1: TForm1
           Role = ''
         end
       end
-      object pageAccountPassword: TWebTabSheet
+      object pageAccountAuthor: TWebTabSheet
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
-        ElementID = 'pageAccountPassword'
-        Caption = 'PW'
-        ChildOrder = 8
-        ElementBodyClassName = 'd-flex flex-column gap-2 nointeract'
+        ElementID = 'pageAccountAuthor'
+        Caption = 'AP'
+        ChildOrder = 12
+        ElementBodyClassName = 'd-flex flex-column h-auto gap-2'
         ElementFont = efCSS
-        object labelCurrentPassword: TWebLabel
-          Left = 12
-          Top = 11
+        object WebLabel3: TWebLabel
+          Left = 0
+          Top = 206
           Width = 200
           Height = 26
           AutoSize = False
-          Caption = 'Current Password *'
-          ElementClassName = 'mx-2 Label order-0 mt-1'
-          ElementID = 'labelCurrentPassword'
-          ElementFont = efCSS
-          ElementPosition = epRelative
-          HeightStyle = ssAuto
-          HeightPercent = 100.000000000000000000
-          WidthPercent = 100.000000000000000000
-        end
-        object labelNewPassword: TWebLabel
-          Left = 18
-          Top = 78
-          Width = 200
-          Height = 26
-          AutoSize = False
-          Caption = 'New Password *'
-          ChildOrder = 2
-          ElementClassName = 'mx-2 Label order-2'
-          ElementID = 'labelNewPassword'
-          ElementFont = efCSS
-          ElementPosition = epRelative
-          HeightStyle = ssPercent
-          HeightPercent = 100.000000000000000000
-          WidthPercent = 100.000000000000000000
-        end
-        object labelConfirmPassword: TWebLabel
-          Left = 18
-          Top = 134
-          Width = 200
-          Height = 26
-          AutoSize = False
-          Caption = 'Confirm Password *'
-          ChildOrder = 4
-          ElementClassName = 'mx-2 Label order-4'
-          ElementID = 'labelConfirmPassword'
-          ElementFont = efCSS
-          ElementPosition = epRelative
-          HeightStyle = ssAuto
-          HeightPercent = 100.000000000000000000
-          WidthPercent = 100.000000000000000000
-        end
-        object editCurrentPassword: TWebEdit
-          Left = 18
-          Top = 38
-          Width = 200
-          Height = 30
-          AutoCompletion = acCurrentPassword
+          Caption = 'Description (Limit: 5,000 characters)'
           ChildOrder = 1
-          ElementClassName = 'Edit ms-2 me-5 order-1'
-          ElementID = 'editCurrentPassword'
+          ElementClassName = 'mt-1 mx-2 Label '
+          ElementID = 'labelAuthorDescription'
           ElementFont = efCSS
           ElementPosition = epRelative
           HeightStyle = ssAuto
           HeightPercent = 100.000000000000000000
-          PasswordChar = '*'
-          SpellCheck = False
           WidthStyle = ssAuto
           WidthPercent = 100.000000000000000000
-          OnChange = editCurrentPasswordChange
         end
-        object editNewPassword: TWebEdit
-          Left = 18
-          Top = 98
-          Width = 200
-          Height = 30
-          AutoCompletion = acNewPassword
-          ChildOrder = 3
-          ElementClassName = 'Edit ms-2 me-5 order-3'
-          ElementID = 'editNewPassword'
-          ElementFont = efCSS
-          ElementPosition = epRelative
-          HeightStyle = ssAuto
-          HeightPercent = 100.000000000000000000
-          PasswordChar = '*'
-          SpellCheck = False
-          WidthStyle = ssAuto
-          WidthPercent = 100.000000000000000000
-          OnChange = editCurrentPasswordChange
-        end
-        object editConfirmPassword: TWebEdit
-          Left = 18
-          Top = 154
-          Width = 200
-          Height = 30
-          AutoCompletion = acNewPassword
-          ChildOrder = 5
-          ElementClassName = 'Edit ms-2 me-5 order-5'
-          ElementID = 'editConfirmPassword'
-          ElementFont = efCSS
-          ElementPosition = epRelative
-          HeightStyle = ssAuto
-          HeightPercent = 100.000000000000000000
-          PasswordChar = '*'
-          SpellCheck = False
-          WidthStyle = ssAuto
-          WidthPercent = 100.000000000000000000
-          OnChange = editCurrentPasswordChange
-        end
-        object divChangePassword: TWebHTMLDiv
-          Left = 3
-          Top = 207
-          Width = 249
-          Height = 57
-          ElementClassName = 'order-6 ms-2 me-5 mt-2 d-flex flex-row align-items-center'
-          ElementID = 'divChangePassword'
-          HeightStyle = ssAuto
-          WidthStyle = ssAuto
-          ChildOrder = 6
+        object divAuthorProfileHolder: TWebHTMLDiv
+          Left = 0
+          Top = 0
+          Width = 330
+          Height = 190
+          ElementClassName = 'p-2 resize nointeract d-flex flex-column'
+          ElementID = 'divAuthorProfileHolder'
           ElementPosition = epRelative
           ElementFont = efCSS
           Role = ''
-          OnClick = btnChangePasswordClick
-          object labelChangePassword: TWebLabel
-            Left = 69
-            Top = 15
-            Width = 229
-            Height = 25
-            Cursor = crHandPoint
-            AutoSize = False
-            Caption = 'Enter Current Password'
-            ChildOrder = 2
-            ElementClassName = 'LabelAlt my-2 ps-1 pe-5 pb-1 w-100 text-wrap'
-            ElementID = 'labelChangePassword'
-            ElementFont = efCSS
-            ElementPosition = epRelative
+          object divAuthorProfileDescription: TWebHTMLDiv
+            Left = 10
+            Top = 125
+            Width = 310
+            Height = 55
+            ElementClassName = 'nointeractresize pe-1 pt-1 mb-1 '
+            ElementID = 'divAuthorProfileDescription'
             HeightStyle = ssAuto
-            HeightPercent = 100.000000000000000000
-            WordWrap = True
-            WidthPercent = 100.000000000000000000
-          end
-          object btnChangePassword: TWebButton
-            Left = 3
-            Top = 4
-            Width = 50
-            Height = 50
-            Caption = '<i class="fa-duotone fa-xmark Swap fa-2x"></i>'
+            WidthStyle = ssPercent
             ChildOrder = 1
-            ElementClassName = 'btn btn-link'
-            ElementID = 'btnChangePassword'
-            ElementFont = efCSS
             ElementPosition = epRelative
-            HeightPercent = 100.000000000000000000
-            WidthPercent = 100.000000000000000000
+            ElementFont = efCSS
+            Role = ''
           end
-          object divChangePasswordBG: TWebHTMLDiv
-            Left = 213
-            Top = 13
-            Width = 30
-            Height = 20
-            ElementClassName = 'ContainerBlog position-absolute'
-            ElementID = 'divChangePasswordBG'
-            HeightStyle = ssPercent
+          object divAuthorProfileTop: TWebHTMLDiv
+            Left = 10
+            Top = 10
+            Width = 310
+            Height = 110
+            ElementClassName = 'd-flex flex-row'
+            ElementID = 'divAuthorProfileTop'
+            HeightStyle = ssAuto
             WidthStyle = ssPercent
             ElementPosition = epRelative
             ElementFont = efCSS
             Role = ''
+            object divAuthorProfilePhoto: TWebHTMLDiv
+              Left = 5
+              Top = 5
+              Width = 90
+              Height = 90
+              ElementClassName = 'ContainerAuthorPhoto flex-shrink-0'
+              ElementID = 'divAuthorProfilePhoto'
+              ElementPosition = epRelative
+              ElementFont = efCSS
+              Role = ''
+            end
+            object divAuthorProfileRight: TWebHTMLDiv
+              Left = 100
+              Top = 5
+              Width = 205
+              Height = 100
+              ElementClassName = 'd-flex flex-column ps-2'
+              ElementID = 'divAuthorProfileRight'
+              HeightStyle = ssAuto
+              WidthStyle = ssPercent
+              ChildOrder = 1
+              ElementPosition = epRelative
+              ElementFont = efCSS
+              Role = ''
+              object divAuthorProfileName: TWebHTMLDiv
+                Left = 5
+                Top = 5
+                Width = 195
+                Height = 32
+                ElementClassName = 'overflow-hidden text-ellipsis nointeractresize'
+                ElementID = 'divAuthorProfileName'
+                WidthStyle = ssAuto
+                ElementPosition = epRelative
+                ElementFont = efCSS
+                Role = ''
+              end
+              object divAuthorProfileLinks: TWebHTMLDiv
+                Left = 5
+                Top = 40
+                Width = 195
+                Height = 55
+                ElementClassName = 
+                  'ps-1 nointeractresize d-flex flex-row gap-1 flex-wrap align-item' +
+                  's-center'
+                ElementID = 'divAuthorProfileLinks'
+                HeightStyle = ssAuto
+                WidthStyle = ssPercent
+                ChildOrder = 1
+                ElementPosition = epRelative
+                ElementFont = efCSS
+                Role = ''
+              end
+            end
+          end
+        end
+        object divAccountLinks: TWebHTMLDiv
+          Left = 0
+          Top = 288
+          Width = 179
+          Height = 41
+          ElementClassName = 'mt-3 mb-2 nointeract'
+          ElementID = 'divAccountLinks'
+          HeightStyle = ssAuto
+          WidthStyle = ssPercent
+          ChildOrder = 4
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+        end
+        object divAccountLinksNav: TWebHTMLDiv
+          Left = -3
+          Top = 335
+          Width = 305
+          Height = 48
+          ElementClassName = 'd-flex flex-row align-items-center justify-content-between'
+          ElementID = 'divAccountLinksNav'
+          HeightStyle = ssAuto
+          WidthStyle = ssAuto
+          ChildOrder = 5
+          ElementPosition = epIgnore
+          ElementFont = efCSS
+          Role = ''
+          object WebLabel4: TWebLabel
+            Left = 3
+            Top = 4
+            Width = 135
+            Height = 31
+            AutoSize = False
+            Caption = 'Social Media & Other Links'
+            ElementClassName = 'flex-shrink-1'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            ShowAccelChar = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+          end
+          object WebHTMLDiv4: TWebHTMLDiv
+            Left = 158
+            Top = 4
+            Width = 144
+            Height = 41
+            ElementClassName = 'pe-2'
+            HeightStyle = ssAuto
+            WidthStyle = ssAuto
+            ChildOrder = 5
+            ElementPosition = epIgnore
+            ElementFont = efCSS
+            Role = ''
+            object btnLinkInsert: TWebButton
+              Left = 3
+              Top = 3
+              Width = 30
+              Height = 30
+              Hint = 'New Link'
+              Caption = '<i class="fa-duotone fa-pencil"></i>'
+              ChildOrder = 1
+              ElementClassName = 'btn btn-link NavButton'
+              ElementID = 'btnLinkInsert'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightStyle = ssAuto
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLinkInsertClick
+            end
+            object btnLinkDelete: TWebButton
+              Left = 39
+              Top = 3
+              Width = 30
+              Height = 30
+              Hint = 'Delete Link'
+              Caption = '<i class="fa-duotone fa-trash-can Swap"></i>'
+              ChildOrder = 2
+              ElementClassName = 'btn btn-link NavButton'
+              ElementID = 'btnLinkDelete'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightStyle = ssAuto
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLinkDeleteClick
+            end
+            object btnLinkSave: TWebButton
+              Left = 75
+              Top = 3
+              Width = 30
+              Height = 30
+              Hint = 'Save Changes'
+              Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
+              ChildOrder = 3
+              ElementClassName = 'btn btn-link NavButton'
+              ElementID = 'btnLinkSave'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightStyle = ssAuto
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLinkSaveClick
+            end
+            object btnLinkCancel: TWebButton
+              Left = 111
+              Top = 3
+              Width = 30
+              Height = 30
+              Hint = 'Cancel Changes'
+              Caption = '<i class="fa-duotone fa-xmark fa-xl Swap"></i>'
+              ChildOrder = 4
+              ElementClassName = 'btn btn-link NavButton'
+              ElementID = 'btnLinkCancel'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightStyle = ssAuto
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLinkCancelClick
+            end
+          end
+        end
+        object WebHTMLDiv8: TWebHTMLDiv
+          Left = 0
+          Top = 229
+          Width = 321
+          Height = 41
+          ElementClassName = 'ms-2 me-5'
+          HeightStyle = ssAuto
+          WidthStyle = ssAuto
+          ChildOrder = 2
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+          object btnDescriptionCancel: TWebButton
+            Left = 263
+            Top = 3
+            Width = 30
+            Height = 30
+            Caption = '<i class="fa-duotone fa-xmark Swap fa-xl"></i>'
+            ChildOrder = 2
+            ElementClassName = 'btn btn-link NavButton ButtonR2'
+            ElementID = 'btnDescriptionCancel'
+            ElementFont = efCSS
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            TabStop = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnDescriptionCancelClick
+          end
+          object btnDescriptionSave: TWebButton
+            Left = 227
+            Top = 3
+            Width = 30
+            Height = 30
+            Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
+            ChildOrder = 1
+            ElementClassName = 'btn btn-link NavButton ButtonR1'
+            ElementID = 'btnDescriptionSave'
+            ElementFont = efCSS
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            TabStop = False
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnDescriptionSaveClick
+          end
+          object memoAuthorDescription: TWebMemo
+            Left = 3
+            Top = 0
+            Width = 207
+            Height = 40
+            AutoSize = False
+            BorderStyle = bsNone
+            ChildOrder = 2
+            ElementClassName = 'Edit nointeract'
+            ElementID = 'memoAuthorDescription'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            SelLength = 0
+            SelStart = 0
+            TextHint = 'What would you like everyone to know about you?'
+            WidthStyle = ssPercent
+            WidthPercent = 100.000000000000000000
+            OnChange = memoAuthorDescriptionChange
           end
         end
       end
@@ -3297,7 +3879,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountRoles'
         Caption = 'RO'
@@ -3309,7 +3891,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountCategories'
         Caption = 'CG'
@@ -3321,7 +3903,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountBlogs'
         Caption = 'BL'
@@ -3333,7 +3915,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountNotify'
         Caption = 'NO'
@@ -3341,14 +3923,14 @@ object Form1: TForm1
         ElementBodyClassName = 'd-flex flex-column gap-2 nointeract'
         ElementFont = efCSS
       end
-      object pageAccountSponsor: TWebTabSheet
+      object pageAccountPromotion: TWebTabSheet
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
-        ElementID = 'pageAccountSponsor'
-        Caption = 'SP'
+        ElementID = 'pageAccountPromotion'
+        Caption = 'PR'
         ChildOrder = 3
         ElementBodyClassName = 'd-flex flex-column gap-2 nointeract'
         ElementFont = efCSS
@@ -3369,7 +3951,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountDonate'
         Caption = 'DO'
@@ -3421,7 +4003,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountHistory'
         Caption = 'LH'
@@ -3447,7 +4029,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountActivity'
         Caption = 'AL'
@@ -3572,7 +4154,7 @@ object Form1: TForm1
         Left = 0
         Top = 20
         Width = 400
-        Height = 387
+        Height = 486
         ElementClassName = 'bg-none Page'
         ElementID = 'pageAccountLogout'
         Caption = 'LO'

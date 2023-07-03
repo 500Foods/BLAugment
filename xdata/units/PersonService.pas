@@ -51,7 +51,29 @@ type
     ///  </remarks>
     [Authorize] [HttpGet] function ActionLog(Person: Integer; Session: String): TStream;
 
+    ///  <summary>
+    ///    Update basic person information, including names, birthdate, and description fields.
+    ///  </summary>
+    ///  <remarks>
+    ///    Normally this would be called only by the person themselves, but accommmodations
+    ///    have been made via the role mechanism to accept changes from another account.
+    ///  </remarks>
+
+    [Authorize] [HttpPost] function UpdatePerson(PersonID: Integer; FirstName, MiddleName, LastName, Birthdate, Description: String):String;
+
+
+    ///  <summary>
+    ///    Updates the user-supplied list of links.  This maps directly into the contacts table.
+    ///  </summary>
+    ///  <remarks>
+    ///    Normally this would be called only by the person themselves, but accommmodations
+    ///    have been made via the role mechanism to accept changes from another account.
+    ///  </remarks>
+
+    [Authorize] [HttpPost] function UpdatePersonLinks(PersonID: Integer; Links: String):String;
+
   end;
+
 
 implementation
 

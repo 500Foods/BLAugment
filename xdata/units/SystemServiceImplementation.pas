@@ -7,6 +7,7 @@ uses
   System.SysUtils,
   System.JSON,
   System.DateUtils,
+  System.StrUtils,
 
   System.Generics.Collections,
 
@@ -23,6 +24,23 @@ uses
 
   Bcl.Jose.Core.JWT,
   Bcl.Jose.Core.Builder,
+
+  IdStack,
+  IdBaseComponent,
+  IdComponent,
+  IdTCPConnection,
+  IdTCPClient,
+  IdExplicitTLSClientServerBase,
+  IdMessageClient,
+  IdMessage,
+  IdMessageBuilder,
+  IdAttachment,
+  IdMessageParts,
+  IdEMailAddress,
+  IdAttachmentFile,
+  IdSMTPBase,
+  IdSMTP,
+  IdAttachmentMemory,
 
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
@@ -44,7 +62,13 @@ type
     function Logout(ActionSession: String; ActionLog: String):TStream;
     function LogoutAll(ActionSession: String; ActionLog: String):TStream;
     function Renew(ActionSession: String; ActionLog: String):TStream;
+
     function ChangePassword(OldPassword: String; NewPassword: String; PasswordTest: String):String;
+    function ChangeAccount(AccountName: String):String;
+    function CheckUnique(UniqueAccount: String):Boolean;
+
+    function SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String):String;
+    function VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String):String;
 
     function AvailableIconSets:TStream;
     function SearchIconSets(SearchTerms: String; SearchSets:String; Results:Integer):TStream;
@@ -68,6 +92,109 @@ begin
   Result := TStringStream.Create(MainForm.AppIconSets);
 end;
 
+function TSystemService.ChangeAccount(AccountName: String): String;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+  User: IUserIdentity;
+  JWT: String;
+  PersonID: Integer;
+begin
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  // Time this event
+  ElapsedTime := Now;
+
+  // Get data from the JWT
+  User := TXDataOperationContext.Current.Request.User;
+  JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');
+  if (User = nil) then raise EXDataHttpUnauthorized.Create('Missing authentication');
+
+  // Setup DB connection and query
+  try
+    DatabaseName := User.Claims.Find('dbn').AsString;
+    DatabaseEngine := User.Claims.Find('dbe').AsString;
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Check if we've got a valid JWT (one that has not been revoked)
+  try
+    {$Include sql\system\token_check\token_check.inc}
+    Query1.ParamByName('TOKENHASH').AsString := DBSupport.HashThis(JWT);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+    end;
+  end;
+  if Query1.RecordCount <> 1 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('JWT was not validated');
+  end;
+
+
+  // All good, let's update the account name
+  PersonID := User.Claims.Find('usr').AsInteger;
+  try
+    {$Include sql\system\change_account\change_account.inc}
+    Query1.ParamByName('PERSONID').AsInteger := PersonID;
+    Query1.ParamByName('ACCOUNTNAME').AsString := AccountName;
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CA');
+    end;
+  end;
+
+  // All done.
+  Result := 'Success';
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.ChangeAccount';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := User.Claims.Find('app').AsString;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+IntToStr(PersonID)+': '+AccountName+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
+
 function TSystemService.ChangePassword(OldPassword, NewPassword, PasswordTest: String): String;
 var
   DBConn: TFDConnection;
@@ -77,8 +204,6 @@ var
   ElapsedTime: TDateTime;
   User: IUserIdentity;
   JWT: String;
-  ResultJSON: TJSONObject;
-  ResultArray: TJSONArray;
   PersonID: Integer;
   PasswordHash: String;
 begin
@@ -161,7 +286,7 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: PPC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: CP');
     end;
   end;
   if Query1.RowsAffected <> 1 then
@@ -185,7 +310,111 @@ begin
     Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
     Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
     Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
-    Query1.ParamByName('DETAILS').AsString := '[ '+IntToStr(PersonID)+': '+Result+' ]';
+    Query1.ParamByName('DETAILS').AsString := '['+IntToStr(PersonID)+': '+Result+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
+
+function TSystemService.CheckUnique(UniqueAccount: String): Boolean;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+  User: IUserIdentity;
+  JWT: String;
+begin
+  // Time this event
+  ElapsedTime := Now;
+
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  // Get data from the JWT
+  User := TXDataOperationContext.Current.Request.User;
+  JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');
+  if (User = nil) then raise EXDataHttpUnauthorized.Create('Missing authentication');
+
+  // Setup DB connection and query
+  try
+    DatabaseName := User.Claims.Find('dbn').AsString;
+    DatabaseEngine := User.Claims.Find('dbe').AsString;
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Check if we've got a valid JWT (one that has not been revoked)
+  try
+    {$Include sql\system\token_check\token_check.inc}
+    Query1.ParamByName('TOKENHASH').AsString := DBSupport.HashThis(JWT);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+    end;
+  end;
+  if Query1.RecordCount <> 1 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('JWT was not validated');
+  end;
+
+  // All good, so let's see if it is unique
+    try
+    {$Include sql\system\unique_account\unique_account.inc}
+    Query1.ParamByName('UNIQUEACCOUNT').ASString := Uppercase(Trim(Copy(UniqueAccount,1,32)));
+    Query1.Open;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: UA');
+    end;
+  end;
+  if Query1.RowsAffected <> 1 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('Internal Error: UA');
+  end;
+
+  // All done.
+  Result := (Query1.FieldByName('matches').AsInteger = 0);
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.CheckUnique';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := User.Claims.Find('app').AsString;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+UniqueAccount+': '+Result.ToString(True)+']';
     Query1.ExecSQL;
   except on E: Exception do
     begin
@@ -962,6 +1191,8 @@ var
   ExpiresAt: TDateTime;
   Roles: String;
 
+  EMailAddress: String;
+
   User: IUserIdentity;
 begin
   // Returning JWT, so flag it as such
@@ -1073,6 +1304,35 @@ begin
 //    end;
 //  end;
 
+  // Get the first available EMail address if possible
+  EMailAddress := 'unavailable';
+  try
+    {$Include sql\system\contact_email\contact_email.inc}
+    Query1.ParamByName('PERSONID').AsInteger :=  User.Claims.Find('usr').AsInteger;
+    Query1.Open;
+    if Query1.RecordCount > 0
+    then EMailAddress := Query1.FieldByName('value').AsString;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CE');
+    end;
+  end;
+
+  // Get Profile information - Might have changed since logging in
+  try
+    {$Include sql\person\profile\profile.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: Profile');
+    end;
+  end;
+
+
   // Generate a new JWT
   JWT := TJWT.Create;
   try
@@ -1085,11 +1345,13 @@ begin
     JWT.Claims.SetClaimOfType<string>( 'dbn', User.Claims.Find('dbn').asString );
     JWT.Claims.SetClaimOfType<string>( 'dbe', User.Claims.Find('dbe').asString );
     JWT.Claims.SetClaimOfType<string>( 'rol', Roles );
-    JWT.Claims.SetClaimOfType<string>( 'eml', User.Claims.Find('eml').asString );
-    JWT.Claims.SetClaimOfType<string>( 'fnm', User.Claims.Find('fnm').asString );
-    JWT.Claims.SetClaimOfType<string>( 'mnm', User.Claims.Find('mnm').asString );
-    JWT.Claims.SetClaimOfType<string>( 'lnm', User.Claims.Find('lnm').asString );
-    JWT.Claims.SetClaimOfType<string>( 'anm', User.Claims.Find('anm').asString );
+
+    JWT.Claims.SetClaimOfType<string>( 'eml', EMailAddress );
+    JWT.Claims.SetClaimOfType<string>( 'fnm', Query1.FieldByName('first_name').AsString );
+    JWT.Claims.SetClaimOfType<string>( 'mnm', Query1.FieldByName('middle_name').AsString );
+    JWT.Claims.SetClaimOfType<string>( 'lnm', Query1.FieldByName('last_name').AsString );
+    JWT.Claims.SetClaimOfType<string>( 'anm', Query1.FieldByName('account_name').AsString );
+
     JWT.Claims.SetClaimOfType<string>( 'net', User.Claims.Find('net').asString );
     JWT.Claims.SetClaimOfType<string>( 'aft', FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz',  TTimeZone.local.ToUniversalTime(IssuedAt))+' UTC');
     JWT.Claims.SetClaimOfType<string>( 'unt', FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz',  TTimeZone.local.ToUniversalTime(ExpiresAt))+' UTC');
@@ -1282,6 +1544,324 @@ begin
 
   // Return the array of results
   Result := TStringStream.Create(IconsFound.ToString);
+end;
+
+function TSystemService.SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String): String;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+
+  AuthorizationCode: Integer;
+  AuthorizationCodeString1: String;
+  AuthorizationCodeString2: String;
+  ExpiresAt: TDateTime;
+  ApplicationName: String;
+
+  SMTP1: TIdSMTP;
+  Msg1: TIdMessage;
+  Addr1: TIdEmailAddressItem;
+  Html1: TIdMessageBuilderHtml;
+  SMTPResult: WideString;
+
+begin
+  // Time this event
+  ElapsedTime := Now;
+  ExpiresAt := Now + (10 * 60) / 86400; // 10 minutes
+
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  if not(MainForm.MailServerAvailable)
+  then raise EXDataHttpUnauthorized.Create('Mail Services Not Configured');
+
+  // If the subject doesn't contain a place for the authorization code, then we can't really send an authorization message.
+  if (Pos('{AUTHORIZATION_CODE}', EMailSubject) = 0)
+  then raise EXDataHttpUnauthorized.Create('Invalid Subject: Missing {AUTHORIZATION_CODE}');
+
+  // If the message doesn't contain a place for the authorization code, then we can't really send an authorization message.
+  if (Pos('{AUTHORIZATION_CODE}', EMailBody) = 0)
+  then raise EXDataHttpUnauthorized.Create('Invalid Body: Missing {AUTHORIZATION_CODE}');
+
+  // Setup DB connection and query
+  DatabaseName := MainForm.DatabaseName;
+  DatabaseEngine := MainForm.DatabaseEngine;
+  try
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Check if we've got a valid API_Key
+  try
+    {$Include sql\system\api_key_check\api_key_check.inc}
+    Query1.ParamByName('APIKEY').AsString := LowerCase(APIKey);
+    Query1.Open;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: AKC');
+    end;
+  end;
+  if Query1.RecordCount = 0 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('API_Key was not validated.');
+  end;
+  ApplicationName := Query1.FieldByName('application').AsString;
+
+  // Generate an authorization code (6 digits with a hyphen in the middle)
+  AuthorizationCode := Random(999998)+1; // Don't want zero as a code!
+  AuthorizationCodeString1 := RightStr('000000'+IntToStr(AuthorizationCode),6);
+  AuthorizationCodeString1 := Copy(AuthorizationCodeString1,1,3)+' '+Copy(AuthorizationCodeString1,4,3);
+  AuthorizationCodeString2 := RightStr('000000'+IntToStr(AuthorizationCode),6);
+  AuthorizationCodeString2 := '<span>'+Copy(AuthorizationCodeString2,1,3)+'</span><span style="margin-left:10px">'+Copy(AuthorizationCodeString2,4,3)+'</span>';
+
+  // Store the generated Authorization code for later
+  try
+    {$Include sql\system\authcode_insert\authcode_insert.inc}
+    Query1.ParamByName('AUTHCODE').AsString := DBSupport.HashThis(IntToStr(AuthorizationCode)+EMailAddress+SessionCode);
+    Query1.ParamByName('DESTINATION').AsString:= DBSupport.HashThis(EMailAddress+SessionCode);
+    Query1.ParamByName('VALIDAFTER').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('VALIDUNTIL').AsDateTime := TTimeZone.local.ToUniversalTime(ExpiresAt);
+    Query1.ParamByName('APPLICATION').AsString := ApplicationName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: TI');
+    end;
+  end;
+
+  // Finally, let's send the email
+  Msg1  := nil;
+  Addr1 := nil;
+  SMTP1 := TIdSMTP.Create(nil);
+  SMTP1.Host     := MainForm.MailServerHost;
+  SMTP1.Port     := MainForm.MailServerPort;
+  SMTP1.Username := MainForm.MailServerUser;
+  SMTP1.Password := MainForm.MailServerPass;
+
+  try
+    Html1 := TIdMessageBuilderHtml.Create;
+    try
+      Html1.Html.Add('<html>');
+      Html1.Html.Add('<head>');
+      Html1.Html.Add('</head>');
+      Html1.Html.Add('<body>');
+      Html1.Html.Add(StringReplace(EMailBody, '{AUTHORIZATION_CODE}', AuthorizationCodeString2, [rfReplaceAll, rfIgnoreCase]));
+      Html1.Html.Add('</body>');
+      Html1.Html.Add('</html>');
+      Html1.HtmlCharSet := 'utf-8';
+
+      Msg1 := Html1.NewMessage(nil);
+      Msg1.Subject := StringReplace(EMailSUbject, '{AUTHORIZATION_CODE}', AuthorizationCodeString1, [rfReplaceAll, rfIgnoreCase]);
+      Msg1.From.Text := MainForm.MailServerFrom;
+      Msg1.From.Name := MainForm.MailServerName;
+
+      Addr1 := Msg1.Recipients.Add;
+      Addr1.Address := EMailAddress;
+
+      SMTP1.Connect;
+      try
+        try
+          SMTP1.Send(Msg1);
+        except on E: Exception do
+          begin
+            SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+          end;
+        end;
+      finally
+        SMTP1.Disconnect();
+      end;
+    finally
+      Addr1.Free;  // Shouldn't have to free this?
+      Msg1.Free;   // Shouldn't have to free this?
+      Html1.Free;  // Should have to free this!
+    end;
+  except on E: Exception do
+    begin
+      SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+    end;
+  end;
+  SMTP1.Free; // Should have to free this!
+
+  if SMTPResult = ''
+  then Result := 'Sent'
+  else Result := 'Send Failed: '+SMTPResult;
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+//    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('PERSONID').AsInteger := 1;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.SendConfirmationCode';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := ApplicationName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+Reason+': '+EMailAddress+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
+
+function TSystemService.VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String): String;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+  ApplicationName: String;
+
+begin
+  // Time this event
+  ElapsedTime := Now;
+
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  if not(MainForm.MailServerAvailable)
+  then raise EXDataHttpUnauthorized.Create('Mail Services Not Configured');
+
+  // Setup DB connection and query
+  DatabaseName := MainForm.DatabaseName;
+  DatabaseEngine := MainForm.DatabaseEngine;
+  try
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Check if we've got a valid API_Key
+  try
+    {$Include sql\system\api_key_check\api_key_check.inc}
+    Query1.ParamByName('APIKEY').AsString := LowerCase(APIKey);
+    Query1.Open;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: AKC');
+    end;
+  end;
+  if Query1.RecordCount = 0 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('API_Key was not validated.');
+  end;
+  ApplicationName := Query1.FieldByName('application').AsString;
+
+  // See if we can find a match
+  try
+    {$Include sql\system\authcode_verify\authcode_verify.inc}
+    Query1.ParamByName('AUTHCODE').AsString := DBSupport.HashThis(ConfirmationCode+EMailAddress+SessionCode);
+    Query1.ParamByName('DESTINATION').AsString:= DBSupport.HashThis(EMailAddress+SessionCode);
+    Query1.ParamByName('APPLICATION').AsString := ApplicationName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.Open;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: TI');
+    end;
+  end;
+
+  if Query1.RecordCount = 1
+  then Result := 'Success'
+  else Result := 'Fail';
+
+  // Validated?  What else do we need to do?
+  if (Result = 'Success') and (Copy(Reason,1,6) = 'EMAIL-') then
+  begin
+    try
+      {$Include sql\system\contact_email_update\contact_email_update.inc}
+      Query1.ParamByName('EMAILADDRESS').AsString := EMailAddress;
+      Query1.ParamByName('PERSONID').AsInteger := StrToInt(Copy(Reason,7,length(Reason) - 6));
+      Query1.ExecSQL;
+    except on E: Exception do
+      begin
+        DBSupport.DisconnectQuery(DBConn, Query1);
+        MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+        raise EXDataHttpUnauthorized.Create('Internal Error: CEU');
+      end;
+    end;
+
+    if Query1.RowsAffected <> 1 then
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CP');
+    end;
+
+  end;
+
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+//    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('PERSONID').AsInteger := 1;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.VerifyConfirmationCode';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := ApplicationName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+EMailAddress+': '+Result+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+
 end;
 
 initialization

@@ -81,6 +81,8 @@ begin
   bw := TFDBatchMoveJSONWriter.Create(nil);
   br := TFDBatchMoveDataSetReader.Create(nil);
   try
+    bw.DataDef.WriteNulls := True;
+
     br.Dataset := QueryResult;
     bw.Stream := os;
     bm.Reader := br;

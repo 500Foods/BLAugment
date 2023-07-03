@@ -49,8 +49,9 @@ begin
       SQL.Add('insert into '+TableName+' values( 0, 0, Datetime("now"), 0, 0, "Lists", "");');
       SQL.Add('insert into '+TableName+' values( 0, 1, Datetime("now"), 0, 1, "Contact Types", "");');
       SQL.Add('insert into '+TableName+' values( 0, 2, Datetime("now"), 0, 2, "Organization Info", "");');
-      SQL.Add('insert into '+TableName+' values( 0, 3, Datetime("now"), 0, 2, "Photo Types", "");');
-      SQL.Add('insert into '+TableName+' values( 0, 4, Datetime("now"), 0, 2, "Custom Icons", "");');
+      SQL.Add('insert into '+TableName+' values( 0, 3, Datetime("now"), 0, 3, "Photo Types", "");');
+      SQL.Add('insert into '+TableName+' values( 0, 4, Datetime("now"), 0, 4, "Custom Icons", "");');
+      SQL.Add('insert into '+TableName+' values( 0, 5, Datetime("now"), 0, 5, "Account Name Filter", "");');
 
 
       // Contact Types
@@ -62,11 +63,9 @@ begin
       SQL.Add('insert into '+TableName+' values( 1,  5, Datetime("now"), 0,  5, "Telephone (Home)",      ":TelephoneHome");');
       SQL.Add('insert into '+TableName+' values( 1,  6, Datetime("now"), 0,  6, "Fax Machine (Work)",    ":Fax");');
       SQL.Add('insert into '+TableName+' values( 1,  7, Datetime("now"), 0,  7, "Fax Machine (Home)",    ":FaxHome");');
-      SQL.Add('insert into '+TableName+' values( 1,  8, Datetime("now"), 0,  8, "Facebook",              ":Facebook");');
-      SQL.Add('insert into '+TableName+' values( 1,  9, Datetime("now"), 0,  9, "Twitter",               ":Twitter");');
-      SQL.Add('insert into '+TableName+' values( 1, 10, Datetime("now"), 0, 10, "Instagram",             ":Instagram");');
-      SQL.Add('insert into '+TableName+' values( 1, 11, Datetime("now"), 0, 11, "Address (Work)",        ":Address");');
-      SQL.Add('insert into '+TableName+' values( 1, 12, Datetime("now"), 0, 12, "Address (Home)",        ":AddressWork");');
+      SQL.Add('insert into '+TableName+' values( 1,  8, Datetime("now"), 0, 11, "Address (Work)",        ":Address");');
+      SQL.Add('insert into '+TableName+' values( 1,  9, Datetime("now"), 0, 12, "Address (Home)",        ":AddressWork");');
+      SQL.Add('insert into '+TableName+' values( 1, 10, Datetime("now"), 0, 12, "Social Media Link",     "#FAVICON");');
 
       // Organization Info
       SQL.Add('insert into '+TableName+' values( 2,  0, Datetime("now"), 0,  0, "TMS WEB Core/XData Template", "Organization Name");');
@@ -77,6 +76,20 @@ begin
       // Photo Types
       SQL.Add('insert into '+TableName+' values( 3,  0, Datetime("now"), 0,  0, "Photo (Large)", ":User");');
       SQL.Add('insert into '+TableName+' values( 3,  1, Datetime("now"), 1,  0, "Photo (Thumbnail)", ":User");');
+
+      // Custom Icons
+
+      // Account Name Filter
+      // Use this to prevent these from being chosen as account names
+      SQL.Add('insert into '+TableName+' values( 5,  0, Datetime("now"), 0,  0, "SYSINSTALLER",  "");');
+      SQL.Add('insert into '+TableName+' values( 5,  1, Datetime("now"), 0,  0, "ADMIN",         "");');
+      SQL.Add('insert into '+TableName+' values( 5,  2, Datetime("now"), 0,  0, "ADMINISTRATOR", "");');
+      SQL.Add('insert into '+TableName+' values( 5,  3, Datetime("now"), 0,  0, "SYSTEM",        "");');
+      SQL.Add('insert into '+TableName+' values( 5,  4, Datetime("now"), 0,  0, "ROOT",          "");');
+      SQL.Add('insert into '+TableName+' values( 5,  5, Datetime("now"), 0,  0, "BLOG",          "");');
+      SQL.Add('insert into '+TableName+' values( 5,  6, Datetime("now"), 0,  0, "BLAUGMENT",     "");');
+      SQL.Add('insert into '+TableName+' values( 5,  7, Datetime("now"), 0,  0, "DATABASE",      "");');
+      SQL.Add('insert into '+TableName+' values( 5,  8, Datetime("now"), 0,  0, "DBADMIN",       "");');
 
       ExecSQL;
     end;
