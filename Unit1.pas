@@ -1863,6 +1863,12 @@ var
   OldDate: TDateTime;
   NewDate: TDateTime;
 begin
+
+  // Show window with shade
+  divShade.Visible := True;
+  divAccount.Visible := True;
+  divShade.ElementHandle.style.setProperty('opacity','0.7');
+  divAccount.ElementHandle.style.setProperty('opacity','1.0');
   HideTooltips;
 
   // Account Information
@@ -1890,28 +1896,10 @@ begin
       this.tabAccountOptions.selectRow([0]);
     end;
 
-  end;
+    divAccount.ElementHandle.removeAttribute('data-x');
+    divAccount.ElementHandle.removeAttribute('data-y');
+    divAccount.ElementHandle.style.setProperty('transform', 'translate(0px,0px)');
 
-  // Reset Change Password fields
-  btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
-  divChangePassword.ElementHandle.classList.Add('pe-none');
-  editCurrentPassword.Text := '';
-  editNewPassword.Text := '';
-  editConfirmPassword.Text := '';
-  editCurrentPasswordChange(Sender);
-
-  // Show window with shade
-  divShade.Visible := True;
-  divAccount.Visible := True;
-  divShade.ElementHandle.style.setProperty('opacity','0.7');
-  divAccount.ElementHandle.style.setProperty('opacity','1.0');
-
-  divAccount.ElementHandle.removeAttribute('data-x');
-  divAccount.ElementHandle.removeAttribute('data-y');
-  divAccount.ElementHandle.style.setProperty('transform', 'translateZ(0)');
-
-  if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccount) then
-  begin
     // Positioning
     if TWebLocalStorage.getValue('Window.Accounts.Top') <> '' then
     begin
@@ -1927,10 +1915,17 @@ begin
       divAccount.ElementHandle.style.setProperty('width','630px');
       divAccount.ElementHandle.style.setProperty('height','450px');
     end;
+    WebFormResize(Sender);
 
   end;
-  WebFormResize(Sender);
 
+  // Reset Change Password fields
+  btnChangePassword.Caption := '<i class="fa-duotone fa-xmark Swap me-2 fa-2x"></i>';
+  divChangePassword.ElementHandle.classList.Add('pe-none');
+  editCurrentPassword.Text := '';
+  editNewPassword.Text := '';
+  editConfirmPassword.Text := '';
+  editCurrentPasswordChange(Sender);
 
   // Author Profile
   divAuthorProfileName.ElementHandle.innerHTML := '<div class="LabelAlt DropShadow ps-1 pe-5" style="width: auto; overflow: hidden; text-overflow: ellipsis;">'+User_Name+'</div>';

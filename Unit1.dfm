@@ -2769,8 +2769,19 @@ object Form1: TForm1
       '  <i class="fa-duotone fa-sun fa-3x"></i>'
       '  <i class="fa-duotone fa-moon fa-3x"></i>'
       '  <i class="fa-duotone fa-heart fa-3x"></i>'
-      '  <i class="fa-duotone fa-clock-desk fa-lg Swap"></i>'
-      '  <i class="fa-duotone fa-globe fa-lg Swap"></i>'
+      '  <i class="fa-duotone fa-clock-desk fa-lg"></i>'
+      '  <i class="fa-duotone fa-globe fa-lg"></i>'
+      '  <i class="fa-duotone fa-computer fa-lg"></i>'
+      '  <i class="fa-duotone fa-globe fa-lg"></i>'
+      '  <i class="fa-duotone fa-computer"></i>'
+      '  <i class="fa-duotone fa-tablet-button"></i>'
+      '  <i class="fa-duotone fa-tablet-button"></i>'
+      '  <i class="fa-brands fa-chrome"></i>'
+      '  <i class="fa-brands fa-edge"></i>'
+      '  <i class="fa-brands fa-firefox-browser"></i>'
+      '  <i class="fa-brands fa-safari"></i>'
+      '  <i class="fa-brands fa-windows"></i>'
+      '  <i class="fa-brands-apple"></i>'
       
         '  <img src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/ic' +
         'ons/en.svg">'
@@ -2902,7 +2913,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 9
+      TabIndex = 11
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet

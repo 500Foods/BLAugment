@@ -1,22 +1,18 @@
-html,
-body {
-  width: 100;
+html {
+  width: 100%;
   height: 100%;
 }
 
 body {
-  font-family: Cairo !important;
-  background: black;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   margin: 0px;
   padding: 0px;
   opacity: 0;
+  font-family: Cairo !important;
+  background: black;
   transition: opacity 1s 1s, background 1s;
   overflow: hidden;
-}
-* {
-  box-sizing: border-box;
 }
 
 /* Setup our Default Theme - Dark */
