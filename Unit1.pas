@@ -37,7 +37,6 @@ type
     divSearchBG: TWebHTMLDiv;
     editSearch: TWebEdit;
     divMainMenuBG: TWebHTMLDiv;
-    btnThemeDark: TWebButton;
     btnRegister: TWebButton;
     btnLogin: TWebButton;
     divBlogTypes: TWebHTMLDiv;
@@ -277,8 +276,6 @@ type
     btnChangeAccountEMail: TWebButton;
     WebHTMLDiv7: TWebHTMLDiv;
     editEMailCode: TWebEdit;
-    btnThemeLight: TWebButton;
-    btnThemeRed: TWebButton;
     pageAccountAuthor: TWebTabSheet;
     WebLabel3: TWebLabel;
     divAuthorProfileHolder: TWebHTMLDiv;
@@ -304,6 +301,10 @@ type
     btnDescriptionCancel: TWebButton;
     btnDescriptionSave: TWebButton;
     memoAuthorDescription: TWebMemo;
+    divThemes: TWebHTMLDiv;
+    btnThemeLight: TWebButton;
+    btnThemeRed: TWebButton;
+    btnThemeDark: TWebButton;
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
     [async] procedure WebFormCreate(Sender: TObject);
@@ -361,6 +362,7 @@ type
     [async] procedure btnFirstNameSaveClick(Sender: TObject);
     [async] procedure btnDescriptionSaveClick(Sender: TObject);
     procedure btnDescriptionCancelClick(Sender: TObject);
+    procedure WebFormResize(Sender: TObject);
   private
     { Private declarations }
   public
@@ -472,7 +474,7 @@ begin
           }, 500);
         }
       }
-    },500);
+    },1250);
   end;
 end;
 
@@ -509,7 +511,7 @@ begin
     LogStamp
   ]));
 
-  if RequestResponse = 'Success' then
+  if RequestResponse = 'Sent' then
   begin
     LogAction('Activity Log E-Mail Sent');
   end
@@ -523,9 +525,24 @@ begin
 end;
 
 procedure TForm1.btnActivityLogPrintClick(Sender: TObject);
+var
+  PageHeader: String;
 begin
-  LogAction('[ Print Activity Log ]');
+  PageHeader := '[ '+App_Name+' '+App_Version+' ][ '+User_Account+' ] Activity Log for ';
+  if comboActivityLog.DisplayText = 'Current Session'
+  then PageHeader := PageHeader+'Current Session: '+FormatDateTime('yyyy-mmm-dd hh:nn:ss',App_Start)
+  else PageHeader := PageHeader+comboActivityLog.DisplayText;
 
+  LogAction('[ Activity Log Printed: '+comboActivityLog.DisplayText+' ]');
+
+  asm
+    printJS({
+      printable: 'divActionLog',
+      type: 'html',
+      header: PageHeader,
+      headerStyle: 'font-size: 14px; font-weight: bold; font-family: sans-serif;'
+    });
+  end;
 end;
 
 procedure TForm1.UpdateAccountLinks;
@@ -539,7 +556,7 @@ begin
       } catch {
         var domain = 'blaugment.com';
       }
-      var image =  '<img class="DropShadow" style="object-fit:contain; border-radius: 4px; width:100%;" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=128">';
+      var image =  '<img class="DropShadow" style="object-fit:contain; border-radius: 4px; width:100%;" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=180">';
       divAuthorProfileLinks.innerHTML +=
         '<div title="'+domain+'" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" style="border-radius: 8px; width: 28px;">'+
           '<a target="_blank" style="text-decoration: none;" href="'+row.getCell('Link').getValue()+'">'+
@@ -548,9 +565,14 @@ begin
        '</div>';
     }
 
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    var tooltipList = tooltipTriggerList.map( function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger : 'hover',
+        container: 'body'
+      });
+    });
 
     // Also update navigator buttons
     var This = pas.Unit1.Form1;
@@ -597,6 +619,8 @@ begin
   else if Theme = 'red'   then btnThemeRed.ElementHandle.style.setProperty('opacity','1');
 
   document.documentElement.setAttribute('theme', Theme);
+
+  editSearch.ElementHandle.setAttribute('size','1');
 
   // If Font Awesome Pro is not available, switch to the free version
   // btnTheme.Caption := StringReplace(btnTheme.Caption,'fa-duotone','fa-solid',[]);
@@ -863,8 +887,13 @@ begin
 
   // Convert all tooltips to Bootstrap tooltips
   asm
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
+    var tooltipList = tooltipTriggerList.map( function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger : 'hover'
+      });
+    });
   end;
 
   // JavaScript Sleep Function
@@ -918,7 +947,7 @@ begin
       index: "ID",
       layout: "fitColumns",
       selectable: 1,
-      rowHeight: 30,
+      rowHeight: 27,
       headerVisible: false,
       columnDefaults:{
         resizable: false
@@ -1083,7 +1112,7 @@ begin
               } catch {
                 var domain = 'blaugment.com';
               }
-              return '<img title="'+domain+'" style="width:24px; border-radius:4px;" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=128 ">';
+              return '<img title="'+domain+'" style="width:24px; border-radius:4px;" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=180">';
             }
         },
         { title: "", field: "Link", editor: true, cssClass: "Links" }
@@ -1286,6 +1315,7 @@ begin
     addAutoResize();
   end;
 
+  PreventCompilerHint(i);
 end;
 
 function TForm1.JSONRequest(Endpoint: String; Params: array of JSValue): String;
@@ -1817,6 +1847,8 @@ end;
 
 procedure TForm1.btnAccountChangeClick(Sender: TObject);
 begin
+  HideToolTips;
+
   // Manage different Account
 
 
@@ -1897,6 +1929,8 @@ begin
     end;
 
   end;
+  WebFormResize(Sender);
+
 
   // Author Profile
   divAuthorProfileName.ElementHandle.innerHTML := '<div class="LabelAlt DropShadow ps-1 pe-5" style="width: auto; overflow: hidden; text-overflow: ellipsis;">'+User_Name+'</div>';
@@ -2235,6 +2269,8 @@ end;
 
 procedure TForm1.btnLoginClick(Sender: TObject);
 begin
+  HideToolTips;
+
   // Login
   if not(LoggedIn) then
   begin
@@ -2265,6 +2301,7 @@ end;
 
 procedure TForm1.btnSearchClick(Sender: TObject);
 begin
+  HideToolTips;
   // Search for Blogs
 
 end;
@@ -2344,6 +2381,8 @@ end;
 
 procedure TForm1.btnThemeDarkClick(Sender: TObject);
 begin
+  HideToolTips;
+
   // Switch Themes - only 'dark' and 'light' for now
   if Theme = 'dark' then
   begin
@@ -2397,7 +2436,7 @@ var
     fail: Integer;
     RequestResponse: String;
   const
-    Nums: array[0..9] of String = ('0','1','2','3','4','5','6','7','8','9');
+//    Nums: array[0..9] of String = ('0','1','2','3','4','5','6','7','8','9');
     // removed hyphen, dot, and forward slash
     Syms: array[0..25] of String = ('!','@','#','$','%','^','&','*','(',')','+','=',',','<','>','?','`','~','[',']','{','}','\','|',';',':');
   begin
@@ -2557,6 +2596,7 @@ var
 
   function IsValidEMail(EMail: String):Boolean;
   begin
+    Result := False;
     asm
       // https://www.regextester.com/115911
       var validformat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
@@ -2642,9 +2682,6 @@ begin
 end;
 
 procedure TForm1.editFirstNameChange(Sender: TObject);
-var
-  Change: Boolean;
-  ValidChange: Boolean;
 begin
 
   if (Trim(editFirstName.Text) <> User_FirstName) or
@@ -2814,6 +2851,8 @@ end;
 
 procedure TForm1.btnAccountRefreshClick(Sender: TObject);
 begin
+  HideToolTips;
+
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin Swap fa-xl"></i>';
 
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccountRefresh)
@@ -2927,6 +2966,47 @@ begin
 
 end;
 
+
+procedure TForm1.WebFormResize(Sender: TObject);
+var
+  innerWidth: Double;
+  innerHeight: Double;
+
+  dialogTop: Double;
+  dialogLeft: Double;
+  dialogWidth: Double;
+  dialogHeight: Double;
+
+begin
+  if divAccount.Visible then
+  begin
+    asm
+      innerWidth = divShade.getBoundingClientRect().width;
+      innerHeight = divShade.getBoundingClientRect().height;
+
+      dialogTop = divAccount.getBoundingClientRect().top + (divAccount.getAttribute('data-y') || 0);
+      dialogLeft = divAccount.getBoundingClientRect().left + (divAccount.getAttribute('data-x') || 0);
+      dialogWidth = divAccount.getBoundingClientRect().width;
+      dialogHeight = divAccount.getBoundingClientRect().height;
+//      console.log('t: '+dialogTop+', l: '+dialogLeft+', w: '+dialogWidth+', h: '+dialogHeight+', IW: '+innerWidth+', IH: '+innerHeight);
+    end;
+
+    if (dialogTop < 0) or
+       ((dialogTop + dialogHeight) > innerHeight) or
+       (dialogLeft < 0) or
+       ((dialogLeft + dialogWidth) > innerWidth) then
+    begin
+      divAccount.ElementHandle.setAttribute('data-x','0');
+      divAccount.ElementHandle.setAttribute('data-y','0');
+      divAccount.ElementHandle.style.setProperty('transform','translate(0px, 0px)');
+      divAccount.ElementHandle.style.setProperty('top','2px');
+      divAccount.ElementHandle.style.setProperty('left','2px');
+      divAccount.ElementHandle.style.setProperty('width',IntToStr(Trunc(innerWidth - 4))+'px');
+      divAccount.ElementHandle.style.setProperty('height',IntToStr(Trunc(innerHeight - 4))+'px');
+    end;
+  end;
+
+end;
 
 procedure TForm1.tmrLogoutTimer(Sender: TObject);
 begin

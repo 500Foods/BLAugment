@@ -737,8 +737,6 @@ begin
   LinksJSON := TJSONObject.ParseJSONValue(Links) as TJSONArray;
   if (LinksJSON = nil) then raise EXDataHttpUnauthorized.Create('ParameterData JSON parse failed');
 
-  MainForm.mmInfo.LInes.add(LinksJSON.toString);
-
   // Get data from the JWT
   User := TXDataOperationContext.Current.Request.User;
   JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');

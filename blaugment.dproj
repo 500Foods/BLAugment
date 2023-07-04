@@ -1,0 +1,2528 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{28AF142E-522E-4853-934D-802FEDB32174}</ProjectGuid>
+        <ProjectVersion>18.7</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>blaugment.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <TMSWebProject>2</TMSWebProject>
+        <TMSWebPWA>2</TMSWebPWA>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+        <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
+        <SanitizedProjectName>blaugment</SanitizedProjectName>
+        <TMSWebPWAServiceWorkerFile>ServiceWorker.js</TMSWebPWAServiceWorkerFile>
+        <TMSPWAManifestFile>Manifest.json</TMSPWAManifestFile>
+        <TMSWebPWAResIconLowFile>IconResLow.png</TMSWebPWAResIconLowFile>
+        <TMSWebPWAResIconMidFile>IconResMid.png</TMSWebPWAResIconMidFile>
+        <TMSWebPWAResIconHighFile>IconResHigh.png</TMSWebPWAResIconHighFile>
+        <TMSWebHTMLFile>blaugment.html</TMSWebHTMLFile>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;fmxase;DBXDb2Driver;DBXInterBaseDriver;FmxTeeUI926;VCLTMSFNCChartPkgDXE12;vclactnband;vclFireDAC;emsclientfiredac;tethering;svnui;DataSnapFireDAC;FireDACADSDriver;DBXMSSQLDriver;TMSQueryStudio;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;JSExtend;vcltouch;rbUSERDesign2126;FMXTMSFNCUIPackPkgDXE12;vcldb;bindcompfmx;svn;TMSWEBCorePkgLibDXE12;DBXOracleDriver;TMSCloudPkgDXE12;inetdb;IcsFmxD103Run;CEF4Delphi;FMXTMSFNCWebSocketPkgDXE12;IcsVclD103Run;rbTC2126;FMXTMSFNCWXPackPkgDXE12;emsedge;fmx;FireDACIBDriver;fmxdae;vclib;rbBDE2126;FireDACDBXDriver;dbexpress;IndyCore;DCEF_XE5;xdata;vclx;dsnap;emsclient;DataSnapCommon;rbRCL2126;FireDACCommon;VCLTMSFNCUIPackPkgDXE12;RESTBackendComponents;DataSnapConnectors;TMSCloudPkgDEDXE12;VCLRESTComponents;soapserver;vclie;FMXTeeDB926;bindengine;DBXMySQLDriver;CloudService;FireDACOracleDriver;FireDACMySQLDriver;DBXFirebirdDriver;CData.QuickBooksOnline.D26;FireDACCommonODBC;FireDACCommonDriver;VCLTMSFNCCorePkgDXE12;DataSnapClient;inet;rbTCUI2126;IndyIPCommon;bindcompdbx;vcl;IndyIPServer;DBXSybaseASEDriver;sparkle;tmsbcl;IndySystem;FireDACDb2Driver;VCLTMSFNCDashboardPackPkgDXE12;FMXTee926;dsnapcon;VCLTMSFNCMapsPkgDXE12;FMXTMSFNCCorePkgDXE12;TMSWorkflow;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;FireDAC;FMXTMSFNCMapsPkgDXE12;emshosting;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;advmemopkgdXE12;DBXOdbcDriver;FireDACTDataDriver;TMSDiagram;soaprtl;DbxCommonDriver;FMXTMSFNCDashboardPackPkgDXE12;ibxpress;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;vclwinx;FireDACDSDriver;rtl;emsserverresource;DbxClientDriver;ibxbindings;DBXSybaseASADriver;CustomIPTransport;vcldsnap;VCLTMSFNCWebSocketPkgDXE12;rbIDE2126;bindcomp;appanalytics;DBXInformixDriver;IndyIPClient;EurekaLogCore;rbCloudSC2126;bindcompvcl;IcsCommonD103Run;rbUSER2126;TMSCryptoPkgDXE12;dclTMSQueryStudio;TMSWEBCorePkgDXE12;dbxcds;VclSmp;adortl;FireDACODBCDriver;VCLTMSFNCWXPackPkgDXE12;DataSnapIndy10ServerTransport;aurelius;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;inetdbxpress;FireDACMongoDBDriver;TMSCryptoPkgDEDXE12;FMXTMSFNCChartPkgDXE12;DataSnapServerMidas;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;fmxase;DBXDb2Driver;DBXInterBaseDriver;VCLTMSFNCChartPkgDXE12;vclactnband;vclFireDAC;emsclientfiredac;tethering;DataSnapFireDAC;FireDACADSDriver;DBXMSSQLDriver;TMSQueryStudio;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;vcltouch;FMXTMSFNCUIPackPkgDXE12;vcldb;bindcompfmx;DBXOracleDriver;inetdb;IcsFmxD103Run;CEF4Delphi;IcsVclD103Run;emsedge;fmx;FireDACIBDriver;fmxdae;vclib;FireDACDBXDriver;dbexpress;IndyCore;xdata;vclx;dsnap;emsclient;DataSnapCommon;FireDACCommon;VCLTMSFNCUIPackPkgDXE12;RESTBackendComponents;DataSnapConnectors;VCLRESTComponents;soapserver;vclie;bindengine;DBXMySQLDriver;CloudService;FireDACOracleDriver;FireDACMySQLDriver;DBXFirebirdDriver;CData.QuickBooksOnline.D26;FireDACCommonODBC;FireDACCommonDriver;VCLTMSFNCCorePkgDXE12;DataSnapClient;inet;IndyIPCommon;bindcompdbx;vcl;IndyIPServer;DBXSybaseASEDriver;sparkle;tmsbcl;IndySystem;FireDACDb2Driver;VCLTMSFNCDashboardPackPkgDXE12;dsnapcon;VCLTMSFNCMapsPkgDXE12;FMXTMSFNCCorePkgDXE12;TMSWorkflow;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;FireDAC;FMXTMSFNCMapsPkgDXE12;emshosting;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;DBXOdbcDriver;FireDACTDataDriver;TMSDiagram;soaprtl;DbxCommonDriver;ibxpress;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;vclwinx;FireDACDSDriver;rtl;emsserverresource;DbxClientDriver;ibxbindings;DBXSybaseASADriver;CustomIPTransport;vcldsnap;bindcomp;appanalytics;DBXInformixDriver;IndyIPClient;bindcompvcl;IcsCommonD103Run;dbxcds;VclSmp;adortl;FireDACODBCDriver;DataSnapIndy10ServerTransport;aurelius;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;inetdbxpress;FireDACMongoDBDriver;FMXTMSFNCChartPkgDXE12;DataSnapServerMidas;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+        <TMSWebDebugInfo>2</TMSWebDebugInfo>
+        <TMSWebDefines>$(TMSWebDefines);DEBUG</TMSWebDefines>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <TMSWebObfuscation>2</TMSWebObfuscation>
+        <TMSWebOptimization>2</TMSWebOptimization>
+        <TMSWebDefines>$(TMSWebDefines);RELEASE</TMSWebDefines>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Icon_MainIcon>icons\favicon.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>icons\favicon-44x44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>icons\favicon-150x150.png</UWP_DelphiLogo150>
+        <TMSPWAApplicationShortName>blaugment</TMSPWAApplicationShortName>
+        <TMSWebPWAResIconLowFile>icons\favicon-64x64.png</TMSWebPWAResIconLowFile>
+        <TMSPWAApplicationName>blaugment</TMSPWAApplicationName>
+        <TMSWebPWAThemeColor>black</TMSWebPWAThemeColor>
+        <TMSWebPWAResIconHighFile>icons\favicon-512x512.png</TMSWebPWAResIconHighFile>
+        <TMSPWABackgroundColor>black</TMSPWABackgroundColor>
+        <TMSWebPWAResIconMidFile>icons\favicon-256x256.png</TMSWebPWAResIconMidFile>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="Unit1.pas">
+            <Form>Form1</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TWebForm</DesignClass>
+        </DCCReference>
+        <None Include="blaugment.html"/>
+        <None Include="Manifest.json"/>
+        <None Include="ServiceWorker.js"/>
+        <None Include="blaugment.css"/>
+        <RcItem Include="images\bookshelf_blue.jpg">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>JpgImage_1</ResourceId>
+        </RcItem>
+        <RcItem Include="images\bookshelf.jpg">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>JpgImage_2</ResourceId>
+        </RcItem>
+        <RcItem Include="images\bookshelf_red.jpg">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>JpgImage_3</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\apple-touch-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_6</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon.ico">
+            <ResourceType>ICON</ResourceType>
+            <ResourceId>Icon_1</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-16x16.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_7</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_8</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-44x44.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_9</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-64x64.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_10</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-128x128.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_11</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-150x150.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_12</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-192x192.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_13</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-256x256.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_14</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-512x512.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_4</ResourceId>
+        </RcItem>
+        <RcItem Include="favicon.ico">
+            <ResourceType>ICON</ResourceType>
+            <ResourceId>Icon_2</ResourceId>
+        </RcItem>
+        <RcItem Include="favicon-64x64.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_1</ResourceId>
+        </RcItem>
+        <RcItem Include="favicon-256x256.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_2</ResourceId>
+        </RcItem>
+        <RcItem Include="favicon-512x512.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_3</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_5</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable-hdpi-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_15</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable-ldpi-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_16</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable-mdpi-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_17</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable-xhdpi-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_18</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable-xxhdpi-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_19</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\drawable-xxxhdpi-icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_20</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\favicon-1024x1024.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_21</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_22</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_23</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-20.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_24</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-20x20@1x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_25</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-20x20@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_26</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-20x20@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_27</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-24@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_28</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-27.5@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_29</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-29x29@1x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_30</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-29x29@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_31</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-29x29@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_32</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-40.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_33</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-40@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_34</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-40@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_35</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-40x40@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_36</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-40x40@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_37</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-44@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_38</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-50.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_39</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-50@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_40</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-60.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_41</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-60@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_42</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-60@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_43</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-60x60@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_44</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-60x60@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_45</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-72.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_46</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-72@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_47</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-76.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_48</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-76@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_49</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-76x76@1x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_50</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-76x76@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_51</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-83.5@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_52</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-86@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_53</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-98@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_54</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-1024.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_55</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-16x16.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_56</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-24x24.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_57</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-30x30.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_58</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_59</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-42x42.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_60</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-48x48.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_61</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-50x50.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_62</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-54x54.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_63</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-70x70.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_64</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-90x90.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_65</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-120x120.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_66</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-150x150.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_67</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-210x210.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_68</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-256x256.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_69</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\iconApplicationIcon-270x270.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_70</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\Icon-marketing-1024x1024.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_71</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-small.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_72</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-small@2x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_73</ResourceId>
+        </RcItem>
+        <RcItem Include="icons\icon-small@3x.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_74</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\blaugment-4096x4096.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_75</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@2x~ipad~anyany.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_76</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@2x~ipad~comany.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_77</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@2x~iphone.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_78</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@2x~iphone~comany.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_79</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@2x~iphone~comcom.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_80</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@2x~universal~anyany.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_81</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@3x~iphone~anyany.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_82</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@3x~iphone~anycom.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_83</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default@3x~iphone~comany.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_84</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default~iphone.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_85</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-568h@2x~iphone.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_86</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-667h.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_87</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-736h.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_88</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-2436h.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_89</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Landscape@~ipadpro.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_90</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Landscape@2x~ipad.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_91</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Landscape~ipad.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_92</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Landscape-736h.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_93</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Landscape-2436h.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_94</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Portrait@~ipadpro.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_95</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Portrait@2x~ipad.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_96</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\Default-Portrait~ipad.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_97</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-hdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_98</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-ldpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_99</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-mdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_100</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_101</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-xhdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_102</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-xxhdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_103</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-land-xxxhdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_104</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-hdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_105</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-ldpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_106</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-mdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_107</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_108</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-xhdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_109</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-xxhdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_110</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\drawable-port-xxxhdpi-screen.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_111</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_112</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage~ipad.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_113</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage~iphone_640x960.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_114</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage~iphone-320x480.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_115</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-568h@2x~iphone_640x1136.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_116</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-750@2x~iphone6-landscape_1334x750.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_117</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-750@2x~iphone6-portrait_750x1334.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_118</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-828@2x~iphoneXr-portrait_828x1792.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_119</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-1125@3x~iphoneX-portrait_1125x2436.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_120</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-1242@3x~iphone6s-landscape_2208x1242.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_121</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-1242@3x~iphone6s-portrait_1242x2208.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_122</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-1242@3x~iphoneXsMax-portrait_1242x2688.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_123</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-1792@2x~iphoneXr-landscape_1792x828.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_124</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-2436@3x~iphoneX-landscape_2436x1125.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_125</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-2688@3x~iphoneXsMax-landscape_2688x1242.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_126</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Landscape@2x~ipad_2048x1496.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_127</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Landscape@2x~ipad_2048x1536.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_128</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Landscape@2x~ipad_2224x1668.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_129</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Landscape@2x~ipad_2732x2048.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_130</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Landscape~ipad_1024x748.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_131</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Landscape~ipad_1024x768.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_132</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Portrait@2x~ipad_1536x2008.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_133</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Portrait@2x~ipad_1536x2048.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_134</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Portrait@2x~ipad_1668x2224.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_135</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Portrait@2x~ipad_2048x2732.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_136</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\LaunchImage-Portrait~ipad_768x1024.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_137</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\screenSplashscreen-620x300.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_138</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\screenSplashscreen-868x420.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_139</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\screenSplashscreen-1116x540.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_140</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\ipad_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_141</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\ipadpro1_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_142</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\ipadpro2_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_143</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\ipadpro3_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_144</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\iphone5_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_145</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\iphone6_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_146</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\iphoneplus_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_147</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\iphonex_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_148</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\iphonexr_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_149</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\iphonexsmax_splash.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_150</ResourceId>
+        </RcItem>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">blaugment.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\Steema Software\Steema TeeChart Standard VCL FMX 2022.35\Delphi26\Delphi26.win32\Bin\DclTee926.bpl">TeeChart Standard 2022 Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\FMXTMSFNCWXPackPkgDXE12.bpl">TMS FNC WX Pack for FMX</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCWXPackPkgDEDXE12.bpl">TMS FNC WX Pack for FMX/VCL Designtime</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCCorePkgDEDXE12.bpl">TMS FNC Core for FMX/VCL Designtime</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCUIPackPkgDEDXE12.bpl">TMS FNC UI Pack for FMX/VCL Designtime</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCChartPkgDEDXE12.bpl">TMS FNC Chart for FMX/VCL Designtime</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment Version="3">
+                <DeployFile LocalName="splashes\drawable-land-xxxhdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Untitled1.css" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Landscape@~ipadpro.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-512x512.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-29x29@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-1242@3x~iphone6s-portrait_1242x2208.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-1792@2x~iphoneXr-landscape_1792x828.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@3x~iphone~comany.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-828@2x~iphoneXr-portrait_828x1792.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-70x70.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\blaugment-4096x4096.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-76x76@1x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-mdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Portrait@2x~ipad_1536x2048.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-76x76@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-small.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon.ico" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-16x16.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-568h@2x~iphone_640x1136.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="images\bookshelf.jpg" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Portrait~ipad.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-60x60@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\ipadpro1_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-60.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Landscape-2436h.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage~iphone_640x960.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Portrait@2x~ipad.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\blaugment.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>blaugment.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Landscape@2x~ipad_2224x1668.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\iphone6_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="favicon-256x256.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-86@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-marketing-1024x1024.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-210x210.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-24x24.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable-xxxhdpi-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-29x29@1x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable-xhdpi-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Manifest.json" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-40@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\apple-touch-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-76.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-150x150.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-27.5@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="IconResHigh.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-land-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Landscape-736h.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-750@2x~iphone6-portrait_750x1334.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Landscape@2x~ipad.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-40x40@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-1242@3x~iphoneXsMax-portrait_1242x2688.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Portrait~ipad_768x1024.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-1024.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="blaugment.css" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-750@2x~iphone6-landscape_1334x750.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\screenSplashscreen-620x300.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-270x270.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@2x~iphone~comcom.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-land-xhdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-98@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-land-ldpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-xhdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\ipadpro2_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Portrait@2x~ipad_2048x2732.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-50.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-20x20@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-72.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-48x48.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable-mdpi-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@2x~iphone.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-568h@2x~iphone.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Portrait@~ipadpro.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ServiceWorker.js" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-Landscape~ipad.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Landscape@2x~ipad_2732x2048.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Landscape~ipad_1024x748.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-736h.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\iphone5_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-120x120.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-256x256.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-40.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="images\bookshelf_blue.jpg" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-83.5@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\screenSplashscreen-1116x540.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-1242@3x~iphone6s-landscape_2208x1242.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-64x64.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-24@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@2x~ipad~comany.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-40x40@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default~iphone.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Landscape@2x~ipad_2048x1496.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Manifest.json" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable-xxhdpi-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-60@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Portrait@2x~ipad_1536x2008.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-1125@3x~iphoneX-portrait_1125x2436.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-29x29@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@2x~iphone~comany.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\ipad_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-1024x1024.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-42x42.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-44@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ServiceWorker.js" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-256x256.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="favicon.ico" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-50@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@2x~universal~anyany.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-20x20@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage~ipad.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-2436@3x~iphoneX-landscape_2436x1125.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Landscape@2x~ipad_2048x1536.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-76@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\iphonex_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="IconResMid.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="images\bookshelf_red.jpg" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-20x20@1x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-32x32.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-small@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Release\blaugment.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>blaugment.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-land-hdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-land-mdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage~iphone-320x480.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\screenSplashscreen-868x420.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-54x54.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-30x30.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-50x50.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="favicon-64x64.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-hdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Landscape~ipad_1024x768.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-Portrait@2x~ipad_1668x2224.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-ldpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-land-xxhdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\LaunchImage-2688@3x~iphoneXsMax-landscape_2688x1242.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-16x16.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\ipadpro3_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-20.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-72@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="blaugment.html" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-2436h.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\iphoneplus_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default-667h.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Project1.html" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-40@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-192x192.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-small@3x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable-ldpi-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\Icon-60x60@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\iconApplicationIcon-90x90.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="favicon-512x512.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@2x~ipad~anyany.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-150x150.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\iphonexr_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\iphonexsmax_splash.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-xxhdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\drawable-port-xxxhdpi-screen.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\drawable-hdpi-icon.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-128x128.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="IconResLow.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\icon-60@2x.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@3x~iphone~anyany.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-44x44.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\Default@3x~iphone~anycom.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="icons\favicon-32x32.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidFileProvider">
+                    <Platform Name="Android">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_Colors">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon24">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_Strings">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1024x768">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1536x2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1668">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1668x2388">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048x1536">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048x2732">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2224">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2388x1668">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2732x2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch768x1024">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1125">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1136x640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1242">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1242x2688">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1334">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1792">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2208">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2436">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2688x1242">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch320">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640x1136">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch750">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch828">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSEntitlements">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSInfoPList">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXDebug">
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements">
+                    <Platform Name="OSX32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXInfoPList">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+            </Deployment>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>
