@@ -83,6 +83,17 @@ type
 
     [Authorize] [HttpPost] function SendActionLog(LogText: String; LogStamp: String):String;
 
+    ///  <summary>
+    ///    Update basic person information, including names, birthdate, and description fields.
+    ///  </summary>
+    ///  <remarks>
+    ///    Normally this would be called only by the person themselves, but accommmodations
+    ///    have been made via the role mechanism to accept changes from another account.
+    ///  </remarks>
+
+    [Authorize] [HttpPost] function UpdatePersonPhoto(PersonID: Integer; Photo: String):String;
+
+
   end;
 
 

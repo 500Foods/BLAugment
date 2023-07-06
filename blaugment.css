@@ -15,7 +15,12 @@ body {
   overflow: hidden;
 }
 
-/* Setup our Default Theme - Dark */
+/* Recommended for helping with iOS page zoom blocking */
+* {
+  box-sizing: border-box;
+}
+
+/* Setup Default Theme - Dark */
 :root {
   --bl-color-one: cornflowerblue;
   --bl-color-two: #0047AB; /* cobalt blue */
@@ -27,7 +32,7 @@ body {
   --bl-image-size: contain;
   --bl-border: 2px solid var(--bl-color-one);
   --bl-radius: 8px;
-  --bl-opacity: 0.75;
+  --bl-opacity: 0.9;
   --bl-shadow: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black);
 
   --bl-background-blog: var(--bl-color-one);
@@ -117,20 +122,36 @@ html[theme="red"] .BLTooltip {
 }
 
 
-/* Specific Overrides */
+/* used to hide layers of UI */
 #divShade {
+  z-index: 100;
   position: absolute;
+  background: black;
+  margin: 0px;
+  padding: 0px;
   top: 0px;
   left: 0px;
   width: 100%;
   height: 100%;
-  background: black;
   opacity: 0;
   transition: opacity 0.5s;
-  z-index: 100;
+}
+#divShade2 {
+  z-index: 200;
+  position: absolute;
+  background: black;
   margin: 0px;
   padding: 0px;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s;
 }
+
+
+/* Specific Elements */
 #divAccount,
 #divAdd,
 #divLogin {
@@ -139,6 +160,14 @@ html[theme="red"] .BLTooltip {
   transition: opacity 0.5s;
 }
 #divLogin {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+}
+#divURL {
+  z-index: 201;
+  opacity: 0;
+  transition: opacity 0.5s;
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%);
@@ -221,6 +250,25 @@ html[theme="red"] .BLTooltip {
   height: calc(100% - 2rem - 42px) !important;
   border-right: var(--bl-border) !important;
 }
+#divAccountOptions .tabulator-row .tabulator-cell {
+  padding: 3px 0px;
+  overflow: visible;
+  text-overflow: unset;
+  filter: var(--bl-shadow);
+}
+
+.Entries {
+    background: var(--bl-color-two);
+    border-radius: var(--bl-radius);
+    margin: 0px 4px 0px 0px;
+    padding: 2px 4px 0px 4px;
+    height: 21px !important;
+    font-size: 12px;
+}
+.Entries > div {
+  filter: var(--bl-shadow);
+  color: var(--bl-color-input);
+}
 
 
 /* Font Awesome Free uses <i>, Pro uses <svg> */
@@ -280,9 +328,15 @@ button > svg > g > path {
   opacity: 0;
   transition: all 1s linear;
   position: absolute !important;
-  left: 0px;
-  top: 2px;
-  width: 75px !important;
+  left: 0px !important;
+  top: 0px !important;
+  width: 65px !important;
+  height: 65px !important;
+  padding: 6px;
+}
+.MenuButton {
+  padding: 0px;
+  border-radius: var(--bl-radius);
 }
 
 .ComboUtility {
@@ -352,15 +406,22 @@ button > svg > g > path {
   transition: background 1s, border 1s;
 }
 .ContainerPhoto {
-  overflow: hidden;
-  border: var(--bl-border-blog);
+  top: 0px !important;
+  left: 0px !important;
+  width: calc(100% - 20px) !important;
+  height: calc(100% - 20px) !important;
+  border: var(--bl-border);
   border-radius: var(--bl-radius);
-  filter: var(--bl-shadow);
-  max-width: 300px;
+  background: transparent;
 }
-.ContainerPhoto > img {
+.ContainerPhoto > div > img {
   width: 100%;
 }
+#divAccountPhotoHolder {
+  min-width: 90px;
+  min-height: 90px;
+}
+
 .ContainerAuthor {
   overflow: hidden;
   border: none;
@@ -382,7 +443,7 @@ button > svg > g > path {
 
 
 #divSearch {
-  flex-grow: 20;
+  flex-grow: 100;
 }
 #editUsername,
 #editPassword {
@@ -393,8 +454,18 @@ button > svg > g > path {
   color: var(--bl-color-input) !important;
   font-size: 16px;
 }
-#btnLoginOK,
-#btnLoginCancel {
+#editURL {
+  background: #20202080;
+  padding: 6px 6px;
+  border: none;
+  border-radius: var(--bl-radius);
+  color: var(--bl-color-input) !important;
+  font-size: 14px;
+}
+#btnLoginOK:hover,
+#btnLoginCancel:hover,
+#btnForgotUsername:hover,
+#btnForgotPassword:hover {
   --fa-primary-color: #C0C0C0;
 }
 #editSearch {
@@ -404,6 +475,7 @@ button > svg > g > path {
   font-size: 36px;
   min-width: 200px;
 }
+#editURL:focus-visible,
 #editUsername:focus-visible,
 #editPassword:focus-visible,
 #editSearch:focus-visible {
@@ -473,6 +545,7 @@ button > svg > g > path {
 }
 .tabulator-cell {
   border: none !important;
+  filter: var(--bl-shadow);
 }
 .tabulator-selected {
   background-color: #FFFF0080 !important;
@@ -484,15 +557,13 @@ button > svg > g > path {
   text-overflow: hidden;
 }
 
-#divAccountOptions .tabulator-row .tabulator-cell {
-  padding: 3px;
-}
 
 /* Tabulator with column headers */
 #divAccountLinks,
 #divAccountHistory {
   font-family: Cairo !important;
   font-size: 14px;
+  padding-top: 32px;
   width: calc(100% - 32px) !important;
 }
 #divAccountLinks .tabulator-header,
@@ -515,6 +586,13 @@ button > svg > g > path {
 }
 #divAccountLinks {
   border: none;
+}
+/* remove double dropshadow */
+#divAccountLinks .tabulator-cell[tabulator-field="LinkIcon"] {
+  filter: none;
+}
+#divAccountLinks .tabulator-cell[tabulator-field="Link"] {
+  padding-top: 6px;
 }
 
 /* Tabulator sort icons
@@ -541,7 +619,6 @@ button > svg > g > path {
   display: inline-block;
   fill: var(--bl-color-input);
 }
-
 
 /* Customize Simplebar scrollbars */
 .simplebar-wrapper {
@@ -574,21 +651,21 @@ button > svg > g > path {
 #divAuthorProfileHolder .simplebar-track {
   cursor: ns-resize !important;
   background: none;
-  width: 33px !important;
+/*  width: 33px !important;
   margin-top: 8px;
   margin-bottom: 10px;
-  margin-right: 8px;
+  margin-right: 8px; */
 }
 #divAuthorProfileHolder .simplebar-offset {
   background: var(--bl-color-two);
   border-radius: 12px;
-  margin: 8px;
+/*  margin: 8px; */
 }
-#divAuthorProfileHolder .simplebar-scrollbar::before {
+#DivAuthorProfileHolder .simplebar-scrollbar::before {
   background: var(--bl-color-input);
   width: 22px !important;
   left:  8px !important;
-  margin: 0px 0px 21px 0px !important;
+  margin: 0px 0px 0px 0px !important;
   border-radius: 10px;
 }
 
