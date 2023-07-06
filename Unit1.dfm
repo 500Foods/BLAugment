@@ -2832,11 +2832,11 @@ object Form1: TForm1
         Width = 98
         Height = 35
         AutoSize = False
-        ElementClassName = 'mx-2 DropShadow flex-grow-1'
+        ElementClassName = 'd-flex flex-row w-100'
+        ElementLabelClassName = 'd-flex flex-row w-100'
         ElementID = 'labelAccountName'
         ElementFont = efCSS
         ElementPosition = epRelative
-        HeightStyle = ssAuto
         HeightPercent = 100.000000000000000000
         HTML = 'User Name'
         WidthStyle = ssAuto
@@ -2906,7 +2906,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 9
+      TabIndex = 11
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -4242,7 +4242,7 @@ object Form1: TForm1
           Top = 9
           Width = 338
           Height = 75
-          ElementClassName = 'p-3 LabelAlt text-center text-wrap'
+          ElementClassName = 'ps-3 pt-3 pe-5 pb-3 LabelAlt text-center text-wrap'
           ElementID = 'divDonate'
           HeightStyle = ssAuto
           WidthStyle = ssPercent
@@ -4574,12 +4574,11 @@ object Form1: TForm1
       Left = 10
       Top = 43
       Width = 270
-      Height = 30
+      Height = 33
       AutoCompletion = acURL
       ChildOrder = 3
       ElementID = 'editURL'
       ElementFont = efCSS
-      HeightStyle = ssAuto
       HeightPercent = 100.000000000000000000
       SpellCheck = False
       TextHint = 'https://'

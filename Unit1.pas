@@ -1088,7 +1088,7 @@ begin
       },
       columns: [
         { title: "ID", field: "ID", visible: false },
-        { title: "Icon", field: "Icon", hozAlign: "center", formatter: "html", minWidth: 35, width: 35},
+        { title: "Icon", field: "Icon", hozAlign: "center", formatter: "html", minWidth: 40, width: 40},
         { title: "Name", field: "Name" },
         { title: "Entries", field: "Entries", width: 40,
             formatter: function(cell, formatterParams, onRendered) {
@@ -1143,6 +1143,9 @@ begin
               }
               else if (browser[0] == 'Firefox') {
                 icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-firefox-browser"></i>';
+              }
+              else if (browser[0] == 'Mobile Safari') {
+                icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-safari"></i>';
               }
               else if (browser[0] == 'Safari') {
                 icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-safari"></i>';
@@ -1930,6 +1933,9 @@ begin
   begin
     asm
       pas.Unit1.Form1.tabAccountHistory.redraw(true);
+      divAccountHistory.firstElementChild.style.setProperty('position','absolute');
+      divAccountHistory.firstElementChild.style.setProperty('z-index', '1');
+      divAccountHistory.firstElementChild.style.setProperty('top', '0px');
     end;
   end
   else if pcAccount.ActivePage.Name = 'pageAccountActivity' then
@@ -2037,6 +2043,7 @@ begin
   TWebLocalStorage.RemoveKey('Login.JWT');
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
+  TWebLocalStorage.RemoveKey('User.Photo.'+User_Account);
   TWebLocalStorage.RemoveKey('Window.Accounts.Top');
   TWebLocalStorage.RemoveKey('Window.Accounts.Left');
   TWebLocalStorage.RemoveKey('Window.Accounts.Width');
@@ -2052,6 +2059,7 @@ begin
   TWebLocalStorage.RemoveKey('Login.JWT');
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
+  TWebLocalStorage.RemoveKey('User.Photo.'+User_Account);
   TWebLocalStorage.RemoveKey('Window.Accounts.Top');
   TWebLocalStorage.RemoveKey('Window.Accounts.Left');
   TWebLocalStorage.RemoveKey('Window.Accounts.Width');
@@ -2100,7 +2108,8 @@ begin
     LogAction('[ Account Settings ]');
 
     // Set Caption for "window"
-    labelAccountTitle.HTML := '<i class="fa-duotone fa-fw fa-xl fa-cat Swap me-2"></i>'+User_Firstname+' '+User_MiddleName+' '+User_LastName;
+    labelAccountTitle.HTML := '<div style="width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
+                              '<div class="DropShadow mt-1">'+User_Name+'</div>';
     editAccountName.Text := User_Account;
     editFirstName.Text := User_Firstname;
     editMiddleName.Text := User_MiddleName;

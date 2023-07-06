@@ -594,6 +594,9 @@ button > svg > g > path {
 #divAccountLinks .tabulator-cell[tabulator-field="Link"] {
   padding-top: 6px;
 }
+#divAccountOptions .tabulator-cell[tabulator-field="Icon"] {
+  padding: 3px 2px 3px 0px;
+}
 
 /* Tabulator sort icons
 /* Hide all sort icons by default */
