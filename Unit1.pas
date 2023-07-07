@@ -320,6 +320,17 @@ type
     divURLLabel: TWebHTMLDiv;
     WebOpenDialog1: TWebOpenDialog;
     btnLinkInsert: TWebButton;
+    divIconSearch: TWebHTMLDiv;
+    WebHTMLDiv10: TWebHTMLDiv;
+    btnIconCancel: TWebButton;
+    editIconSearch: TWebEdit;
+    WebHTMLDiv12: TWebHTMLDiv;
+    btnIconOK: TWebButton;
+    btnIconSearch: TWebButton;
+    divIconSearchDataBG: TWebHTMLDiv;
+    divIconSearchResults: TWebHTMLDiv;
+    divIconSearchData: TWebHTMLDiv;
+    divIconSearchResultsInner: TWebHTMLDiv;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
@@ -393,8 +404,10 @@ type
     procedure WebOpenDialog1GetFileAsBase64(Sender: TObject; AFileIndex: Integer; ABase64: string);
     [async] function AccountIsValid(acct: String):String;
     procedure btnLinkInsertClick(Sender: TObject);
-    procedure editURLKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure btnPhotoIconsClick(Sender: TObject);
+    [async] procedure btnIconCancelClick(Sender: TObject);
+    procedure btnIconOKClick(Sender: TObject);
+    [async] procedure btnIconSearchClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -478,9 +491,17 @@ type
     scrollAccountHistory: JSValue;
     scrollAccountActivity: JSValue;
     scrollAccountLogout: JSValue;
+    scrollIcons: JSValue;
 
     // Account Photo Pan/Zoom object
     pz: JSValue;
+
+    // Icon Search
+    IconSetList: JSValue;            // Icon sets retrieved from server
+    IconSetNames: Array of String;   // Icon set names
+    IconSetCount: Array of Integer;  // How many icons in each set
+    IconResults: Integer;            // How many total icons
+    IconSelected: String;            // The selected Icon
 
     // Use these to help reduce compiler hints about....
     // ...Delphi variables used only in ASM blocks
@@ -1018,6 +1039,14 @@ begin
   ConfigureTooltip(btnForgotUsername);
   ConfigureTooltip(btnForgotPassword);
 
+  ConfigureTooltip(btnPhotoClear);
+  ConfigureTooltip(btnPhotoURL);
+  ConfigureTooltip(btnPhotoUpload);
+  ConfigureTooltip(btnPhotoIcons);
+  ConfigureTooltip(btnPhotoReset);
+  ConfigureTooltip(btnPhotoSave);
+  ConfigureTooltip(btnPhotoCancel);
+
 
   // Convert all tooltips to Bootstrap tooltips
   asm
@@ -1205,7 +1234,7 @@ begin
                 icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-computer"></i>';
               }
               else if (device.type == 'mobile') {
-                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-mobile-button"></i>';
+                icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-mobile-button Swap"></i>';
               }
               else if (device.type == 'tablet') {
                 icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-tablet-button"></i>';
@@ -1425,6 +1454,7 @@ begin
     this.scrollAccountHistory    = new SimpleBar(document.getElementById('pageAccountHistory'     ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountActivity   = new SimpleBar(document.getElementById('pageAccountActivity'    ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountLogout     = new SimpleBar(document.getElementById('pageAccountLogout'      ), { forceVisible: 'y', autoHide: false });
+    this.scrollIcons             = new SimpleBar(document.getElementById('divIconSearchResults'   ), { forceVisible: 'y', autoHide: false });
 
     this.scrollAccountHistory.getScrollElement().addEventListener('scroll', function(){
       divAccountHistory.firstElementChild.style.setProperty('top',
@@ -1445,7 +1475,8 @@ begin
       animate: true,
       cursor: 'all-scroll',
       minScale: 0.5,
-      maxScale: 20
+      maxScale: 20,
+      duration: 50
     });
     divAccountPhoto.addEventListener('wheel',pas.Unit1.Form1.pz.zoomWithWheel);
     divAccountPhoto.addEventListener('panzoomchange', (event) => {
@@ -1525,6 +1556,41 @@ begin
 
     addAutoResize();
   end;
+
+
+
+  // Icon Selection
+  asm
+    divIconSearchResultsInner.addEventListener('click', (e) => {
+
+      // Remove current highlight
+      var selected = divIconSearchResultsInner.querySelectorAll('.Selected');
+      selected.forEach(el => {
+        el.classList.remove('Selected');
+      });
+      pas.Unit1.Form1.btnIconOK.FEnabled = false;
+      btnIconOK.setAttribute('disabled','');
+
+     // What was clicked on? Could be the icon itself or the icon name
+      var el = null;
+      if (e.target.getAttribute('icon-library') !== null) {
+        var el = e.target;
+        this.IconSelected = el.firstElementChild.outerHTML;
+        pas.Unit1.Form1.btnIconOKClick(null);
+      } else if (e.target.classList.contains('IconName')) {
+        var el = e.target.parentElement;
+        el.classList.add('Selected');
+        btnIconOK.removeAttribute('disabled');
+        pas.Unit1.Form1.btnIconOK.FEnabled = true;
+        divIconSearchData.innerHTML =
+            '<div>Results: <span style="color: var(--bl-color-input);">'+this.IconResults+'</span></div>'+
+            '<div>'+el.getAttribute('icon-library')+'</div>'+
+            '<div>'+el.getAttribute('icon-license')+'</div>'+
+          '</div>';
+      }
+    });
+  end;
+
 
   PreventCompilerHint(i);
 end;
@@ -2085,6 +2151,7 @@ end;
 procedure TForm1.btnAccountClick(Sender: TObject);
 var
   i: Integer;
+  count: Integer;
   ResponseString: String;
   SessionTimestamp: Array of String;
   SessionID: Array of String;
@@ -2254,6 +2321,43 @@ begin
 
   // Configure Activity Log
   btnActivityLogReloadClick(Sender);
+
+
+
+  // This intializes the custom icon editor to use the "remote" approach.
+  ResponseString := await(JSONRequest('ISystemService.AvailableIconSets',[]));
+  asm
+    this.IconSets = [];
+    this.IconSetNames = [];
+    this.IconSetCount = [];
+
+    // Load up our Local icon sets
+    this.IconSetList = JSON.parse(ResponseString);
+
+    // Original list is soprted by filename.  Lets sort it by library name instead (case-insensitive)
+    this.IconSetList = this.IconSetList.sort((a, b) => {
+      if (a.name.toLowerCase() < b.name.toLowerCase()) {
+        return -1;
+      }
+    });
+
+    // Get count data from this list
+    for (var i = 0; i < this.IconSetList.length; i++) {
+      var iconcount = this.IconSetList[i].count
+      this.IconSetNames.push(this.IconSetList[i].name+': '+iconcount+' icons');
+      this.IconSetCount.push(iconcount);
+    };
+  end;
+
+  // Populate the listLibraries control
+  count := 0;
+  for i := 0 to Length(IconsetNames)-1 do
+  begin
+    count := count + IconSetCount[i];
+  end;
+  editIconSearch.TextHint := 'Search '+FloatToStrF(count,ffNumber,5,0)+' icons';
+
+
 end;
 
 procedure TForm1.btnBlogClick(Sender: TObject);
@@ -2516,6 +2620,7 @@ end;
 
 procedure TForm1.btnPhotoCancelClick(Sender: TObject);
 begin
+  HideTooltips;
   asm
     divAccountPhoto.innerHTML = this.User_Photo;
     if (btnAccount.firstElementChild !== null) {
@@ -2548,6 +2653,7 @@ end;
 
 procedure TForm1.btnPhotoClearClick(Sender: TObject);
 begin
+  HideTooltips;
   if divAccountPhoto.ElementHandle.innerHTML <> '' then
   begin
     divAccountPhoto.elementHandle.innerHTML := '';
@@ -2556,8 +2662,28 @@ begin
   end;
 end;
 
+procedure TForm1.btnPhotoIconsClick(Sender: TObject);
+begin
+  HideTooltips;
+  editIconSearch.Text := '';
+  btnIconOK.Tag := 1; // Account Photo
+
+  divShade2.Visible := True;
+  divIconSearch.Visible := True;
+  divShade2.ElementHandle.style.setProperty('opacity','0.75');
+  divIconSearch.ElementHandle.style.setProperty('opacity','1.0');
+  HideTooltips;
+
+  LogAction(' ');
+  LogAction('[ Searching Photo Icons ]');
+
+  editIconSearch.setFocus;
+
+end;
+
 procedure TForm1.btnPhotoResetClick(Sender: TObject);
 begin
+  HideTooltips;
   asm
    // Reset Pan/Zoom
     pas.Unit1.Form1.pz.reset();
@@ -2569,6 +2695,8 @@ var
   RequestResponse: String;
 
 begin
+  HideTooltips;
+
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
 
   LogAction('[ Saving Account Photo ]');
@@ -2587,9 +2715,10 @@ begin
       divAuthorProfilePhoto.innerHTML = this.User_Photo;
     }
     btnAccount.innerHTML = divAuthorProfilePhoto.innerHTML;
-
-
   end;
+
+  labelAccountTitle.HTML := '<div style="width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
+                            '<div class="DropShadow mt-1">'+User_Name+'</div>';
 
   TWebLocalStorage.SetValue('User.Photo.'+User_Account, User_Photo);
 
@@ -2619,6 +2748,8 @@ procedure TForm1.btnPhotoUploadClick(Sender: TObject);
 var
   i: Integer;
 begin
+  HideTooltips;
+
   WebOpenDialog1.Accept := 'image/*';
 
   await(string, WebOpenDialog1.Perform);
@@ -2634,14 +2765,14 @@ end;
 
 procedure TForm1.btnPhotoURLClick(Sender: TObject);
 begin
-
+  HideTooltips;
   editURL.Text := '';
   asm editURLLabel.innerHTML = 'Enter an Image Link'; end;
   btnURLOK.Tag := 1; // Photo URL
 
   divShade2.Visible := True;
   divURL.Visible := True;
-  divShade2.ElementHandle.style.setProperty('opacity','0.7');
+  divShade2.ElementHandle.style.setProperty('opacity','0.75');
   divURL.ElementHandle.style.setProperty('opacity','1.0');
   HideTooltips;
 
@@ -2669,6 +2800,114 @@ procedure TForm1.btnForgotUsernameClick(Sender: TObject);
 begin
   editUsername.Text := '';
   editUsername.SetFocus;
+end;
+
+procedure TForm1.btnIconCancelClick(Sender: TObject);
+begin
+  divShade2.ElementHandle.style.setProperty('opacity','0');
+  divIconSearch.ElementHandle.style.setProperty('opacity','0');
+
+  asm await sleep(1000); end;
+
+  divIconSearch.Visible := False;
+  divShade2.Visible := False;
+end;
+
+procedure TForm1.btnIconOKClick(Sender: TObject);
+begin
+  if IconSelected <> '' then
+  begin
+    asm
+      divAccountPhoto.innerHTML = '';
+      this.pz.reset();
+      divAccountPhoto.innerHTML = this.IconSelected;
+    end;
+  end;
+  btnIconCancelClick(Sender);
+end;
+
+procedure TForm1.btnIconSearchClick(Sender: TObject);
+var
+  Search: String;
+  IconSize:Integer;
+  MaxResults: Integer;
+  SearchLib: String;
+  RequestResponse: String;
+begin
+  // Icon names are always lower case, so search with that
+  Search := LowerCase(Trim(editIconSearch.text));
+
+  // Limit returns while typing
+  MaxResults := 500;
+  IconSize := 40;
+  SearchLib := 'all';
+
+  // Must have something to search for and somewhere to search
+  if Trim(Search) = '' then
+  begin
+    asm
+      divIconSearchResultsInner.replaceChildren();
+    end;
+    exit;
+  end;
+
+    asm
+
+      // Build a new results array
+      var results = [];
+
+      // Search for at most three terms
+      var searchterms = Search.split(' ').slice(0,3).join(' ');
+
+      var response = await fetch(this.Server_URL+'/SystemService/SearchIconSets'+
+        '?SearchTerms='+encodeURIComponent(searchterms)+
+        '&SearchSets=all'+
+        '&Results='+MaxResults);
+      var results = await response.json();
+
+      // Sort results by icon name
+      results = results.sort((a, b) => {
+        if (a[0] < b[0]) {
+          return -1;
+        }
+      });
+
+      // Update count
+      divIconSearchData.innerHTML = '<div>Results: <span style="color: var(--bl-color-input);">'+results.length+'</span></div>';
+      this.IconResults = results.length;
+
+      // Clear existing results
+      divIconSearchResultsInner.replaceChildren();
+
+      // Create icons for display
+      var display = '';
+      for (var i = 0; i < results.length; i++) {
+
+        // Figure out which library we're using - note that it is now sorted differently
+        var lib = this.IconSetList.find( o => o.library == results[i][1]);
+
+        // Each library has its default width and height, and then overrides at the icon level
+        var iconheight = results[i][2].height || lib.height;
+        var iconwidth = results[i][2].width || lib.width;
+
+        var displayicon = '<div style="font-size:'+IconSize+'px;" class="SearchIcon" '+
+                               'icon-library="'+lib.name+'" '+
+                               'icon-license="'+lib.license+'">'+
+                             '<svg class="pe-none" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '+
+                               'viewBox="0 0 '+iconwidth+' '+iconheight+'">'+
+                                 results[i][2].body+
+                             '</svg>'+
+                             '<div class="IconName text-wrap" style="font-size:12px; text-align:center; width:100%;">'+
+                               results[i][0]+
+                             '</div>'+
+                           '</div>';
+
+        display += displayicon;
+      }
+      divIconSearchResultsInner.innerHTML = display;
+    end;
+
+
 end;
 
 procedure TForm1.comboActivityLogChange(Sender: TObject);
@@ -2772,7 +3011,6 @@ end;
 
 procedure TForm1.btnURLCancelClick(Sender: TObject);
 begin
-
   divShade2.ElementHandle.style.setProperty('opacity','0');
   divURL.ElementHandle.style.setProperty('opacity','0');
 
@@ -3130,12 +3368,6 @@ begin
 
 end;
 
-procedure TForm1.editURLKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if Key = VK_RETURN then btnURLOKClick(Sender);
-  if Key = VK_ESCAPE then btnURLCancelClick(Sender);
-end;
-
 procedure TForm1.FinalRequest;
 begin
   LogAction(' ');
@@ -3216,7 +3448,7 @@ begin
 
     divShade2.Visible := True;
     divURL.Visible := True;
-    divShade2.ElementHandle.style.setProperty('opacity','0.7');
+    divShade2.ElementHandle.style.setProperty('opacity','0.75');
     divURL.ElementHandle.style.setProperty('opacity','1.0');
     HideTooltips;
 
@@ -3233,7 +3465,7 @@ begin
 
   divShade2.Visible := True;
   divURL.Visible := True;
-  divShade2.ElementHandle.style.setProperty('opacity','0.7');
+  divShade2.ElementHandle.style.setProperty('opacity','0.75');
   divURL.ElementHandle.style.setProperty('opacity','1.0');
   HideTooltips;
 
@@ -3428,6 +3660,20 @@ begin
   begin
     btnChangePasswordClick(Sender);
   end;
+
+  if (Key = VK_ESCAPE) then
+  begin
+    if (divIconSearch.Visible = True) then btnIconCancelClick(Sender)
+    else if (divURL.Visible = True) then btnURLCancelClick(Sender)
+    else if (divAccount.Visible = True) then btnAccountCloseClick(Sender);
+  end
+
+  else if (Key = VK_RETURN) then
+  begin
+    if (divIconSearch.Visible = True) then btnIconSearchClick(Sender)
+    else if (divURL.Visible = True) then btnURLOKClick(Sender);
+  end;
+
 
 end;
 

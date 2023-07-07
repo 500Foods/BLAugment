@@ -2792,8 +2792,8 @@ object Form1: TForm1
     Visible = False
   end
   object divAccount: TWebHTMLDiv
-    Left = 8
-    Top = 494
+    Left = 0
+    Top = 536
     Width = 625
     Height = 555
     ElementClassName = 'resize-drag overflow-hidden p-2'
@@ -2906,7 +2906,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 11
+      TabIndex = 3
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3548,7 +3548,7 @@ object Form1: TForm1
             Top = 3
             Width = 40
             Height = 40
-            Hint = 'Select Icom'
+            Hint = 'Select Icon'
             Caption = '<i class="fa-duotone fa-icons Swap fa-lg"></i>'
             ChildOrder = 3
             ElementClassName = 'btn btn-light ButtonUtility'
@@ -3558,7 +3558,7 @@ object Form1: TForm1
             HeightStyle = ssAuto
             HeightPercent = 100.000000000000000000
             WidthPercent = 100.000000000000000000
-            OnClick = btnActivityLogPrintClick
+            OnClick = btnPhotoIconsClick
           end
           object btnPhotoURL: TWebButton
             Left = 46
@@ -3793,7 +3793,7 @@ object Form1: TForm1
           Top = 288
           Width = 179
           Height = 41
-          ElementClassName = 'mt-3 mb-2 nointeract'
+          ElementClassName = 'mt-2 mb-2 nointeract'
           ElementID = 'divAccountLinks'
           HeightStyle = ssAuto
           WidthStyle = ssPercent
@@ -3939,7 +3939,7 @@ object Form1: TForm1
           Top = 229
           Width = 321
           Height = 41
-          ElementClassName = 'ms-2 me-5'
+          ElementClassName = 'ms-1 me-5'
           HeightStyle = ssAuto
           WidthStyle = ssAuto
           ChildOrder = 2
@@ -4559,7 +4559,6 @@ object Form1: TForm1
       Top = 41
       Width = 35
       Height = 40
-      Hint = 'Cancel URL'
       Caption = '<i class="fa-duotone fa-xmark fa-xl"></i>'
       ChildOrder = 2
       ElementClassName = 'btn btn-link'
@@ -4583,7 +4582,6 @@ object Form1: TForm1
       SpellCheck = False
       TextHint = 'https://'
       WidthPercent = 100.000000000000000000
-      OnKeyDown = editURLKeyDown
     end
     object divURLLabel: TWebHTMLDiv
       Left = 50
@@ -4617,7 +4615,6 @@ object Form1: TForm1
       Top = 41
       Width = 35
       Height = 40
-      Hint = 'Login'
       Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
       ChildOrder = 1
       ElementClassName = 'btn btn-link'
@@ -4627,6 +4624,170 @@ object Form1: TForm1
       HeightPercent = 100.000000000000000000
       WidthPercent = 100.000000000000000000
       OnClick = btnURLOKClick
+    end
+  end
+  object divIconSearch: TWebHTMLDiv
+    Left = 436
+    Top = 370
+    Width = 350
+    Height = 160
+    ElementID = 'divIconSearch'
+    ChildOrder = 2
+    ElementFont = efCSS
+    Role = ''
+    Visible = False
+    object WebHTMLDiv10: TWebHTMLDiv
+      Left = 0
+      Top = 35
+      Width = 350
+      Height = 30
+      Cursor = crHandPoint
+      ElementClassName = 'ContainerBG position-absolute'
+      ElementID = 'divLoginBG'
+      HeightStyle = ssPercent
+      ChildOrder = 1
+      ElementFont = efCSS
+      Role = ''
+    end
+    object btnIconCancel: TWebButton
+      Left = 310
+      Top = 41
+      Width = 35
+      Height = 40
+      Caption = '<i class="fa-duotone fa-xmark fa-xl"></i>'
+      ChildOrder = 2
+      ElementClassName = 'btn btn-link'
+      ElementID = 'btnIconCancel'
+      ElementFont = efCSS
+      HeightStyle = ssAuto
+      HeightPercent = 100.000000000000000000
+      WidthPercent = 100.000000000000000000
+      OnClick = btnIconCancelClick
+    end
+    object editIconSearch: TWebEdit
+      Left = 40
+      Top = 43
+      Width = 239
+      Height = 33
+      AutoCompletion = acNope
+      ChildOrder = 3
+      ElementID = 'editIconSearch'
+      ElementFont = efCSS
+      HeightPercent = 100.000000000000000000
+      SpellCheck = False
+      TextHint = 'Search 180,000 Icons'
+      WidthPercent = 100.000000000000000000
+      OnChange = btnIconSearchClick
+    end
+    object WebHTMLDiv12: TWebHTMLDiv
+      Left = 50
+      Top = 0
+      Width = 250
+      Height = 35
+      ElementClassName = 'overflow-hidden'
+      ElementID = 'divURLLabel'
+      ChildOrder = 8
+      ElementFont = efCSS
+      HTML.Strings = (
+        '<div class="ContainerBGLogin" '
+        '        style="position: absolute; width:100%; height:100%;">'
+        '</div>'
+        
+          '<div class="h-100 d-flex justify-content-center align-items-cent' +
+          'er" '
+        '        style="position: relative;">'
+        '  <div id="editURLLabel" class="DropShadow" '
+        
+          '          style="font-size: 16px; font-weight: bold; color: var(' +
+          '--bl-color-one); font-family: Cairo;">'
+        '    Select an Icon'
+        '  </div>'
+        '</div>'
+        '')
+      Role = ''
+    end
+    object btnIconOK: TWebButton
+      Left = 275
+      Top = 41
+      Width = 35
+      Height = 40
+      Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
+      ChildOrder = 1
+      ElementClassName = 'btn btn-link'
+      ElementID = 'btnIconOK'
+      ElementFont = efCSS
+      HeightStyle = ssAuto
+      HeightPercent = 100.000000000000000000
+      WidthPercent = 100.000000000000000000
+      OnClick = btnIconOKClick
+    end
+    object btnIconSearch: TWebButton
+      Left = 0
+      Top = 41
+      Width = 35
+      Height = 40
+      Hint = 'Search'
+      Caption = '<i class="fa-duotone fa-magnifying-glass fa-xl Swap"></i>'
+      ChildOrder = 1
+      ElementClassName = 'btn btn-link'
+      ElementID = 'btnIconSearch'
+      ElementFont = efCSS
+      HeightStyle = ssAuto
+      HeightPercent = 100.000000000000000000
+      WidthStyle = ssAuto
+      WidthPercent = 100.000000000000000000
+      OnClick = btnIconSearchClick
+    end
+    object divIconSearchDataBG: TWebHTMLDiv
+      Left = 2
+      Top = 81
+      Width = 346
+      Height = 30
+      ElementID = 'divIconSearchDataBG'
+      ChildOrder = 6
+      ElementFont = efCSS
+      Role = ''
+    end
+    object divIconSearchResults: TWebHTMLDiv
+      Left = 2
+      Top = 117
+      Width = 346
+      Height = 35
+      ElementClassName = 'd-flex flex-row justify-content-center'
+      ElementID = 'divIconSearchResults'
+      HeightStyle = ssAuto
+      WidthStyle = ssAuto
+      ChildOrder = 6
+      ElementPosition = epRelative
+      ElementFont = efCSS
+      Role = ''
+      object divIconSearchResultsInner: TWebHTMLDiv
+        Left = 16
+        Top = 3
+        Width = 258
+        Height = 19
+        ElementClassName = 
+          'd-flex flex-row flex-wrap justify-content-center py-2 ps-2 pe-5 ' +
+          'gap-2'
+        ElementID = 'divIconSearchResultsInner'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ChildOrder = 6
+        ElementPosition = epRelative
+        ElementFont = efCSS
+        Role = ''
+      end
+    end
+    object divIconSearchData: TWebHTMLDiv
+      Left = 2
+      Top = 81
+      Width = 346
+      Height = 30
+      ElementClassName = 'd-flex align-items-center justify-content-between px-3'
+      ElementID = 'divIconSearchData'
+      ChildOrder = 6
+      ElementFont = efCSS
+      Role = ''
     end
   end
   object XDataConn: TXDataWebConnection
