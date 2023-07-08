@@ -2850,6 +2850,7 @@ object Form1: TForm1
         HTML = 'User Name'
         WidthStyle = ssAuto
         WidthPercent = 100.000000000000000000
+        OnDblClick = labelAccountTitleDblClick
       end
       object btnAccountRefresh: TWebButton
         Left = 260
@@ -2915,7 +2916,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 0
+      TabIndex = 11
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3609,7 +3610,7 @@ object Form1: TForm1
             Width = 40
             Height = 40
             Hint = 'Save Changes'
-            Caption = '<i class="fa-duotone fa-check fa-xl Swap"></i>'
+            Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
             ChildOrder = 5
             ElementClassName = 'btn btn-light ButtonUtility'
             ElementID = 'btnPhotoSave'

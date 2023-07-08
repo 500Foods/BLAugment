@@ -415,6 +415,7 @@ type
     [async] procedure btnIconSearchClick(Sender: TObject);
     procedure btnSelectActivityLogClick(Sender: TObject);
     [async] procedure divSessionListLabelClick(Sender: TObject);
+    procedure labelAccountTitleDblClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -496,7 +497,7 @@ type
     scrollAccountBlogs: JSValue;
     scrollAccountNotify: JSValue;
     scrollAccountPromotion: JSValue;
-    scrollAccountDonate: JSValue;
+//    scrollAccountDonate: JSValue;
     scrollAccountHistory: JSValue;
     scrollAccountActivity: JSValue;
     scrollAccountLogout: JSValue;
@@ -1583,7 +1584,7 @@ begin
     this.scrollAccountBlogs      = new SimpleBar(document.getElementById('pageAccountBlogs'       ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountNotify     = new SimpleBar(document.getElementById('pageAccountNotify'      ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountPromotion  = new SimpleBar(document.getElementById('pageAccountPromotion'   ), { forceVisible: 'y', autoHide: false });
-    this.scrollAccountDonate     = new SimpleBar(document.getElementById('pageAccountDonate'      ), { forceVisible: 'y', autoHide: false });
+//    this.scrollAccountDonate     = new SimpleBar(document.getElementById('pageAccountDonate'      ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountHistory    = new SimpleBar(document.getElementById('pageAccountHistory'     ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountActivity   = new SimpleBar(document.getElementById('pageAccountActivity'    ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountLogout     = new SimpleBar(document.getElementById('pageAccountLogout'      ), { forceVisible: 'y', autoHide: false });
@@ -1647,9 +1648,10 @@ begin
       then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
       btnAccount.ElementHandle.innerHTML := User_Photo;
 
+      await(btnAccountClick(Sender));
+
       await(tmrJWTRenewalTimer(Sender));
 
-      btnAccountClick(Sender);
 
     end
     else
@@ -1784,6 +1786,39 @@ begin
 
   LogAction('Responded: '+Endpoint+' ('+IntToStr(MillisecondsBetween(Now, Elapsed))+'ms)');
   PreventCompilerHint(Blob);
+end;
+
+procedure TForm1.labelAccountTitleDblClick(Sender: TObject);
+begin
+  if divAccount.Tag = 0 then
+  begin
+    divAccount.Tag := 1;
+    divAccount.ElementHandle.removeAttribute('data-x');
+    divAccount.ElementHandle.removeAttribute('data-y');
+    divAccount.ElementHandle.style.setProperty('top','5px');
+    divAccount.ElementHandle.style.setProperty('left','5px');
+    divAccount.ElementHandle.style.setProperty('right','5px');
+    divAccount.ElementHandle.style.setProperty('bottom','5px');
+    divAccount.ElementHandle.style.setProperty('width','unset');
+    divAccount.ElementHandle.style.setProperty('height','unset');
+    divAccount.ElementHandle.style.setProperty('transform','translate(0px,0px)');
+    divAccount.ElementHandle.removeAttribute('data-x');
+    divAccount.ElementHandle.removeAttribute('data-y');
+  end
+  else
+  begin
+    divAccount.Tag := 0;
+    divAccount.ElementHandle.setAttribute('data-x', FloatToSTr(window.innerWidth / 4));
+    divAccount.ElementHandle.setAttribute('data-y', FloatToStr(window.innerHeight / 10));
+    divAccount.ElementHandle.style.setProperty('top','unset');
+    divAccount.ElementHandle.style.setProperty('left','unset');
+    divAccount.ElementHandle.style.setProperty('right','unset');
+    divAccount.ElementHandle.style.setProperty('bottom','unset');
+    divAccount.ElementHandle.style.setProperty('width',FloatToSTr(window.innerWidth * 0.5)+'px');
+    divAccount.ElementHandle.style.setProperty('height',FloatToSTr(window.innerHeight * 0.8)+'px');
+    divAccount.ElementHandle.style.setProperty('transform','translate('+FloatToSTr(window.innerWidth / 4)+'px, '+FloatToSTr(window.innerHeight / 10)+'px');
+
+  end;
 end;
 
 function TForm1.StringRequest(Endpoint: String; Params: array of JSValue): String;
@@ -2296,10 +2331,6 @@ var
   i: Integer;
   count: Integer;
   ResponseString: String;
-  SessionTimestamp: Array of String;
-  SessionID: Array of String;
-  OldDate: TDateTime;
-  NewDate: TDateTime;
 begin
 
 
@@ -2967,10 +2998,9 @@ end;
 procedure TForm1.btnIconSearchClick(Sender: TObject);
 var
   Search: String;
-  IconSize:Integer;
+  IconSize: Integer;
   MaxResults: Integer;
   SearchLib: String;
-  RequestResponse: String;
 begin
   // Icon names are always lower case, so search with that
   Search := LowerCase(Trim(editIconSearch.text));
@@ -3011,6 +3041,7 @@ begin
     });
 
     // Update count
+    pas.Unit1.Form1.LogAction('[ Icon Search: '+Search+' ('+results.length+' results) ]');
     divIconSearchData.innerHTML = '<div>Results: <span style="color: var(--bl-color-input);">'+results.length+'</span></div>';
     this.IconResults = results.length;
 
@@ -3045,6 +3076,9 @@ begin
     divIconSearchResultsInner.innerHTML = display;
   end;
 
+  PreventCompilerHint(IconSize);
+  PreventCompilerHint(MaxResults);
+  PreventCompilerHint(SearchLib);
 end;
 
 procedure TForm1.ActivityLogChange(Sender: TObject);
