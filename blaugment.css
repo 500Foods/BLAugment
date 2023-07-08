@@ -13,6 +13,13 @@ body {
   background: black;
   transition: opacity 1s 1s, background 1s;
   overflow: hidden;
+
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 /* Recommended for helping with iOS page zoom blocking */
@@ -172,6 +179,7 @@ html[theme="red"] .BLTooltip {
   left: 50% !important;
   transform: translate(-50%, -50%);
 }
+#divSessions,
 #divIconSearch {
   z-index: 201;
   opacity: 0;
@@ -225,7 +233,6 @@ html[theme="red"] .BLTooltip {
   right: -4px;
   top: -40px !important;
 }
-
 
 
 #divLoginMessage {
@@ -327,6 +334,7 @@ button > svg > g > path {
   background: var(--bl-color-two);
   filter: var(--bl-shadow);
   padding: 8px 8px;
+  font-size: 14px;
 }
 .ButtonUtility:hover {
   background: var(--bl-color-one);
@@ -632,33 +640,63 @@ button > svg > g > path {
 
 
 /* Tabulator with column headers */
+#divSessionList {
+  font-family: Cairo !important;
+  font-size: 12px;
+  padding-top: 30px;
+  padding-right: 32px;
+}
 #divAccountLinks,
 #divAccountHistory {
   font-family: Cairo !important;
   font-size: 14px;
   width: calc(100% - 32px) !important;
 }
+#divSessions {
+  padding: 37px 2px 3px 2px;
+}
+#divSessionListBG {
+  height: calc(100% - 38px) !important;
+}
+#divSessionListHolder {
+  border-radius: 6px;
+  height: 100%;
+}
+#divSessionList .tabulator-header {
+  border-top-left-radius: 6px;
+  width: 315px;
+  margin-top: -1px;
+}
+#divSessionList .tabulator-headers > div {
+  height: 30px;
+  padding-top: 2px;
+}
+
 #divAccountHistory {
   padding-top: 32px;
 }
+#divSessionList .tabulator-header,
 #divAccountLinks .tabulator-header,
 #divAccountHistory .tabulator-header {
   color: var(--bl-color-input);
   border: none;
-  background: black;
+  background: transparent;
   height: 30px;
 }
+#divSessionList .tabulator-header .tabulator-col,
 #divAccountLinks .tabulator-header .tabulator-col,
 #divAccountHistory .tabulator-header .tabulator-col {
   border: 0px;
   background: var(--bl-color-two);
   opacity: 0.8;
 }
+#divAccountSessionList .tabulator-header .tabulator-col .tabulator-col-title,
 #divAccountLinks .tabulator-header .tabulator-col .tabulator-col-title,
 #divAccountHistory .tabulator-header .tabulator-col .tabulator-col-title {
   filter: var(--bl-shadow);
   font-weight: normal;
 }
+#divSessionList,
 #divAccountLinks {
   border: none;
 }
@@ -698,13 +736,19 @@ button > svg > g > path {
   fill: var(--bl-color-input);
 }
 
+
+
 /* Customize Simplebar scrollbars */
 .simplebar-wrapper {
   height: 100%;
 }
+
+/*
 .simplebar-content-wrapper {
   scroll-behavior: smooth;
 }
+*/
+
 .simplebar-track {
   cursor: ns-resize !important;
   background: var(--bl-color-two);
@@ -739,6 +783,12 @@ button > svg > g > path {
     border: var(--bl-border);
     border-radius: var(--bl-radius);
 }
+
+#divSessionListHolder .simplebar-track,
+#divSessionListHolder .simplebar-content-wrapper {
+  border-top-right-radius: 6px;
+}
+
 
 
 /* Dunno why Bootstrap only declares 1-5? */

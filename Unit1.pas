@@ -263,9 +263,8 @@ type
     btnPhotoIcons: TWebButton;
     btnAccountClose: TWebButton;
     btnAccountChange: TWebButton;
-    comboActivityLog: TWebLookupComboBox;
     tmrLogout: TWebTimer;
-    WebHTMLDiv3: TWebHTMLDiv;
+    divLoginLabel: TWebHTMLDiv;
     divChangeAccountName: TWebHTMLDiv;
     labelChangeAccountName: TWebLabel;
     btnChangeAccountName: TWebButton;
@@ -324,13 +323,19 @@ type
     WebHTMLDiv10: TWebHTMLDiv;
     btnIconCancel: TWebButton;
     editIconSearch: TWebEdit;
-    WebHTMLDiv12: TWebHTMLDiv;
+    divIconSearchLabel: TWebHTMLDiv;
     btnIconOK: TWebButton;
     btnIconSearch: TWebButton;
     divIconSearchDataBG: TWebHTMLDiv;
     divIconSearchResults: TWebHTMLDiv;
     divIconSearchData: TWebHTMLDiv;
     divIconSearchResultsInner: TWebHTMLDiv;
+    btnSelectActivityLog: TWebButton;
+    divSessions: TWebHTMLDiv;
+    divSessionListHolderBG: TWebHTMLDiv;
+    divSessionListLabel: TWebHTMLDiv;
+    divSessionListHolder: TWebHTMLDiv;
+    divSessionList: TWebHTMLDiv;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
@@ -370,7 +375,7 @@ type
     procedure btnActivityLogPrintClick(Sender: TObject);
     [async] procedure btnAccountCloseClick(Sender: TObject);
     procedure btnAccountChangeClick(Sender: TObject);
-    [async] procedure comboActivityLogChange(Sender: TObject);
+    [async] procedure ActivityLogChange(Sender: TObject);
     procedure tmrLogoutTimer(Sender: TObject);
     [async] procedure editAccountNameChange(Sender: TObject);
     [async] procedure btnChangeAccountNameClick(Sender: TObject);
@@ -408,6 +413,8 @@ type
     [async] procedure btnIconCancelClick(Sender: TObject);
     procedure btnIconOKClick(Sender: TObject);
     [async] procedure btnIconSearchClick(Sender: TObject);
+    procedure btnSelectActivityLogClick(Sender: TObject);
+    [async] procedure divSessionListLabelClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -455,6 +462,7 @@ type
 
     ActionLog: TStringList;
     ActionLogCurrent: TStringList;
+    Current_ActionLog: String;
 
     User_FirstName: String;
     User_MiddleName: String;
@@ -475,6 +483,7 @@ type
     tabAccountLinks: JSValue;
     LinksData: JSValue;
     LinksDataBackup: JSValue;
+    tabAccountSessions: JSValue;
 
     // Simplebar References
     scrollAccountName: JSValue;
@@ -492,6 +501,7 @@ type
     scrollAccountActivity: JSValue;
     scrollAccountLogout: JSValue;
     scrollIcons: JSValue;
+    scrollSessions: JSValue;
 
     // Account Photo Pan/Zoom object
     pz: JSValue;
@@ -658,9 +668,7 @@ begin
         'Res &raquo; '+App_Country+'/'+App_Region+'/'+App_City+
       '</pre></p>';
 
-  if comboActivityLog.DisplayText = 'Current Session'
-  then LogStamp := 'Current Session: '+FormatDateTime('yyyy-mmm-dd hh:nn:ss',App_Start)
-  else LogStamp := comboActivityLog.DisplayText;
+  LogStamp := btnSelectActivityLog.Caption;
 
   RequestResponse := await(StringRequest('IPersonService.SendActionLog',[
     LogMessage,
@@ -686,11 +694,8 @@ var
 
 begin
   PageHeader := '[ '+App_Name+' '+App_Version+' ][ '+User_Account+' ] Activity Log for ';
-  if comboActivityLog.DisplayText = 'Current Session'
-  then PageHeader := PageHeader+'Current Session: '+FormatDateTime('yyyy-mmm-dd hh:nn:ss',App_Start)
-  else PageHeader := PageHeader+comboActivityLog.DisplayText;
-
-  LogAction('[ Activity Log Printed: '+comboActivityLog.DisplayText+' ]');
+  PageHeader := PageHeader + btnSelectActivityLog.Caption;
+  LogAction('[ Activity Log Printed: '+btnSelectActivityLog.Caption+' ]');
 
   asm {
     printJS({
@@ -705,7 +710,7 @@ end;
 procedure TForm1.UpdateAccountLinks;
 begin
   asm
-    this.tabAccountOptions.getRow(3).getCell('Entries').setValue(this.tabAccountLinks.getDataCount());
+    this.tabAccountOptions.getRow(3).getCell('Entries').setValue(this.tabAccountLinks.getDataCount().toLocaleString());
     divAuthorProfileLinks.innerHTML = '';
     for (var i = 1; i <= this.tabAccountLinks.getDataCount(); i++) {
       var row = this.tabAccountLinks.getRowFromPosition(i);
@@ -916,22 +921,30 @@ begin
     this.LogAction(' ----- Language: '+locn[6]);
   end;
   LogAction(' -- App Device: ');
-  asm
-    var dvc = JSON.parse(this.App_Device);
+  asm {
+    try {
+      var dvc = JSON.parse(this.App_Device);
+    } catch {
+      var dvc = {model:"undefined", type:"undefined", vendor:"undefined"}
+    }
     this.LogAction(' ----- Model: '+dvc.model);
     this.LogAction(' ----- Type: '+dvc.type);
     this.LogAction(' ----- Vendor: '+dvc.vendor);
-  end;
+  } end;
   LogAction(' -- App Browser: ');
-  asm
-    var brw = JSON.parse(this.App_Browser);
+  asm {
+    try {
+      var brw = JSON.parse(this.App_Browser);
+    } catch {
+      var brw = ['undefined', 'undefined', 'undefined', 'undefined'];
+    }
     this.LogAction(' ----- Browser: '+brw[0]);
     this.LogAction(' ----- Version: '+brw[1]);
     this.LogAction(' ----- OS: '+brw[2]);
     this.LogAction(' ----- Version: '+brw[3]);
     this.App_Browser_Short = brw[0];
     this.App_OS_Short = brw[2];
-  end;
+  } end;
   LogAction('============================================================');
   LogAction(' ');
 
@@ -955,7 +968,7 @@ begin
       LogAction(' -- '+Server_URL);
 
     end;
-  except on E:Exception do
+  except on E: Exception do
     begin
     end
   end;
@@ -1138,6 +1151,9 @@ begin
   end;
 
   // Account Login History
+  // NOTE: Using IFNDEF for this asm block primarily due to the try{}catch{} JavaScript
+  //       code that seems to be what throws the IDE into fits
+  {$IFNDEF WIN32}
   asm
     this.tabAccountHistory = new Tabulator("#divAccountHistory",{
       layout: "fitColumns",
@@ -1157,14 +1173,22 @@ begin
         },
         { title: "", field: "ip_location", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
             formatter: function(cell, formatterParams, onRendered) {
-              var locndata = JSON.parse(cell.getValue());
+              try {
+                var locndata = JSON.parse(cell.getValue());
+              } catch {
+                locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
+              }
               var clientlocation = locndata[3]+', '+locndata[2]+', '+locndata[1];
-              return '<img title="'+clientlocation+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.7/1x1/'+JSON.parse(cell.getValue())[0]+'.svg">';
+              return '<img title="'+clientlocation+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.7/1x1/'+locndata[0]+'.svg">';
             }
         },
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
             formatter: function(cell, formatterParams, onRendered) {
-              var browser = JSON.parse(cell.getValue());
+              try {
+                var browser = JSON.parse(cell.getValue());
+              } catch {
+                var browser = ['undefined','undefined','undefined','undefined']
+              }
               var icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-duotone fa-browser"></i>';
               var title = browser[0]+' '+browser[1];
               if (browser[0] == 'Chrome') {
@@ -1187,7 +1211,11 @@ begin
         },
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
             formatter: function(cell, formatterParams, onRendered) {
-              var browser = JSON.parse(cell.getValue());
+              try {
+                var browser = JSON.parse(cell.getValue());
+              } catch {
+                var browser = ['undefined','undefined','undefined','undefined']
+              }
               var icon = '';
               var title = browser[2]+' '+browser[3];
               if (browser[2] == 'Windows') {
@@ -1225,7 +1253,11 @@ begin
         },
         { title: "", field: "device_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
             formatter: function(cell, formatterParams, onRendered) {
-              var device = JSON.parse(cell.getValue());
+              try {
+                var device = JSON.parse(cell.getValue());
+              } catch {
+                var device = {model:"undefined", type:"undefined", vendor: "undefined"}
+              }
               var icon = '';
               var title = device.model+' / '+device.type+' / '+device.vendor;
 
@@ -1248,14 +1280,23 @@ begin
 
         { title: "", field: "ip_location", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
             formatter: function(cell, formatterParams, onRendered) {
-              var clientlanguage = JSON.parse(cell.getValue())[6];
-              return '<img title="'+clientlanguage+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+JSON.parse(cell.getValue())[6].slice(0,2).toLowerCase()+'.svg">';
+              try {
+                var locndata = JSON.parse(cell.getValue());
+              } catch {
+                locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
+              }
+              var clientlanguage = locndata[6];
+              return '<img title="'+clientlanguage+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+locndata[6].slice(0,2).toLowerCase()+'.svg">';
             }
         },
         { title: "IP Address", field: "ip_address", width: 125, minWidth: 100 },
         { title: "Location", field: "ip_location", minWidth: 150,
             formatter: function(cell, formatterParams, onRendered) {
-              var locndata = JSON.parse(cell.getValue());
+              try {
+                var locndata = JSON.parse(cell.getValue());
+              } catch {
+                locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
+              }
               var clientlocation = locndata[3]+', '+locndata[2]+', '+locndata[1];
               return clientlocation;
             }
@@ -1272,6 +1313,7 @@ begin
       pas.Unit1.Form1.tabAccountHistory.selectRow([row]);
     });
   end;
+  {$ENDIF}
 
   // Account links
   asm
@@ -1327,6 +1369,96 @@ begin
       }
     });
   end;
+
+
+  // Account Session List
+  asm
+    this.tabAccountSessions = new Tabulator("#divSessionList", {
+      layout: "fitColumns",
+      selectable: 1,
+      maxHeight: "100%",
+      columnDefaults:{
+        resizable: false,
+        headerWordWrap:true,
+      },
+      columns: [
+        { title: false, field:"session_id", headerSort: false, width: 5, minWidth: 5,
+            formatter: function(cell, formatterParams, onRendered) {
+              return "";
+           }
+        },
+        { title: false, field: "log_status", width: 25, minWidth: 25,
+            formatter: function(cell, formatterParams, onRendered) {
+              var icon = '';
+              var status = cell.getValue();
+              if (status == 1) {
+                icon = '<i title="Browser Closed" class="fa-duotone fa-flag fa-lg Swap"></i>';
+              }
+              else if (status == 2) {
+                icon = '<i title="Logout: Normal" class="fa-duotone fa-flag-pennant fa-lg"></i>';
+              }
+              else if (status == 3) {
+                icon = '<i title="Logout: Clear" class="fa-duotone fa-flag-swallowtail fa-lg"></i>';
+              }
+              else if (status == 4) {
+                icon = '<i title="Logout: All" class="fa-duotone fa-flag-checkered fa-lg"></i>';
+              }
+              return icon;
+            }
+        },
+        { title: false, field: "log_start", width: 25, minWidth: 25,
+            formatter: function(cell, formatterParams, onRendered) {
+              var icon = '';
+              var start = cell.getValue();
+              if (start == 1) {
+                icon = '<i title="Login" class="fa-duotone fa-shield-keyhole Swap fa-lg"></i>';
+              }
+              else if (start == 2) {
+                icon = '<i title="AutoLogin" class="fa-duotone fa-shield-check fa-lg"></i>';
+              }
+              return icon;
+            }
+        },
+        { title: '<div class="ps-1 DropShadow">Session Start</div>', field: "session_start",
+            formatter: function(cell, formatterParams, onRendered) {
+              return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
+            }
+        },
+        { title: '<i class="fa-duotone fa-computer-mouse ps-1 DropShadow Swap"></i>', field: "log_events", width: 42, hozAlign: "center" },
+        { title: '<i class="fa-duotone fa-hammer ps-1 DropShadow Swap"></i>', field: "log_changes", width: 42, hozAlign: "center" },
+        { title: '<i class="fa-duotone fa-bug ps-1 DropShadow"></i>', field: "log_errors", width: 42, hozAlign: "center" },
+        { title: false, field: "person_id", headerSort: false, width: 5, minWidth: 5,
+            formatter: function(cell, formatterParams, onRendered) {
+              return "";
+           }
+        }
+      ]
+    });
+    this.tabAccountSessions.on('tableBuilt', function() {
+      divSessionList.firstElementChild.style.setProperty('position','absolute');
+      divSessionList.firstElementChild.style.setProperty('z-index', '1');
+      divSessionList.firstElementChild.style.setProperty('top', '0px');
+    });
+    this.tabAccountSessions.on('rowClick', function(e, row){
+      pas.Unit1.Form1.tabAccountSessions.selectRow([row]);
+    });
+    this.tabAccountSessions.on('rowDblClick', function(e, row){
+      var This = pas.Unit1.Form1;
+      This.tabAccountSessions.selectRow([row]);
+
+      if (This.btnActivityLogTimezone.FTag$1 == 0) {
+        btnSelectActivityLog.innerHTML = row.getCell('session_start').getValue()+' UTC' ;
+        This.btnSelectActivityLog.FCaption = btnSelectActivityLog.innerHTML;
+      } else {
+        btnSelectActivityLog.innerHTML = luxon.DateTime.fromISO(row.getCell('session_start').getValue().split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
+        This.btnSelectActivityLog.FCaption = btnSelectActivityLog.innerHTML;
+      }
+      This.Current_ActionLog = row.getCell('session_id').getValue();
+      This.ActivityLogChange(null);
+      This.divSessionListLabelClick(null);
+    });
+  end;
+
 
   // This is used to adjust the size and position of "windows"
   asm
@@ -1455,11 +1587,20 @@ begin
     this.scrollAccountActivity   = new SimpleBar(document.getElementById('pageAccountActivity'    ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountLogout     = new SimpleBar(document.getElementById('pageAccountLogout'      ), { forceVisible: 'y', autoHide: false });
     this.scrollIcons             = new SimpleBar(document.getElementById('divIconSearchResults'   ), { forceVisible: 'y', autoHide: false });
+    this.scrollSessions          = new SimpleBar(document.getElementById('divSessionListHolder'   ), { forceVisible: 'y', autoHide: false });
 
+    // Fix tabulator header to top of table
     this.scrollAccountHistory.getScrollElement().addEventListener('scroll', function(){
       divAccountHistory.firstElementChild.style.setProperty('top',
         divAccountHistory.parentElement.parentElement.parentElement.getBoundingClientRect().y
         - divAccountHistory.getBoundingClientRect().y
+        + 'px');
+    });
+
+    this.scrollSessions.getScrollElement().addEventListener('scroll', function(){
+      divSessionList.firstElementChild.style.setProperty('top',
+        divSessionList.parentElement.parentElement.parentElement.getBoundingClientRect().y
+        - divSessionList.getBoundingClientRect().y
         + 'px');
     });
   end;
@@ -1630,7 +1771,7 @@ begin
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('ERROR Request Exception Received From'+Endpoint);
-        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
         LogAction(' -- '+ErrorCode);
@@ -1681,7 +1822,7 @@ begin
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('ERROR Request Exception Received From'+Endpoint);
-        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
         LogAction(' -- '+ErrorCode);
@@ -1783,8 +1924,8 @@ begin
       LogAction('Connection Established: ('+IntToStr(MillisecondsBetween(Now, ElapsedTime))+'ms)');
     except on E: Exception do
       begin
-        LogAction('Connection Failed: '+XDataConn.URL);
-        LogAction(' -- ['+E.ClassName+']');
+        LogAction('Connection Unsuccessful: '+XDataConn.URL);
+        LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+E.Message);
       end;
     end;
@@ -1871,7 +2012,7 @@ begin
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('Login Exception:');
-        LogAction(' -- ['+E.ClassName+']');
+        LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
         LogAction(' -- '+ErrorCode);
@@ -2174,9 +2315,6 @@ begin
     LogAction(' ');
     LogAction('[ Account Settings ]');
 
-    // Set Caption for "window"
-    labelAccountTitle.HTML := '<div style="width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
-                              '<div class="DropShadow mt-1">'+User_Name+'</div>';
     editAccountName.Text := User_Account;
     editFirstName.Text := User_Firstname;
     editMiddleName.Text := User_MiddleName;
@@ -2248,25 +2386,17 @@ begin
 
 
       // Account Page - Logins
-      this.tabAccountOptions.getRow(9).getCell('Entries').setValue(data['RecentLogins'].length);
+      this.tabAccountOptions.getRow(9).getCell('Entries').setValue(data['RecentLogins'].length.toLocaleString());
       this.tabAccountHistory.setData(data['RecentLogins']);
 
       // Account Page - Sessions
-      this.tabAccountOptions.getRow(8).getCell('Entries').setValue(data['RecentActions'].length);
-      for (var i = 0; i < data['RecentActions'].length; i++) {
-        SessionTimestamp.push(data['RecentActions'][i].session_start);
-        SessionID.push(data['RecentActions'][i].session_id);
-      }
+      this.tabAccountOptions.getRow(8).getCell('Entries').setValue(data['RecentActions'].length.toLocaleString());
+      this.tabAccountSessions.setData(data['RecentActions']);
 
-//
 //      var lastlogin = luxon.DateTime.fromISO(data['RecentLogins'][0]['logged_in'].split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
 //      iconLastLogin.innerHTML = icon['Login'];
 //      labelLastLogin.innerHTML = '<span title="'+lastlogin+'">'+lastlogin+'</span>';
-//
-//      iconRecentLogins.innerHTML = icon['Clock'];
-//      labelRecentLogins.innerHTML = data['RecentLogins'].length+' <small class="text-secondary me-3"> 7d </small> '+data['Logins'][0]['logins']+' <small class="text-secondary"> All </small>';
-//
-//
+
       // Account Page - Author Profile
       divAuthorProfilePhoto.innerHTML = this.User_Photo;
       this.LinksData = [];
@@ -2288,32 +2418,9 @@ begin
     end;
   end;
 
-  // Configure Activity History List
-  comboActivityLog.LookupValues.Clear;
-  comboActivityLog.LookupValues.AddPair('Current', 'Current Session');
-  i := 0;
-  while i < Length(SessionTimestamp) do
-  begin
-    if btnActivityLogTimeZone.Tag = 0 then
-    begin
-      comboActivityLog.LookupValues.AddPair(SessionID[i], SessionTimestamp[i]+' UTC');
-    end
-    else
-    begin
-      OldDate := EncodeDateTime(
-        StrToInt(Copy(SessionTimestamp[i],1,4)),
-        StrToInt(Copy(SessionTimestamp[i],6,2)),
-        StrToInt(Copy(SessionTimeStamp[i],9,2)),
-        StrToInt(Copy(SessionTimestamp[i],12,2)),
-        StrToInt(Copy(SessionTimestamp[i],15,2)),
-        StrToInt(Copy(SessionTimestamp[i],18,2)),
-        StrToInt(Copy(SessionTimestamp[i],21,3))
-      );
-      NewDate := IncMinute(OldDate, - App_TZOffset);
-      comboActivityLog.LookupValues.AddPair(SessionID[i], FormatDateTime(App_LogDateTimeFormat, NewDate));
-    end;
-    i := i + 1;
-  end;
+  // Update "window" header icon
+  labelAccountTitle.HTML := '<div style="width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
+                            '<div class="DropShadow mt-1">'+User_Name+'</div>';
 
   // Author Page
   memoAuthorDescription.Lines.Text := User_Description;
@@ -2796,6 +2903,27 @@ begin
 
 end;
 
+procedure TForm1.btnSelectActivityLogClick(Sender: TObject);
+begin
+  HideTooltips;
+
+  divShade2.Visible := True;
+  divSessions.Visible := True;
+  divShade2.ElementHandle.style.setProperty('opacity','0.75');
+  divSessions.ElementHandle.style.setProperty('opacity','1.0');
+  HideTooltips;
+
+  asm
+    this.tabAccountSessions.redraw(true);
+    divSessionList.firstElementChild.style.setProperty('position','absolute');
+    divSessionList.firstElementChild.style.setProperty('z-index', '1');
+    divSessionList.firstElementChild.style.setProperty('top', 'px');
+  end;
+
+  LogAction(' ');
+  LogAction('[ Searching Sessions ]');
+end;
+
 procedure TForm1.btnForgotUsernameClick(Sender: TObject);
 begin
   editUsername.Text := '';
@@ -2851,66 +2979,65 @@ begin
     exit;
   end;
 
-    asm
+  asm
 
-      // Build a new results array
-      var results = [];
+    // Build a new results array
+    var results = [];
 
-      // Search for at most three terms
-      var searchterms = Search.split(' ').slice(0,3).join(' ');
+    // Search for at most three terms
+    var searchterms = Search.split(' ').slice(0,3).join(' ');
 
-      var response = await fetch(this.Server_URL+'/SystemService/SearchIconSets'+
-        '?SearchTerms='+encodeURIComponent(searchterms)+
-        '&SearchSets=all'+
-        '&Results='+MaxResults);
-      var results = await response.json();
+    var response = await fetch(this.Server_URL+'/SystemService/SearchIconSets'+
+      '?SearchTerms='+encodeURIComponent(searchterms)+
+      '&SearchSets=all'+
+      '&Results='+MaxResults);
+    var results = await response.json();
 
-      // Sort results by icon name
-      results = results.sort((a, b) => {
-        if (a[0] < b[0]) {
-          return -1;
-        }
-      });
-
-      // Update count
-      divIconSearchData.innerHTML = '<div>Results: <span style="color: var(--bl-color-input);">'+results.length+'</span></div>';
-      this.IconResults = results.length;
-
-      // Clear existing results
-      divIconSearchResultsInner.replaceChildren();
-
-      // Create icons for display
-      var display = '';
-      for (var i = 0; i < results.length; i++) {
-
-        // Figure out which library we're using - note that it is now sorted differently
-        var lib = this.IconSetList.find( o => o.library == results[i][1]);
-
-        // Each library has its default width and height, and then overrides at the icon level
-        var iconheight = results[i][2].height || lib.height;
-        var iconwidth = results[i][2].width || lib.width;
-
-        var displayicon = '<div style="font-size:'+IconSize+'px;" class="SearchIcon" '+
-                               'icon-library="'+lib.name+'" '+
-                               'icon-license="'+lib.license+'">'+
-                             '<svg class="pe-none" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '+
-                               'viewBox="0 0 '+iconwidth+' '+iconheight+'">'+
-                                 results[i][2].body+
-                             '</svg>'+
-                             '<div class="IconName text-wrap" style="font-size:12px; text-align:center; width:100%;">'+
-                               results[i][0]+
-                             '</div>'+
-                           '</div>';
-
-        display += displayicon;
+    // Sort results by icon name
+    results = results.sort((a, b) => {
+      if (a[0] < b[0]) {
+        return -1;
       }
-      divIconSearchResultsInner.innerHTML = display;
-    end;
+    });
 
+    // Update count
+    divIconSearchData.innerHTML = '<div>Results: <span style="color: var(--bl-color-input);">'+results.length+'</span></div>';
+    this.IconResults = results.length;
+
+    // Clear existing results
+    divIconSearchResultsInner.replaceChildren();
+
+    // Create icons for display
+    var display = '';
+    for (var i = 0; i < results.length; i++) {
+
+      // Figure out which library we're using - note that it is now sorted differently
+      var lib = this.IconSetList.find( o => o.library == results[i][1]);
+
+      // Each library has its default width and height, and then overrides at the icon level
+      var iconheight = results[i][2].height || lib.height;
+      var iconwidth = results[i][2].width || lib.width;
+
+      var displayicon = '<div style="font-size:'+IconSize+'px;" class="SearchIcon" '+
+                             'icon-library="'+lib.name+'" '+
+                             'icon-license="'+lib.license+'">'+
+                           '<svg class="pe-none" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '+
+                             'viewBox="0 0 '+iconwidth+' '+iconheight+'">'+
+                               results[i][2].body+
+                           '</svg>'+
+                           '<div class="IconName text-wrap" style="font-size:12px; text-align:center; width:100%;">'+
+                             results[i][0]+
+                           '</div>'+
+                         '</div>';
+
+      display += displayicon;
+    }
+    divIconSearchResultsInner.innerHTML = display;
+  end;
 
 end;
 
-procedure TForm1.comboActivityLogChange(Sender: TObject);
+procedure TForm1.ActivityLogChange(Sender: TObject);
 var
   Response: String;
   RemoteActionLog: TStringList;
@@ -2924,14 +3051,14 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
 
   // Reload current session data
-  if comboActivityLog.Value = 'Current' then
+  if Pos('Now', btnSelectActivityLog.Caption) > 0 then
   begin
     btnActivityLogReloadClick(Sender);
   end
   else
   begin
 
-    Response := await(JSONRequest('IPersonService.ActionLog',[User_ID, comboActivityLog.Value]));
+    Response := await(JSONRequest('IPersonService.ActionLog',[User_ID, Current_ActionLog]));
     asm
       var resp = JSON.parse(Response);
       Response = resp['ActionsLog'][0].actions;
@@ -3089,6 +3216,19 @@ begin
   Button.ElementHandle.setAttribute('data-bs-placement','bottom');
   Button.ElementHandle.setAttribute('data-bs-delay','{"show": 1000, "hide": 100}');
   Button.ElementHandle.setAttribute('data-bs-custom-class','BLTooltip');
+
+end;
+
+procedure TForm1.divSessionListLabelClick(Sender: TObject);
+begin
+  // Serves as our close button
+  divShade2.ElementHandle.style.setProperty('opacity','0');
+  divSessions.ElementHandle.style.setProperty('opacity','0');
+
+  asm await sleep(1000); end;
+
+  divSessions.Visible := False;
+  divShade2.Visible := False;
 
 end;
 
@@ -3371,7 +3511,7 @@ end;
 procedure TForm1.FinalRequest;
 begin
   LogAction(' ');
-  LogAction('Browser closed.');
+  LogAction('Browser Closed.');
   LogAction('Session Duration: '+FormatDateTime('h"h "m"m "s"s"', Now - App_Start));
   LoggedIn := False;
   tmrJWTRenewalTimer(nil);
@@ -3572,10 +3712,10 @@ var
   OldDate: TDateTime;
   NewDate: TDateTime;
 begin
-  comboActivityLog.ItemIndex := 0;
 
   if btnActivityLogTimezone.Tag = 1 then
   begin
+    btnSelectActivityLog.Caption := 'Now: '+FormatDateTime(App_LogDateTimeFormat, App_Start);
     LocalActionLog := TStringList.Create;
     i := 0;
     while i < ActionLog.Count do
@@ -3604,6 +3744,7 @@ begin
   end
   else
   begin
+    btnSelectActivityLog.Caption := 'Now: '+FormatDateTime(App_LogDateTimeFormat, App_Start_UTC)+' UTC';
     divActionLog.HTML.Text := '<pre style="overflow-x: hidden; font-size: 10px; color: var(--bl-color-input">'+ActionLog.Text+'</pre>';
   end;
 end;
@@ -3664,6 +3805,7 @@ begin
   if (Key = VK_ESCAPE) then
   begin
     if (divIconSearch.Visible = True) then btnIconCancelClick(Sender)
+    else if (divSessions.Visible = True) then divSessionListLabelClick(Sender)
     else if (divURL.Visible = True) then btnURLCancelClick(Sender)
     else if (divAccount.Visible = True) then btnAccountCloseClick(Sender);
   end

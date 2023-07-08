@@ -932,6 +932,12 @@ var
   OldJWT: String;
 
   User: IUserIdentity;
+
+  LogStatus: Integer;
+  LogEvents: Integer;
+  LogErrors: Integer;
+  LogStart: Integer;
+  LogChanges: Integer;
 begin
   // Returning JWT, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
@@ -987,6 +993,22 @@ begin
 //    end;
 //  end;
 
+  LogStatus := 0;
+  if Pos('Browser Closed', ActionLog) > 0 then LogStatus := 1
+  else if Pos('Logout: Normal', ActionLog) > 0 then LogStatus := 2
+  else if Pos('Logout: Clean', ActionLog) > 0 then LogStatus := 3
+  else if Pos('Logout: All', ActionLog) > 0 then LogStatus := 4;
+
+  LogStart := 0;
+  if Pos('Login Successful', ActionLog) > 0 then LogStart := 1
+  else if Pos('AutoLogin - JWT Time Remaining', ActionLog) > 0 then LogStart := 2;
+
+  LogEvents := DBSupport.Occurrences('[',ActionLog);
+  LogChanges := DBSupport.Occurrences('<<',ActionLog);
+
+  LogErrors := DBSupport.Occurrences('Failed:',ActionLog) +
+               DBSupport.Occurrences('EXCEPTION:',ActionLog);
+
   // Record Action History
   try
     {$Include sql\system\action_history_insert\action_history_insert.inc}
@@ -997,7 +1019,13 @@ begin
     Query1.ParamByName('SESSIONID').AsString := ActionSession;
     Query1.ParamByName('SESSIONSTART').AsDateTime := DBSupport.DecodeSession(ActionSession);
     Query1.ParamByName('SESSIONRECORDED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('LOGSTATUS').AsInteger := LogStatus;
+    Query1.ParamByName('LOGERRORS').AsInteger := LogErrors;
+    Query1.ParamByName('LOGEVENTS').AsInteger := LogEvents;
+    Query1.ParamByName('LOGCHANGES').AsInteger := LogChanges;
+    Query1.ParamByName('LOGSTART').AsInteger := LogStart;
     Query1.ParamByName('ACTIONS').AsString := ActionLog;
+
     Query1.ExecSQL;
   except on E: Exception do
     begin
@@ -1054,6 +1082,12 @@ var
   OldJWT: String;
 
   User: IUserIdentity;
+
+  LogStatus: Integer;
+  LogEvents: Integer;
+  LogErrors: Integer;
+  LogStart: Integer;
+  LogChanges: Integer;
 begin
   // Returning JWT, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
@@ -1121,6 +1155,22 @@ begin
     end;
   end;
 
+  LogStatus := 0;
+  if Pos('Browser Closed', ActionLog) > 0 then LogStatus := 1
+  else if Pos('Logout: Normal', ActionLog) > 0 then LogStatus := 2
+  else if Pos('Logout: Clean', ActionLog) > 0 then LogStatus := 3
+  else if Pos('Logout: All', ActionLog) > 0 then LogStatus := 4;
+
+  LogStart := 0;
+  if Pos('Login Successful', ActionLog) > 0 then LogStart := 1
+  else if Pos('AutoLogin - JWT Time Remaining', ActionLog) > 0 then LogStart := 2;
+
+  LogEvents := DBSupport.Occurrences('[',ActionLog);
+  LogChanges := DBSupport.Occurrences('<<',ActionLog);
+
+  LogErrors := DBSupport.Occurrences('Failed:',ActionLog) +
+               DBSupport.Occurrences('EXCEPTION:',ActionLog);
+
   // Record Action History
   try
     {$Include sql\system\action_history_insert\action_history_insert.inc}
@@ -1131,6 +1181,11 @@ begin
     Query1.ParamByName('SESSIONID').AsString := ActionSession;
     Query1.ParamByName('SESSIONSTART').AsDateTime := DBSupport.DecodeSession(ActionSession);
     Query1.ParamByName('SESSIONRECORDED').AsDateTime := TTimeZone.local.ToUniversalTime(Now);
+    Query1.ParamByName('LOGSTATUS').AsInteger := LogStatus;
+    Query1.ParamByName('LOGERRORS').AsInteger := LogErrors;
+    Query1.ParamByName('LOGEVENTS').AsInteger := LogEvents;
+    Query1.ParamByName('LOGSTART').AsInteger := LogStart;
+    Query1.ParamByName('LOGCHANGES').AsInteger := LogChanges;
     Query1.ParamByName('ACTIONS').AsString := ActionLog;
     Query1.ExecSQL;
   except on E: Exception do
@@ -1194,6 +1249,12 @@ var
   EMailAddress: String;
 
   User: IUserIdentity;
+
+  LogStatus: Integer;
+  LogEvents: Integer;
+  LogErrors: Integer;
+  LogStart: Integer;
+  LogChanges: Integer;
 begin
   // Returning JWT, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/jwt');
@@ -1385,6 +1446,22 @@ begin
     end;
   end;
 
+  LogStatus := 0;
+  if Pos('Browser Closed', ActionLog) > 0 then LogStatus := 1
+  else if Pos('Logout: Normal', ActionLog) > 0 then LogStatus := 2
+  else if Pos('Logout: Clean', ActionLog) > 0 then LogStatus := 3
+  else if Pos('Logout: All', ActionLog) > 0 then LogStatus := 4;
+
+  LogStart := 0;
+  if Pos('Login Successful', ActionLog) > 0 then LogStart := 1
+  else if Pos('AutoLogin - JWT Time Remaining', ActionLog) > 0 then LogStart := 2;
+
+  LogEvents := DBSupport.Occurrences('[',ActionLog);
+  LogChanges := DBSupport.Occurrences('<<',ActionLog);
+
+  LogErrors := DBSupport.Occurrences('Failed:',ActionLog) +
+               DBSupport.Occurrences('EXCEPTION:',ActionLog);
+
   // Record Action History
   try
     {$Include sql\system\action_history_insert\action_history_insert.inc}
@@ -1395,6 +1472,11 @@ begin
     Query1.ParamByName('SESSIONID').AsString := ActionSession;
     Query1.ParamByName('SESSIONSTART').AsDateTime := DBSupport.DecodeSession(ActionSession);
     Query1.ParamByName('SESSIONRECORDED').AsDateTime := TTimeZone.local.ToUniversalTime(Now);
+    Query1.ParamByName('LOGSTATUS').AsInteger := LogStatus;
+    Query1.ParamByName('LOGERRORS').AsInteger := LogErrors;
+    Query1.ParamByName('LOGEVENTS').AsInteger := LogEvents;
+    Query1.ParamByName('LOGCHANGES').AsInteger := LogChanges;
+    Query1.ParamByName('LOGSTART').AsInteger := LogStart;
     Query1.ParamByName('ACTIONS').AsString := ActionLog;
     Query1.ExecSQL;
   except on E: Exception do

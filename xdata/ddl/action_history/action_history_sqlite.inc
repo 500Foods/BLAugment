@@ -29,6 +29,11 @@ begin
                 '  session_id                 text        NOT NULL, '+
                 '  session_start              text        NOT NULL, '+
                 '  session_recorded           text        NOT NULL, '+
+                '  log_status                 integer     NOT NULL, '+
+                '  log_events                 integer     NOT NULL, '+
+                '  log_changes                integer     NOT NULL, '+
+                '  log_errors                 integer     NOT NULL, '+
+                '  log_start                  integer     NOT NULL, '+
                 '  actions                    text        NOT NULL '+
                 ');'
                );

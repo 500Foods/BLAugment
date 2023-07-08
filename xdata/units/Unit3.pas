@@ -8,6 +8,7 @@ uses
   System.NetEncoding,
   System.Math,
   System.DateUtils,
+  System.StrUtils,
 
   XData.Server.Module,
   XData.Service.Common,
@@ -43,6 +44,7 @@ type
     procedure Export(Format: String; QueryResult: TFDQuery; var OutputStream: TStream);
     function QueryToJSON(QueryResult: TFDQuery): String;
     function DecodeSession(s: String):TDateTime;
+    function Occurrences(const Substring, Text: string): integer;
 
   end;
 
@@ -56,6 +58,19 @@ implementation
 {$R *.dfm}
 
 uses Unit1, Unit2;
+
+function TDBSupport.Occurrences(const Substring, Text: string): integer;
+var
+  offset: integer;
+begin
+  result := 0;
+  offset := PosEx(Substring, Text, 1);
+  while offset <> 0 do
+  begin
+    inc(result);
+    offset := PosEx(Substring, Text, offset + length(Substring));
+  end;
+end;
 
 function TDBSupport.HashThis(InputText: String):String;
 var

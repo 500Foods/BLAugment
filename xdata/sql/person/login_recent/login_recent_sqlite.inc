@@ -19,7 +19,7 @@ begin
             '  login_history '+
             'WHERE '+
             '  (person_id = :PERSONID) '+
-            '  and (logged_in >= datetime("now" , "-7 days")) '+
+            '  and (logged_in >= DateTime("now" , "-30 days")) '+
             'ORDER BY '+
             '  logged_in DESC; '
            );

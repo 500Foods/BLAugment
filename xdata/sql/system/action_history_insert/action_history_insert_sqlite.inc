@@ -9,7 +9,7 @@ begin
     SQL.Clear;
     SQL.Add('insert into '+
             '  action_history '+
-            '    (person_id, ip_address, application, version, session_id, session_start, session_recorded, actions) '+
+            '    (person_id, ip_address, application, version, session_id, session_start, session_recorded, log_status, log_events, log_changes, log_errors, log_start, actions) '+
             'values( '+
             '  :PERSONID, '+
             '  :IPADDRESS, '+
@@ -18,6 +18,11 @@ begin
             '  :SESSIONID, '+
             '  :SESSIONSTART, '+
             '  :SESSIONRECORDED, '+
+            '  :LOGSTATUS, '+
+            '  :LOGEVENTS, '+
+            '  :LOGCHANGES, '+
+            '  :LOGERRORS, '+
+            '  :LOGSTART, '+
             '  :ACTIONS '+
             ');'
            );

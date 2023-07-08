@@ -1,5 +1,5 @@
 object Form1: TForm1
-  Width = 1129
+  Width = 1361
   Height = 1091
   Caption = 'blaugment'
   CSSLibrary = cssBootstrap
@@ -2716,13 +2716,14 @@ object Form1: TForm1
       WidthPercent = 100.000000000000000000
       OnClick = btnLoginCancelClick
     end
-    object WebHTMLDiv3: TWebHTMLDiv
+    object divLoginLabel: TWebHTMLDiv
       Left = 80
       Top = 5
       Width = 190
       Height = 50
+      Cursor = crHandPoint
       ElementClassName = 'overflow-hidden'
-      ElementID = 'divLogo'
+      ElementID = 'divLoginLabel'
       ChildOrder = 8
       ElementFont = efCSS
       HTML.Strings = (
@@ -2742,6 +2743,7 @@ object Form1: TForm1
         '</div>'
         '')
       Role = ''
+      OnClick = btnLoginCancelClick
     end
   end
   object divShade: TWebHTMLDiv
@@ -2769,6 +2771,12 @@ object Form1: TForm1
       '  <i class="fa-duotone fa-computer"></i>'
       '  <i class="fa-duotone fa-tablet-button"></i>'
       '  <i class="fa-duotone fa-tablet-button"></i>'
+      '  <i class="fa-duotone fa-flag"></i>'
+      '  <i class="fa-duotone fa-flag-pennant"></i>'
+      '  <i class="fa-duotone fa-flag-swallowtail"></i>'
+      '  <i class="fa-duotone fa-flag-checkered"></i>'
+      '  <i class="fa-duotone fa-shield-keyhole"></i>'
+      '  <i class="fa-duotone fa-shield-check"></i>'
       '  <i class="fa-brands fa-chrome"></i>'
       '  <i class="fa-brands fa-edge"></i>'
       '  <i class="fa-brands fa-firefox-browser"></i>'
@@ -2831,6 +2839,7 @@ object Form1: TForm1
         Top = 3
         Width = 98
         Height = 35
+        Cursor = crSizeAll
         AutoSize = False
         ElementClassName = 'd-flex flex-row w-100'
         ElementLabelClassName = 'd-flex flex-row w-100'
@@ -2896,7 +2905,7 @@ object Form1: TForm1
     end
     object pcAccount: TWebPageControl
       Left = 158
-      Top = 46
+      Top = 49
       Width = 400
       Height = 506
       ElementClassName = 'nav nav-tabs m-2'
@@ -2906,7 +2915,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 3
+      TabIndex = 0
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -4067,7 +4076,7 @@ object Form1: TForm1
           Top = 3
           Width = 397
           Height = 46
-          ElementClassName = 'nointeract d-flex flex-wrap flex-row gap-1 '
+          ElementClassName = 'nointeract d-flex flex-row gap-1 '
           ElementID = 'divActivityLogHeader'
           HeightStyle = ssAuto
           WidthStyle = ssAuto
@@ -4143,23 +4152,23 @@ object Form1: TForm1
             WidthPercent = 100.000000000000000000
             OnClick = btnActivityLogPrintClick
           end
-          object comboActivityLog: TWebLookupComboBox
+          object btnSelectActivityLog: TWebButton
             Left = 187
-            Top = 7
-            Width = 145
-            Height = 22
+            Top = 3
+            Width = 142
+            Height = 40
+            Hint = 'Select Activity Log'
+            Caption = 'Current Session'
             ChildOrder = 4
-            ElementClassName = 'flex-grow-1 ComboUtility flex-fill'
-            ElementID = 'comboActivityLog'
+            ElementClassName = 'text-wrap p-2 btn btn-light ButtonUtility flex-grow-1'
+            ElementID = 'btnSelectActivityLog'
             ElementFont = efCSS
-            ElementPosition = epRelative
+            ElementPosition = epIgnore
             HeightStyle = ssAuto
             HeightPercent = 100.000000000000000000
             WidthStyle = ssAuto
             WidthPercent = 100.000000000000000000
-            OnChange = comboActivityLogChange
-            ItemIndex = -1
-            LookupValues = <>
+            OnClick = btnSelectActivityLogClick
           end
         end
         object divActionLog: TWebHTMLDiv
@@ -4588,6 +4597,7 @@ object Form1: TForm1
       Top = 0
       Width = 250
       Height = 35
+      Cursor = crHandPoint
       ElementClassName = 'overflow-hidden'
       ElementID = 'divURLLabel'
       ChildOrder = 8
@@ -4609,6 +4619,7 @@ object Form1: TForm1
         '</div>'
         '')
       Role = ''
+      OnClick = btnURLCancelClick
     end
     object btnURLOK: TWebButton
       Left = 275
@@ -4679,13 +4690,14 @@ object Form1: TForm1
       WidthPercent = 100.000000000000000000
       OnChange = btnIconSearchClick
     end
-    object WebHTMLDiv12: TWebHTMLDiv
+    object divIconSearchLabel: TWebHTMLDiv
       Left = 50
       Top = 0
       Width = 250
       Height = 35
+      Cursor = crHandPoint
       ElementClassName = 'overflow-hidden'
-      ElementID = 'divURLLabel'
+      ElementID = 'divIconSearchLabel'
       ChildOrder = 8
       ElementFont = efCSS
       HTML.Strings = (
@@ -4705,6 +4717,7 @@ object Form1: TForm1
         '</div>'
         '')
       Role = ''
+      OnClick = btnIconCancelClick
     end
     object btnIconOK: TWebButton
       Left = 275
@@ -4788,6 +4801,85 @@ object Form1: TForm1
       ChildOrder = 6
       ElementFont = efCSS
       Role = ''
+    end
+  end
+  object divSessions: TWebHTMLDiv
+    Left = 795
+    Top = 263
+    Width = 350
+    Height = 81
+    ElementID = 'divSessions'
+    ChildOrder = 2
+    ElementFont = efCSS
+    Role = ''
+    Visible = False
+    object divSessionListHolderBG: TWebHTMLDiv
+      Left = 0
+      Top = 35
+      Width = 350
+      Height = 38
+      Cursor = crHandPoint
+      ElementClassName = 'ContainerBG position-absolute'
+      ElementID = 'divSessionListBG'
+      HeightStyle = ssPercent
+      ChildOrder = 1
+      ElementFont = efCSS
+      Role = ''
+    end
+    object divSessionListLabel: TWebHTMLDiv
+      Left = 50
+      Top = 0
+      Width = 250
+      Height = 35
+      Cursor = crHandPoint
+      ElementClassName = 'overflow-hidden'
+      ElementID = 'divURLLabel'
+      ChildOrder = 8
+      ElementFont = efCSS
+      HTML.Strings = (
+        '<div class="ContainerBGLogin" '
+        '        style="position: absolute; width:100%; height:100%;">'
+        '</div>'
+        
+          '<div class="h-100 d-flex justify-content-center align-items-cent' +
+          'er" '
+        '        style="position: relative;">'
+        '  <div id="editURLLabel" class="DropShadow" '
+        
+          '          style="font-size: 16px; font-weight: bold; color: var(' +
+          '--bl-color-one); font-family: Cairo;">'
+        '    Select Session'
+        '  </div>'
+        '</div>'
+        '')
+      Role = ''
+      OnClick = divSessionListLabelClick
+    end
+    object divSessionListHolder: TWebHTMLDiv
+      Left = 16
+      Top = 41
+      Width = 285
+      Height = 35
+      ElementID = 'divSessionListHolder'
+      HeightStyle = ssAuto
+      WidthStyle = ssAuto
+      ChildOrder = 6
+      ElementPosition = epRelative
+      ElementFont = efCSS
+      Role = ''
+      object divSessionList: TWebHTMLDiv
+        Left = 56
+        Top = 0
+        Width = 185
+        Height = 35
+        ElementID = 'divSessionList'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ChildOrder = 6
+        ElementPosition = epRelative
+        ElementFont = efCSS
+        Role = ''
+      end
     end
   end
   object XDataConn: TXDataWebConnection
