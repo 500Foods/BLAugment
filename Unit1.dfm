@@ -2798,6 +2798,7 @@ object Form1: TForm1
       '</div>')
     Role = ''
     Visible = False
+    OnClick = divShadeClick
   end
   object divAccount: TWebHTMLDiv
     Left = 0
@@ -4541,6 +4542,7 @@ object Form1: TForm1
       '')
     Role = ''
     Visible = False
+    OnClick = divShade2Click
   end
   object divURL: TWebHTMLDiv
     Left = 439

@@ -31,8 +31,8 @@ body {
 :root {
   --bl-color-one: cornflowerblue;
   --bl-color-two: #0047AB; /* cobalt blue */
+  --bl-color-three: #0047ABCC; /* cobalt blue @80% */
   --bl-color-input: white;
-  --bl-color-three: #0047ABCC; /* cobalb blue @80% */
 
   --bl-background: black;
   --bl-image: none;
@@ -59,6 +59,7 @@ html[theme="dark"] {
 html[theme="light"] {
   --bl-color-one: silver;
   --bl-color-two: dimgray;
+  --bl-color-three: #696969CC; /* dimgray @80% */
   --bl-color-input: white;
   --bl-image: url(images/bookshelf.jpg);
   --bl-opacity: 0.85;
@@ -67,6 +68,7 @@ html[theme="light"] {
 html[theme="red"] {
   --bl-color-one: indianred;
   --bl-color-two: crimson;
+  --bl-color-three: #DC143CCC; /* cobalt blue @80% */
   --bl-color-input: lightpink;
   --bl-image: url(images/bookshelf_red.jpg);
   --bl-opacity: 0.85;

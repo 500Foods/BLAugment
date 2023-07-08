@@ -416,6 +416,8 @@ type
     procedure btnSelectActivityLogClick(Sender: TObject);
     [async] procedure divSessionListLabelClick(Sender: TObject);
     procedure labelAccountTitleDblClick(Sender: TObject);
+    procedure divShadeClick(Sender: TObject);
+    procedure divShade2Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -3274,6 +3276,19 @@ begin
   divSessions.Visible := False;
   divShade2.Visible := False;
 
+end;
+
+procedure TForm1.divShade2Click(Sender: TObject);
+begin
+  if divSessions.Visible then divSessionListLabelClick(Sender);
+  if divURL.Visible then btnURLCancelClick(Sender);
+  if divIconSearch.Visible then btnIconCancelClick(Sender);
+end;
+
+procedure TForm1.divShadeClick(Sender: TObject);
+begin
+  if divAccount.Visible then btnAccountCloseClick(Sender);
+  if divLogin.Visible then btnLoginCancelClick(Sender);
 end;
 
 function TForm1.AccountIsValid(acct: String):String;
