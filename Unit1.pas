@@ -1309,7 +1309,7 @@ begin
     });
     this.tabAccountHistory.on('tableBuilt', function(){
       divAccountHistory.firstElementChild.style.setProperty('position','absolute');
-      divAccountHistory.firstElementChild.style.setProperty('z-index', '1');
+      divAccountHistory.firstElementChild.style.setProperty('z-index', '10');
       divAccountHistory.firstElementChild.style.setProperty('top', '0px');
     });
 
@@ -1423,14 +1423,14 @@ begin
               return icon;
             }
         },
-        { title: '<div class="ps-1 DropShadow">Session Start</div>', field: "session_start",
+        { title: '<div class="ps-1">Session Start</div>', field: "session_start",
             formatter: function(cell, formatterParams, onRendered) {
               return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
             }
         },
-        { title: '<i class="fa-duotone fa-computer-mouse ps-1 DropShadow Swap"></i>', field: "log_events", width: 42, hozAlign: "center" },
-        { title: '<i class="fa-duotone fa-hammer ps-1 DropShadow Swap"></i>', field: "log_changes", width: 42, hozAlign: "center" },
-        { title: '<i class="fa-duotone fa-bug ps-1 DropShadow"></i>', field: "log_errors", width: 42, hozAlign: "center" },
+        { title: '<i title="Events" class="fa-duotone fa-computer-mouse fa-fw Swap fa-lg"></i>', field: "log_events", width: 42, hozAlign: "center" },
+        { title: '<i title="Changes" class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i>', field: "log_changes", width: 42, hozAlign: "center" },
+        { title: '<i title="Errors" class="fa-duotone fa-bug fa-fw fa-lg"></i>', field: "log_errors", width: 42, hozAlign: "center" },
         { title: false, field: "person_id", headerSort: false, width: 5, minWidth: 5,
             formatter: function(cell, formatterParams, onRendered) {
               return "";
@@ -1440,7 +1440,7 @@ begin
     });
     this.tabAccountSessions.on('tableBuilt', function() {
       divSessionList.firstElementChild.style.setProperty('position','absolute');
-      divSessionList.firstElementChild.style.setProperty('z-index', '1');
+      divSessionList.firstElementChild.style.setProperty('z-index', '10');
       divSessionList.firstElementChild.style.setProperty('top', '0px');
     });
     this.tabAccountSessions.on('rowClick', function(e, row){
@@ -1593,26 +1593,23 @@ begin
     this.scrollIcons             = new SimpleBar(document.getElementById('divIconSearchResults'   ), { forceVisible: 'y', autoHide: false });
     this.scrollSessions          = new SimpleBar(document.getElementById('divSessionListHolder'   ), { forceVisible: 'y', autoHide: false });
 
-    // Fix tabulator header to top of table
-    this.scrollAccountHistory.getScrollElement().addEventListener('scroll', function(){
+    // Fix tabulator headers to top
+
+    this.scrollAccountHistory.getScrollElement().addEventListener('scroll', (evt) => {
       divAccountHistory.firstElementChild.style.setProperty('top',
         divAccountHistory.parentElement.parentElement.parentElement.getBoundingClientRect().y
         - divAccountHistory.getBoundingClientRect().y
         + 'px');
-    });
+    }, {capture: true, passive: true});
 
-    this.scrollSessions.getScrollElement().addEventListener('scroll', function(){
+    this.scrollSessions.getScrollElement().addEventListener('scroll', (evt) => {
       divSessionList.firstElementChild.style.setProperty('top',
         divSessionList.parentElement.parentElement.parentElement.getBoundingClientRect().y
         - divSessionList.getBoundingClientRect().y
         + 'px');
-    });
-  end;
+    }, {capture: true, passive: true});
 
-  asm
-    document.body.style.setProperty('opacity','1');
   end;
-
 
   // This loads up pan/zoom functionality
   asm
@@ -1736,6 +1733,11 @@ begin
           '</div>';
       }
     });
+  end;
+
+
+  asm
+    document.body.style.setProperty('opacity','1');
   end;
 
 
@@ -2180,7 +2182,7 @@ begin
     asm
       pas.Unit1.Form1.tabAccountHistory.redraw(true);
       divAccountHistory.firstElementChild.style.setProperty('position','absolute');
-      divAccountHistory.firstElementChild.style.setProperty('z-index', '1');
+      divAccountHistory.firstElementChild.style.setProperty('z-index', '10');
       divAccountHistory.firstElementChild.style.setProperty('top', '0px');
     end;
   end
@@ -2959,7 +2961,7 @@ begin
   asm
     this.tabAccountSessions.redraw(true);
     divSessionList.firstElementChild.style.setProperty('position','absolute');
-    divSessionList.firstElementChild.style.setProperty('z-index', '1');
+    divSessionList.firstElementChild.style.setProperty('z-index', '10');
     divSessionList.firstElementChild.style.setProperty('top', 'px');
   end;
 

@@ -124,7 +124,7 @@ html[theme="red"] .BLTooltip {
 }
 
 
-/* primarily fo the main search input field */
+/* primarily for the main search input field */
 ::placeholder {
   color: var(--fa-primary-color);
   opacity: 0.6;
@@ -199,6 +199,7 @@ html[theme="red"] .BLTooltip {
   min-height: 426px;
   max-height: 100vh;
 }
+
 #divAuthorProfileHolder {
   min-width: 330px;
   max-width: 660px;
@@ -211,6 +212,8 @@ html[theme="red"] .BLTooltip {
 #divAuthorProfileName {
   margin-top: -4px;
 }
+
+
 #divAccountLinksNav {
   top: -6px;
   position: Relative;
@@ -276,13 +279,15 @@ html[theme="red"] .BLTooltip {
   filter: var(--bl-shadow);
 }
 
+
+/* Entries refers to the counts in the Account Options list */
 .Entries {
-    background: var(--bl-color-two);
-    border-radius: var(--bl-radius);
-    margin: 0px 4px 0px 0px;
-    padding: 1px 4px 0px 4px;
-    height: 21px !important;
-    font-size: 12px;
+  background: var(--bl-color-two);
+  border-radius: var(--bl-radius);
+  margin: 0px 4px 0px 0px;
+  padding: 1px 4px 0px 4px;
+  height: 21px !important;
+  font-size: 12px;
 }
 .Entries > div {
   filter: var(--bl-shadow);
@@ -304,6 +309,7 @@ button > svg {
 button > svg > g > path {
   transition: fill 1s;
 }
+
 .ButtonBlog {
   --fa-primary-color: var(--bl-color-one);
   --fa-secondary-color: var(--bl-color-two);
@@ -343,6 +349,7 @@ button > svg > g > path {
   background: var(--bl-color-one);
   transition: background 0.4s !important;
 }
+
 #btnThemeDark,
 #btnThemeLight,
 #btnThemeRed {
@@ -360,16 +367,6 @@ button > svg > g > path {
   border-radius: var(--bl-radius);
 }
 
-.ComboUtility {
-  border: var(--bl-border);
-  border-radius: var(--bl-radius);
-  background: var(--bl-color-two);
-  padding: 0px 8px;
-  outline: none;
-  color: var(--bl-color-input);
-  filter: var(--bl-shadow);
-  font-size: 14px;
-}
 #divActivityLogHeader {
     left: 174px;
     right: 56px;
@@ -541,6 +538,7 @@ button > svg > g > path {
   color: var(--bl-color-input);
 }
 
+/* Lots going on with the search results icons */
 .SearchIcon {
   border-radius: 0.375rem;
   cursor: pointer;
@@ -569,8 +567,8 @@ button > svg > g > path {
 .SearchIcon.Selected {
    color: var(--bl-color-two);
 }
-.SearchIcon.Selected:hover > div,
-.SearchIcon.Selected:hover {
+.SearchIcon.Selected:hover,
+.SearchIcon.Selected:hover > div {
    color: var(--bl-color-two);
 }
 
@@ -582,7 +580,7 @@ button > svg > g > path {
   color: var(--bl-color-input);
 }
 .Edit {
-  background: #20202080;
+  background: #202020CC;
   border: none;
   border-radius: var(--bl-radius);
   padding: 8px;
@@ -592,7 +590,8 @@ button > svg > g > path {
   outline: none;
 }
 
-/* PAGES */
+
+/* Account Pages */
 #pcAccount {
   left: 152px !important;
   top: 42px !important;
@@ -600,7 +599,6 @@ button > svg > g > path {
   height: calc(100% - 2rem - 41px) !important;
   background: transparent;
 }
-
 .Page {
   position: absolute;
   width: 100% !important;
@@ -613,7 +611,9 @@ button > svg > g > path {
   margin: 1rem;
 }
 
-/* Tabulator - used for lists */
+
+
+/* Tabulator Defaults */
 .tabulator-table {
   background-color: transparent !important;
   overflow: hidden !important;
@@ -636,27 +636,58 @@ button > svg > g > path {
   color: white !important;
 }
 
-.IconColumn {
-  padding: 2px !important;
-  text-overflow: hidden;
+
+/* Tabulator Defaults: With Column Headers */
+
+#divSessionList .tabulator-header,
+#divAccountLinks .tabulator-header,
+#divAccountHistory .tabulator-header {
+  color: var(--bl-color-input);
+  border: none;
+  background: transparent;
+  height: 30px;
+}
+#divSessionList .tabulator-header .tabulator-col,
+#divAccountLinks .tabulator-header .tabulator-col,
+#divAccountHistory .tabulator-header .tabulator-col {
+  border: 0px;
+  background: var(--bl-color-two);
+  opacity: 0.8;
+}
+#divSessionList .tabulator-header .tabulator-col .tabulator-col-title,
+#divAccountLinks .tabulator-header .tabulator-col .tabulator-col-title,
+#divAccountHistory .tabulator-header .tabulator-col .tabulator-col-title {
+  filter: var(--bl-shadow);
+  font-weight: normal;
 }
 
 
-/* Tabulator with column headers */
-#divSessionList {
-  font-family: Cairo !important;
-  font-size: 12px;
-  padding-top: 30px;
-  padding-right: 32px;
-}
-#divAccountLinks,
-#divAccountHistory {
+/* Adjustments for specific Tabulator tables */
+
+#divAccountLinks {
+  border: none;
   font-family: Cairo !important;
   font-size: 14px;
   width: calc(100% - 32px) !important;
 }
+
+#divAccountHistory {
+  border:none;
+  font-family: Cairo !important;
+  font-size: 14px;
+  width: calc(100% - 32px) !important;
+  padding-top: 32px;
+}
+
 #divSessions {
   padding: 37px 2px 3px 2px;
+}
+#divSessionList {
+  border: none;
+  font-family: Cairo !important;
+  font-size: 12px;
+  padding-top: 29px;
+  padding-right: 32px;
 }
 #divSessionListBG {
   height: calc(100% - 38px) !important;
@@ -675,46 +706,30 @@ button > svg > g > path {
   padding-top: 2px;
 }
 
-#divAccountHistory {
-  padding-top: 32px;
+/* Adjustments for specific Tabulator columns */
+
+.IconColumn {
+  padding: 2px !important;
+  text-overflow: hidden;
+  white-space: nowrap;
+  overflow: hidden;
 }
-#divSessionList .tabulator-header,
-#divAccountLinks .tabulator-header,
-#divAccountHistory .tabulator-header {
-  color: var(--bl-color-input);
-  border: none;
-  background: transparent;
-  height: 30px;
-}
-#divSessionList .tabulator-header .tabulator-col,
-#divAccountLinks .tabulator-header .tabulator-col,
-#divAccountHistory .tabulator-header .tabulator-col {
-  border: 0px;
-  background: var(--bl-color-two);
-  opacity: 0.8;
-}
-#divAccountSessionList .tabulator-header .tabulator-col .tabulator-col-title,
-#divAccountLinks .tabulator-header .tabulator-col .tabulator-col-title,
-#divAccountHistory .tabulator-header .tabulator-col .tabulator-col-title {
-  filter: var(--bl-shadow);
-  font-weight: normal;
-}
-#divSessionList,
-#divAccountLinks {
-  border: none;
-}
-/* remove double dropshadow */
+
 #divAccountLinks .tabulator-cell[tabulator-field="LinkIcon"] {
   filter: none;
 }
+
 #divAccountLinks .tabulator-cell[tabulator-field="Link"] {
   padding-top: 6px;
 }
+
 #divAccountOptions .tabulator-cell[tabulator-field="Icon"] {
   padding: 3px 2px 3px 0px;
 }
 
+
 /* Tabulator sort icons
+
 /* Hide all sort icons by default */
 .tabulator-col .tabulator-col-sorter div.icon {
   display: none;
@@ -740,18 +755,23 @@ button > svg > g > path {
 }
 
 
+/* User can select these things */
+
+#divActionLog {
+  -webkit-touch-callout: default;
+    -webkit-user-select: text;
+     -khtml-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
+}
+
 
 /* Customize Simplebar scrollbars */
+
 .simplebar-wrapper {
   height: 100%;
 }
-
-/*
-.simplebar-content-wrapper {
-  scroll-behavior: smooth;
-}
-*/
-
 .simplebar-track {
   cursor: ns-resize !important;
   background: var(--bl-color-two);
@@ -773,6 +793,9 @@ button > svg > g > path {
   bottom: 3px;
 }
 
+/* Author Profile - handle things a little differently here.
+** It is normally invisible unless hovering and the
+** trackbar is also hidden. */
 #divAuthorProfileHolder .simplebar-track {
   cursor: ns-resize !important;
   background: none;
@@ -787,14 +810,21 @@ button > svg > g > path {
     border-radius: var(--bl-radius);
 }
 
+
+/* Here the top of the trackbar is rounded as it is in the corner of the visible "window" */
 #divSessionListHolder .simplebar-track,
 #divSessionListHolder .simplebar-content-wrapper {
   border-top-right-radius: 6px;
 }
 
 
+/* Dunno why Bootstrap only declares 1-5?
+**
+** Note: If there is an error in the CSS above, like a missing bracket
+** then these won't make it in, and things will look funny.  Which is
+** good as you can immediately tell that the CSS has an error in it!
+*/
 
-/* Dunno why Bootstrap only declares 1-5? */
 .order-6  {order:  6; }
 .order-7  {order:  7; }
 .order-8  {order:  8; }
@@ -805,4 +835,7 @@ button > svg > g > path {
 .order-13 {order: 13; }
 .order-14 {order: 14; }
 .order-15 {order: 15; }
+
+
+/* The End */
 

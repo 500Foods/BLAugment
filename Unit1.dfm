@@ -2917,7 +2917,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 11
+      TabIndex = 8
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
