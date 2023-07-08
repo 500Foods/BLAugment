@@ -677,7 +677,8 @@ begin
 
   if RequestResponse = 'Sent' then
   begin
-    LogAction('Activity Log E-Mail Sent');
+    LogAction('<< Activity Log E-Mail Sent >>');
+    LogAction(' ');
   end
   else
   begin
@@ -1641,13 +1642,14 @@ begin
 //      MainForm.Position := window.history.length;
 //      MainForm.StartPosition := MainForm.Position - 1;
       ProcessLogin;
-
       User_Photo := TWebLocalStorage.GetValue('User.Photo.'+User_Account);
       if Trim(User_Photo) = ''
       then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
       btnAccount.ElementHandle.innerHTML := User_Photo;
 
       await(tmrJWTRenewalTimer(Sender));
+
+      btnAccountClick(Sender);
 
     end
     else
@@ -2557,7 +2559,8 @@ begin
   if RequestResponse = 'Success' then
   begin
     labelChangeAccountName.ElementHandle.innerHTML := 'Account Name Updated';
-    LogAction('Account Name Changed: '+editAccountName.Text);
+    LogAction('<< Account Name Changed: '+editAccountName.Text + ' >>');
+    LogAction(' ');
     tmrJWTRenewalTimer(Sender);
   end
   else
@@ -2595,7 +2598,8 @@ begin
     editConfirmPassword.Text := '';
     TWebLocalStorage.SetValue('Login.PasswordHash', PasswordCheck);
     editCurrentPassword.SetFocus;
-    LogAction('Password Changed Successfully.');
+    LogAction('<< Password Changed >>');
+    LogAction(' ');
     tmrJWTRenewalTimer(Sender);
   end
   else
@@ -2637,11 +2641,13 @@ begin
     btnDescriptionSave.Enabled := False;
     btnDescriptionCancel.Enabled := False;
     User_Description := memoAuthorDescription.Lines.Text;
+    LogAction('<< Author Description Updated >>');
+    LogAction(' ');
   end
   else
   begin
     btnDescriptionCancelClick(Sender);
-    LogAction('Description Update Failed:');
+    LogAction('Author Description Update Failed:');
     LogAction(RequestResponse);
   end;
 
@@ -2684,6 +2690,9 @@ begin
     User_LastName := Trim(editLastName.Text);
     User_Name := StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]);
 
+    LogAction('<< Names Updated >>');
+    LogAction(' ');
+
     btnFirstNameSave.Enabled := False;
     btnFirstNameCancel.Enabled := False;
 
@@ -2692,7 +2701,7 @@ begin
   else
   begin
     btnFirstNameCancelClick(Sender);
-    LogAction('Person Update Failed:');
+    LogAction('Names Update Failed:');
     LogAction(RequestResponse);
   end;
 
@@ -2838,7 +2847,8 @@ begin
   begin
     btnPhotoSave.Enabled := False;
     btnPhotoCancel.Enabled := False;
-    LogAction('Account Photo Updated');
+    LogAction('<< Account Photo Updated >>');
+    LogAction(' ');
   end
   else
   begin
@@ -3467,7 +3477,8 @@ begin
       asm await sleep(1000); end;
 
       labelChangeAccountEMail.ElementHandle.innerHTML := 'E-Mail Address Updated';
-      LogAction('E-Mail Address Updated');
+      LogAction('<< E-Mail Address Updated >>');
+      LogAction(' ');
       User_EMail := editEMail.text;
       tmrJWTRenewalTimer(Sender);
     end
@@ -3639,12 +3650,14 @@ begin
       btnLinkSave.setAttribute('disabled','');
       btnLinkCancel.setAttribute('disabled','');
       this.LinksDataBackup = JSON.parse(LinkSave);
+      LogAction('<< Account Links Updated >>');
+      LogAction(' ');
     end;
   end
   else
   begin
     btnLinkCancelClick(Sender);
-    LogAction('Update Account Links Failed:');
+    LogAction('Account Links Update Failed:');
     LogAction(RequestResponse);
   end;
 
