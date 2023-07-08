@@ -91,16 +91,16 @@ input:-webkit-autofill:focus {
 
 /* Bootstrap Tooltip Overrides */
 .BLTooltip {
-  --bs-tooltip-bg: #F0F0F0;
-  --bs-tooltip-color: black;
+  --bs-tooltip-bg: #003060;
+  --bs-tooltip-color: var(--bl-color-one);
 }
 html[theme="light"] .BLTooltip {
   --bs-tooltip-bg: #202020;
-  --bs-tooltip-color: white;
+  --bs-tooltip-color: var(--bl-color-input);
 }
 html[theme="red"] .BLTooltip {
   --bs-tooltip-bg: hotpink;
-  --bs-tooltip-color: white;
+  --bs-tooltip-color: var(--bl-color-input);
 }
 
 

@@ -336,12 +336,13 @@ type
     divSessionListLabel: TWebHTMLDiv;
     divSessionListHolder: TWebHTMLDiv;
     divSessionList: TWebHTMLDiv;
+    btnServerStats: TWebButton;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
     [async] procedure WebFormCreate(Sender: TObject);
     procedure btnBlogClick(Sender: TObject);
-    procedure ConfigureTooltip(Button: TWebButton);
+    procedure AddTT(Button: TWebButton);
     procedure btnSearchClick(Sender: TObject);
     procedure btnRegisterClick(Sender: TObject);
     procedure btnLoginClick(Sender: TObject);
@@ -419,20 +420,21 @@ type
     procedure labelAccountTitleDblClick(Sender: TObject);
     procedure divShadeClick(Sender: TObject);
     procedure divShade2Click(Sender: TObject);
+    procedure btnServerStatsClick(Sender: TObject);
 
   private
     { Private declarations }
 
   public
     { Public declarations }
-    Theme: String;
-    LoggedIn: Boolean;
-    Server_URL: String;
-    LastAction: String;
+    Theme: String;        // Current Theme, eg: Dark, Red, Light
+    BootstrapTT: String;  // Bootstrap Tooltip HTML to add to icon classes
+    Server_URL: String;   // XData server
 
-    JWT: String;
-    JWT_Expiry: TDateTime;
-    PasswordCheck: String;
+    LoggedIn: Boolean;       // Whether there is a current login in place
+    JWT: String;             // JWT for current session
+    JWT_Expiry: TDateTime;   // When the JWT Expires
+    PasswordCheck: String;   // Encoded version password
 
     App_Name: String;
     App_Short: String;
@@ -464,9 +466,10 @@ type
     App_Region: String;
     App_City: String;
 
-    ActionLog: TStringList;
-    ActionLogCurrent: TStringList;
-    Current_ActionLog: String;
+    ActionLog: TStringList;          // The entire action log for current session
+    ActionLogCurrent: TStringList;   // Fragment of action log that hasn't been uploaded to server yet
+    LastAction: String;              // Used to prevent adding duplicate lines (particularly blank lines)
+    Current_ActionLog: String;       // The selected action long in the Accounts Activity page
 
     User_FirstName: String;
     User_MiddleName: String;
@@ -632,14 +635,15 @@ end;
 procedure TForm1.HideToolTips;
 begin
   asm
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
-    var tooltipList = tooltipTriggerList.map( function(tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl, {
-        trigger : 'hover',
-        container: 'body'
+    setTimeout(function() {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
+      var tooltipList = tooltipTriggerList.map( function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+          trigger : 'hover'
+        });
       });
-    });
+    },500);
 
     setTimeout(function() {
       var badtooltips = document.getElementsByClassName('bs-tooltip-auto');
@@ -788,6 +792,7 @@ begin
   else if Theme = 'red'   then btnThemeRed.ElementHandle.style.setProperty('opacity','1');
 
   document.documentElement.setAttribute('theme', Theme);
+  BootstrapTT := ' data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip">';
 
   editSearch.ElementHandle.setAttribute('size','1');
 
@@ -1000,79 +1005,91 @@ begin
   await(XDataConnect);
   LogAction(' ');
 
-  // Configure buttons to use Bootstrap tooltips
-  ConfigureTooltip(btnSearch);
-  ConfigureTooltip(btnRegister);
-  ConfigureTooltip(btnAdd);
-  ConfigureTooltip(btnAccount);
-  ConfigureTooltip(btnLogin);
-  ConfigureTooltip(btnThemeDark);
+// Configure buttons to use Bootstrap tooltips
+  AddTT(btnSearch);
+  AddTT(btnRegister);
+  AddTT(btnAdd);
+  AddTT(btnAccount);
+  AddTT(btnLogin);
+  AddTT(btnThemeDark);
 
-  ConfigureTooltip(btnBlogArchitecture);
-  ConfigureTooltip(btnBlogArt);
-  ConfigureTooltip(btnBlogAuto);
-  ConfigureTooltip(btnBlogAviation);
-  ConfigureTooltip(btnBlogBeauty);
-  ConfigureTooltip(btnBlogBoat);
-  ConfigureTooltip(btnBlogBridges);
-  ConfigureTooltip(btnBlogBusiness);
-  ConfigureTooltip(btnBlogCats);
-  ConfigureTooltip(btnBlogClimate);
-  ConfigureTooltip(btnBlogCycling);
-  ConfigureTooltip(btnBlogDesign);
-  ConfigureTooltip(btnBlogDIY);
-  ConfigureTooltip(btnBlogDogs);
-  ConfigureTooltip(btnBlogEducation);
-  ConfigureTooltip(btnBlogFashion);
-  ConfigureTooltip(btnBlogFinance);
-  ConfigureTooltip(btnBlogFitness);
-  ConfigureTooltip(btnBlogFood);
-  ConfigureTooltip(btnBlogGaming);
-  ConfigureTooltip(btnBlogGardening);
-  ConfigureTooltip(btnBlogGovernment);
-  ConfigureTooltip(btnBlogHealth);
-  ConfigureTooltip(btnBlogHealthcare);
-  ConfigureTooltip(btnBlogIndustry);
-  ConfigureTooltip(btnBlogInteriors);
-  ConfigureTooltip(btnBlogInvesting);
-  ConfigureTooltip(btnBlogJustice);
-  ConfigureTooltip(btnBlogLifestyle);
-  ConfigureTooltip(btnBlogMotorcycle);
-  ConfigureTooltip(btnBlogMovies);
-  ConfigureTooltip(btnBlogMusic);
-  ConfigureTooltip(btnBlogNews);
-  ConfigureTooltip(btnBlogParenting);
-  ConfigureTooltip(btnBlogPeople);
-  ConfigureTooltip(btnBlogPersonal);
-  ConfigureTooltip(btnBlogPhotography);
-  ConfigureTooltip(btnBlogPolitics);
-  ConfigureTooltip(btnBlogReligion);
-  ConfigureTooltip(btnBlogScience);
-  ConfigureTooltip(btnBlogSpace);
-  ConfigureTooltip(btnBlogSports);
-  ConfigureTooltip(btnBlogTechnology);
-  ConfigureTooltip(btnBlogTrain);
-  ConfigureTooltip(btnBlogTravel);
-  ConfigureTooltip(btnBlogWellness);
-  ConfigureTooltip(btnBlogWriting);
+  AddTT(btnBlogArchitecture);
+  AddTT(btnBlogArt);
+  AddTT(btnBlogAuto);
+  AddTT(btnBlogAviation);
+  AddTT(btnBlogBeauty);
+  AddTT(btnBlogBoat);
+  AddTT(btnBlogBridges);
+  AddTT(btnBlogBusiness);
+  AddTT(btnBlogCats);
+  AddTT(btnBlogClimate);
+  AddTT(btnBlogCycling);
+  AddTT(btnBlogDesign);
+  AddTT(btnBlogDIY);
+  AddTT(btnBlogDogs);
+  AddTT(btnBlogEducation);
+  AddTT(btnBlogFashion);
+  AddTT(btnBlogFinance);
+  AddTT(btnBlogFitness);
+  AddTT(btnBlogFood);
+  AddTT(btnBlogGaming);
+  AddTT(btnBlogGardening);
+  AddTT(btnBlogGovernment);
+  AddTT(btnBlogHealth);
+  AddTT(btnBlogHealthcare);
+  AddTT(btnBlogIndustry);
+  AddTT(btnBlogInteriors);
+  AddTT(btnBlogInvesting);
+  AddTT(btnBlogJustice);
+  AddTT(btnBlogLifestyle);
+  AddTT(btnBlogMotorcycle);
+  AddTT(btnBlogMovies);
+  AddTT(btnBlogMusic);
+  AddTT(btnBlogNews);
+  AddTT(btnBlogParenting);
+  AddTT(btnBlogPeople);
+  AddTT(btnBlogPersonal);
+  AddTT(btnBlogPhotography);
+  AddTT(btnBlogPolitics);
+  AddTT(btnBlogReligion);
+  AddTT(btnBlogScience);
+  AddTT(btnBlogSpace);
+  AddTT(btnBlogSports);
+  AddTT(btnBlogTechnology);
+  AddTT(btnBlogTrain);
+  AddTT(btnBlogTravel);
+  AddTT(btnBlogWellness);
+  AddTT(btnBlogWriting);
 
-  ConfigureTooltip(btnLinkInsert);
-  ConfigureTooltip(btnLinkDelete);
-  ConfigureTooltip(btnLinkSave);
-  ConfigureTooltip(btnLinkCancel);
+  AddTT(btnLinkInsert);
+  AddTT(btnLinkEdit);
+  AddTT(btnLinkDelete);
+  AddTT(btnLinkSave);
+  AddTT(btnLinkCancel);
 
-  ConfigureTooltip(btnLoginOK);
-  ConfigureTooltip(btnLoginCancel);
-  ConfigureTooltip(btnForgotUsername);
-  ConfigureTooltip(btnForgotPassword);
+  AddTT(btnLoginOK);
+  AddTT(btnLoginCancel);
+  AddTT(btnForgotUsername);
+  AddTT(btnForgotPassword);
 
-  ConfigureTooltip(btnPhotoClear);
-  ConfigureTooltip(btnPhotoURL);
-  ConfigureTooltip(btnPhotoUpload);
-  ConfigureTooltip(btnPhotoIcons);
-  ConfigureTooltip(btnPhotoReset);
-  ConfigureTooltip(btnPhotoSave);
-  ConfigureTooltip(btnPhotoCancel);
+  AddTT(btnPhotoClear);
+  AddTT(btnPhotoURL);
+  AddTT(btnPhotoUpload);
+  AddTT(btnPhotoIcons);
+  AddTT(btnPhotoReset);
+  AddTT(btnPhotoSave);
+  AddTT(btnPhotoCancel);
+
+  AddTT(btnAccountClose);
+  AddTT(btnAccountRefresh);
+  AddTT(btnAccountChange);
+  AddTT(btnServerStats);
+
+  AddTT(btnActivityLogReload);
+  AddTT(btnActivityLogPrint);
+  AddTT(btnActivityLogEMail);
+  AddTT(btnActivityLogTimeZone);
+  AddTT(btnSelectActivityLog);
 
 
   // Convert all tooltips to Bootstrap tooltips
@@ -1193,7 +1210,7 @@ begin
                 locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
               }
               var clientlocation = locndata[3]+', '+locndata[2]+', '+locndata[1];
-              return '<img title="'+clientlocation+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.7/1x1/'+locndata[0]+'.svg">';
+              return '<div title="'+clientlocation+'"'+pas.Unit1.Form1.BootstrapTT+'<img style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.7/1x1/'+locndata[0]+'.svg"></div>';
             }
         },
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
@@ -1220,7 +1237,7 @@ begin
               else if (browser[0] == 'Edge') {
                 icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-edge"></i>';
               }
-              return '<div title="'+title+'">'+icon+'</div>';
+              return '<div title="'+title+'"'+pas.Unit1.Form1.BootstrapTT+icon+'</div>';
             }
         },
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
@@ -1262,7 +1279,7 @@ begin
               else {
                 icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-duotone fa-display"></i>';
               }
-              return '<div title="'+title+'">'+icon+'</div>';
+              return '<div title="'+title+'"'+pas.Unit1.Form1.BootstrapTT+icon+'</div>';
             }
         },
         { title: "", field: "device_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
@@ -1288,7 +1305,7 @@ begin
               else {
                 icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-display Swap"></i>';
               }
-              return '<div title="'+title+'">'+icon+'</div>';
+              return '<div title="'+title+'"'+pas.Unit1.Form1.BootstrapTT+icon+'</div>';
             }
         },
 
@@ -1300,7 +1317,7 @@ begin
                 locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
               }
               var clientlanguage = locndata[6];
-              return '<img title="'+clientlanguage+'" style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+locndata[6].slice(0,2).toLowerCase()+'.svg">';
+              return '<div title="'+clientlanguage+'"'+pas.Unit1.Form1.BootstrapTT+'<img style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+locndata[6].slice(0,2).toLowerCase()+'.svg"></div>';
             }
         },
         { title: "IP Address", field: "ip_address", width: 125, minWidth: 100 },
@@ -1396,34 +1413,23 @@ begin
         headerWordWrap:true,
       },
       columns: [
-        { title: false, field:"session_id", headerSort: false, width: 5, minWidth: 5,
-            formatter: function(cell, formatterParams, onRendered) {
-              return "";
-           }
-        },
+        { title: false, field:"session_id", headerSort: false, width: 5, minWidth: 5, formatter: function(cell, formatterParams, onRendered) {return "";}},
         { title: false, field: "log_status", width: 25, minWidth: 25,
             formatter: function(cell, formatterParams, onRendered) {
               var icon = '';
               var status = cell.getValue();
+              var TT = pas.Unit1.Form1.BootstrapTT;
               if (status == 1) {
-                icon = '<i title="Browser Closed" '+
-                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
-                         'class="fa-duotone fa-flag fa-lg Swap"></i>';
+                icon = '<div title="Browser Closed"'+TT+'<i class="fa-duotone fa-flag fa-lg Swap"></i></div>';
               }
               else if (status == 2) {
-                icon = '<i title="Logout: Normal" '+
-                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
-                         'class="fa-duotone fa-flag-pennant fa-lg"></i>';
+                icon = '<div title="Logout: Normal"'+TT+'<i class="fa-duotone fa-flag-pennant fa-lg"></i></div>';
               }
               else if (status == 3) {
-                icon = '<i title="Logout: Clear" '+
-                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
-                         'class="fa-duotone fa-flag-swallowtail fa-lg"></i>';
+                icon = '<div title="Logout: Clear"'+TT+'<i class="fa-duotone fa-flag-swallowtail fa-lg"></i></div>';
               }
               else if (status == 4) {
-                icon = '<i title="Logout: All" '+
-                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
-                         'class="fa-duotone fa-flag-checkered fa-lg"></i>';
+                icon = '<div title="Logout: All"'+TT+'<i class="fa-duotone fa-flag-checkered fa-lg"></i></div>';
               }
               return icon;
             }
@@ -1432,11 +1438,12 @@ begin
             formatter: function(cell, formatterParams, onRendered) {
               var icon = '';
               var start = cell.getValue();
+              var TT = pas.Unit1.Form1.BootstrapTT;
               if (start == 1) {
-                icon = '<i title="Login" class="fa-duotone fa-shield-keyhole Swap fa-lg"></i>';
+                icon = '<div title="Login"'+TT+'<i class="fa-duotone fa-shield-keyhole Swap fa-lg"></i></div>';
               }
               else if (start == 2) {
-                icon = '<i title="AutoLogin" class="fa-duotone fa-shield-check fa-lg"></i>';
+                icon = '<div title="AutoLogin"'+TT+'<i class="fa-duotone fa-shield-check fa-lg"></i></div>';
               }
               return icon;
             }
@@ -1446,23 +1453,10 @@ begin
               return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
             }
         },
-        { title: '<div title="Events" '+
-                   'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip"> '+
-                   '<i class="fa-duotone fa-computer-mouse fa-fw Swap fa-lg"></i></div>',
-                 field: "log_events", width: 42, hozAlign: "center" },
-        { title: '<div title="Changes" '+
-                   'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip"> '+
-                   '<i class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i></div>',
-                 field: "log_changes", width: 42, hozAlign: "center" },
-        { title: '<div title="Errors" '+
-                   'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip"> '+
-                   '<i class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i></div>',
-                  field: "log_errors", width: 42, hozAlign: "center" },
-        { title: false, field: "person_id", headerSort: false, width: 5, minWidth: 5,
-            formatter: function(cell, formatterParams, onRendered) {
-              return "";
-           }
-        }
+        { title: '<div title="Events"'+this.BootstrapTT+'<i class="fa-duotone fa-computer-mouse fa-fw Swap fa-lg"></i></div>', field: "log_events", width: 42, hozAlign: "center" },
+        { title: '<div title="Changes"'+this.BootstrapTT+'<i class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i></div>', field: "log_changes", width: 42, hozAlign: "center" },
+        { title: '<div title="Errors"'+this.BootstrapTT+'<i class="fa-duotone fa-bug fa-fw fa-lg"></i></div>', field: "log_errors", width: 42, hozAlign: "center" },
+        { title: false, field: "person_id", headerSort: false, width: 5, minWidth: 5, formatter: function(cell, formatterParams, onRendered) {return ""; } }
       ]
     });
     this.tabAccountSessions.on('tableBuilt', function() {
@@ -2350,10 +2344,10 @@ end;
 
 procedure TForm1.btnAccountChangeClick(Sender: TObject);
 begin
-  HideToolTips;
 
   // Manage different Account
 
+  HideToolTips;
 
 end;
 
@@ -2996,6 +2990,12 @@ begin
   HideToolTips;
 end;
 
+procedure TForm1.btnServerStatsClick(Sender: TObject);
+begin
+  //
+  HideTooltips;
+end;
+
 procedure TForm1.btnForgotUsernameClick(Sender: TObject);
 begin
   editUsername.Text := '';
@@ -3280,7 +3280,7 @@ begin
   btnURLCancelClick(Sender);
 end;
 
-procedure TForm1.ConfigureTooltip(Button: TWebButton);
+procedure TForm1.AddTT(Button: TWebButton);
 begin
   // If Font Awesome Pro is not available, switch to the free version
   //Button.Caption := StringReplace(Button.Caption,'fa-duotone','fa-solid',[]);
@@ -3797,7 +3797,6 @@ end;
 procedure TForm1.btnAccountRefreshClick(Sender: TObject);
 begin
   HideToolTips;
-
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin Swap fa-xl"></i>';
 
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccountRefresh)

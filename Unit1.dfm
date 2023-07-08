@@ -2835,13 +2835,13 @@ object Form1: TForm1
       ElementFont = efCSS
       Role = ''
       object labelAccountTitle: TWebLabel
-        Left = 64
+        Left = 32
         Top = 3
         Width = 98
         Height = 35
         Cursor = crSizeAll
         AutoSize = False
-        ElementClassName = 'd-flex flex-row w-100'
+        ElementClassName = 'order-0 d-flex flex-row w-100'
         ElementLabelClassName = 'd-flex flex-row w-100'
         ElementID = 'labelAccountName'
         ElementFont = efCSS
@@ -2859,8 +2859,8 @@ object Form1: TForm1
         Height = 50
         Hint = 'Refresh'
         Caption = '<i class="fa-duotone fa-rotate fa-xl"></i>'
-        ChildOrder = 2
-        ElementClassName = 'btn btn-link'
+        ChildOrder = 3
+        ElementClassName = 'order-3 btn btn-link'
         ElementID = 'btnAccountRefresh'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -2874,10 +2874,10 @@ object Form1: TForm1
         Top = -3
         Width = 50
         Height = 50
-        Hint = 'Close'
+        Hint = 'Close Account Window'
         Caption = '<i class="fa-duotone fa-xmark Swap fa-2x"></i>'
-        ChildOrder = 3
-        ElementClassName = 'btn btn-link'
+        ChildOrder = 4
+        ElementClassName = 'order-4 btn btn-link'
         ElementID = 'btnAccountClose'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -2893,8 +2893,8 @@ object Form1: TForm1
         Height = 50
         Hint = 'Change Account'
         Caption = '<i class="fa-duotone fa-user-secret Swap fa-xl"></i>'
-        ChildOrder = 1
-        ElementClassName = 'btn btn-link'
+        ChildOrder = 2
+        ElementClassName = 'order-2 btn btn-link'
         ElementID = 'btnAccountChange'
         ElementFont = efCSS
         ElementPosition = epRelative
@@ -2902,6 +2902,23 @@ object Form1: TForm1
         HeightPercent = 100.000000000000000000
         WidthPercent = 100.000000000000000000
         OnClick = btnAccountChangeClick
+      end
+      object btnServerStats: TWebButton
+        Left = 148
+        Top = -2
+        Width = 50
+        Height = 50
+        Hint = 'Server Statistics'
+        Caption = '<i class="fa-duotone fa-chart-simple fa-xl"></i>'
+        ChildOrder = 1
+        ElementClassName = 'order-1 btn btn-link'
+        ElementID = 'btnServerStats'
+        ElementFont = efCSS
+        ElementPosition = epRelative
+        HeightStyle = ssAuto
+        HeightPercent = 100.000000000000000000
+        WidthPercent = 100.000000000000000000
+        OnClick = btnServerStatsClick
       end
     end
     object pcAccount: TWebPageControl
@@ -2916,7 +2933,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 0
+      TabIndex = 8
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3857,7 +3874,7 @@ object Form1: TForm1
               Top = 3
               Width = 30
               Height = 30
-              Hint = 'New Link'
+              Hint = 'Edit Link'
               Caption = '<i class="fa-duotone fa-pencil"></i>'
               ChildOrder = 1
               ElementClassName = 'btn btn-link NavButton'
