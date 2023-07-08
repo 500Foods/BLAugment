@@ -65,7 +65,8 @@ type
 
     function ChangePassword(OldPassword: String; NewPassword: String; PasswordTest: String):String;
     function ChangeAccount(AccountName: String):String;
-    function CheckUnique(UniqueAccount: String):Boolean;
+    function CheckUniqueAccount(UniqueAccount: String):Boolean;
+    function CheckUniqueEMail(UniqueEMail: String):Boolean;
 
     function SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String):String;
     function VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String):String;
@@ -330,15 +331,13 @@ begin
   end;
 end;
 
-function TSystemService.CheckUnique(UniqueAccount: String): Boolean;
+function TSystemService.CheckUniqueAccount(UniqueAccount: String): Boolean;
 var
   DBConn: TFDConnection;
   Query1: TFDQuery;
   DatabaseName: String;
   DatabaseEngine: String;
   ElapsedTime: TDateTime;
-  User: IUserIdentity;
-  JWT: String;
 begin
   // Time this event
   ElapsedTime := Now;
@@ -346,15 +345,10 @@ begin
   // Returning JSON, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
 
-  // Get data from the JWT
-  User := TXDataOperationContext.Current.Request.User;
-  JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');
-  if (User = nil) then raise EXDataHttpUnauthorized.Create('Missing authentication');
-
   // Setup DB connection and query
   try
-    DatabaseName := User.Claims.Find('dbn').AsString;
-    DatabaseEngine := User.Claims.Find('dbe').AsString;
+    DatabaseName := MainForm.DatabaseName;
+    DatabaseEngine := MainForm.DatabaseEngine;
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
@@ -363,28 +357,10 @@ begin
     end;
   end;
 
-  // Check if we've got a valid JWT (one that has not been revoked)
-  try
-    {$Include sql\system\token_check\token_check.inc}
-    Query1.ParamByName('TOKENHASH').AsString := DBSupport.HashThis(JWT);
-    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
-    Query1.Open;
-  except on E: Exception do
-    begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
-    end;
-  end;
-  if Query1.RecordCount <> 1 then
-  begin
-    DBSupport.DisconnectQuery(DBConn, Query1);
-    raise EXDataHttpUnauthorized.Create('JWT was not validated');
-  end;
-
   // All good, so let's see if it is unique
     try
     {$Include sql\system\unique_account\unique_account.inc}
-    Query1.ParamByName('UNIQUEACCOUNT').ASString := Uppercase(Trim(Copy(UniqueAccount,1,32)));
+    Query1.ParamByName('UNIQUEACCOUNT').ASString := Uppercase(Trim(Copy(UniqueAccount,1,50)));
     Query1.Open;
   except on E: Exception do
     begin
@@ -405,16 +381,96 @@ begin
   // Keep track of endpoint history
   try
     {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
-    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
-    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.CheckUnique';
+    Query1.ParamByName('PERSONID').AsInteger := 1;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.CheckUniqueAccount';
     Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
     Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
-    Query1.ParamByName('APPLICATION').AsString := User.Claims.Find('app').AsString;
+    Query1.ParamByName('APPLICATION').AsString := MainForm.AppName;
     Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
     Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
     Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
     Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
     Query1.ParamByName('DETAILS').AsString := '['+UniqueAccount+': '+Result.ToString(True)+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
+
+function TSystemService.CheckUniqueEMail(UniqueEMail: String): Boolean;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+begin
+  // Time this event
+  ElapsedTime := Now;
+
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  // Setup DB connection and query
+  try
+    DatabaseName := MainForm.DatabaseName;
+    DatabaseEngine := MainForm.DatabaseEngine;
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // All good, so let's see if it is unique
+    try
+    {$Include sql\system\unique_email\unique_email.inc}
+    Query1.ParamByName('UNIQUEEMAIL').ASString := Uppercase(Trim(Copy(UniqueEMail,1,50)));
+    Query1.Open;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: UA');
+    end;
+  end;
+  if Query1.RowsAffected <> 1 then
+  begin
+    DBSupport.DisconnectQuery(DBConn, Query1);
+    raise EXDataHttpUnauthorized.Create('Internal Error: UA');
+  end;
+
+  // All done.
+  Result := (Query1.FieldByName('matches').AsInteger = 0);
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+//    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('PERSONID').AsInteger := 1;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.CheckUniqueEMail';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := MainForm.AppName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+UniqueEMail+': '+Result.ToString(True)+']';
     Query1.ExecSQL;
   except on E: Exception do
     begin

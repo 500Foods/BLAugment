@@ -200,10 +200,22 @@ type
     ///    Just returns true or false based on whether the account name is available.
     ///  </remarks>
     ///  <param name="UniqueAccount">
-    ///    Typically between 4-32 characters, all uppercase, no symbols, must not start with a number, etc.
+    ///    Typically between 4-50 characters, no symbols, etc.
     ///  </param>
 
-    [Authorize] [HttpGet] function CheckUnique(UniqueAccount: String):Boolean;
+    [HttpGet] function CheckUniqueAccount(UniqueAccount: String):Boolean;
+
+    ///  <summary>
+    ///    Checks if an e-mail address is unique.  Used when registering or updating account information.
+    ///  </summary>
+    ///  <remarks>
+    ///    Just returns true or false based on whether the e-mail address is available.
+    ///  </remarks>
+    ///  <param name="UniqueEMail">
+    ///    Should be valid e-mail (client checks this, not checked here).
+    ///  </param>
+
+    [HttpGet] function CheckUniqueEMail(UniqueEMail: String):Boolean;
 
     ///  <summary>
     ///    Sends a six-digit confirmation code to an E-Mail address to help with E-Mail validation.

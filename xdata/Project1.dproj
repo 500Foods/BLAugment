@@ -305,6 +305,8 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <None Include="sql\person\contact_links_insert\contact_links_insert_sqlite.inc"/>
         <None Include="sql\person\photo_insert\photo_insert.inc"/>
         <None Include="sql\person\photo_insert\photo_insert_sqlite.inc"/>
+        <None Include="sql\system\unique_email\unique_email.inc"/>
+        <None Include="sql\system\unique_email\unique_email_sqlite.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -379,13 +381,13 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="sql\system\contact_email\contact_email_sqlite.inc" Configuration="Release" Class="ProjectFile">
+                <DeployFile LocalName="sql\system\login_history_insert\login_history_insert_sqlite.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="sql\system\login_history_insert\login_history_insert_sqlite.inc" Configuration="Release" Class="ProjectFile">
+                <DeployFile LocalName="sql\system\contact_email\contact_email_sqlite.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -806,6 +808,12 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="sql\system\unique_email\unique_email.inc" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="ddl\endpoint_history\endpoint_history_sqlite.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
@@ -825,6 +833,12 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="sql\system\login_history_insert\login_history_insert.inc" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="sql\system\unique_email\unique_email_sqlite.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

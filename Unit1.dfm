@@ -2630,7 +2630,6 @@ object Form1: TForm1
       Width = 190
       Height = 45
       AutoCompletion = acUserName
-      CharCase = wecUpperCase
       ChildOrder = 3
       ElementID = 'editUsername'
       ElementFont = efCSS
@@ -2917,7 +2916,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 8
+      TabIndex = 0
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3078,7 +3077,6 @@ object Form1: TForm1
           Width = 200
           Height = 30
           AutoCompletion = acNope
-          CharCase = wecUpperCase
           ChildOrder = 9
           ElementClassName = 'nointeract order-10 Edit ms-2 mx-5'
           ElementID = 'editAccountName'
@@ -3086,7 +3084,7 @@ object Form1: TForm1
           ElementPosition = epRelative
           HeightStyle = ssAuto
           HeightPercent = 100.000000000000000000
-          MaxLength = 32
+          MaxLength = 50
           ShowFocus = False
           SpellCheck = False
           TabOrder = 104

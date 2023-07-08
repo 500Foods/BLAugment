@@ -379,7 +379,7 @@ type
     procedure tmrLogoutTimer(Sender: TObject);
     [async] procedure editAccountNameChange(Sender: TObject);
     [async] procedure btnChangeAccountNameClick(Sender: TObject);
-    procedure editEMailChange(Sender: TObject);
+    [async] procedure editEMailChange(Sender: TObject);
     [async] procedure btnChangeAccountEMailClick(Sender: TObject);
     [async] procedure editEMailCodeChange(Sender: TObject);
     procedure memoAuthorDescriptionChange(Sender: TObject);
@@ -408,6 +408,7 @@ type
     function GetFavIcon(FavURL: String): String;
     procedure WebOpenDialog1GetFileAsBase64(Sender: TObject; AFileIndex: Integer; ABase64: string);
     [async] function AccountIsValid(acct: String):String;
+    [async] function EMailIsValid(EMail: String):String;
     procedure btnLinkInsertClick(Sender: TObject);
     procedure btnPhotoIconsClick(Sender: TObject);
     [async] procedure btnIconCancelClick(Sender: TObject);
@@ -631,6 +632,15 @@ end;
 procedure TForm1.HideToolTips;
 begin
   asm
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
+    var tooltipList = tooltipTriggerList.map( function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger : 'hover',
+        container: 'body'
+      });
+    });
+
     setTimeout(function() {
       var badtooltips = document.getElementsByClassName('bs-tooltip-auto');
       if (badtooltips.length > 0) {
@@ -1396,16 +1406,24 @@ begin
               var icon = '';
               var status = cell.getValue();
               if (status == 1) {
-                icon = '<i title="Browser Closed" class="fa-duotone fa-flag fa-lg Swap"></i>';
+                icon = '<i title="Browser Closed" '+
+                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
+                         'class="fa-duotone fa-flag fa-lg Swap"></i>';
               }
               else if (status == 2) {
-                icon = '<i title="Logout: Normal" class="fa-duotone fa-flag-pennant fa-lg"></i>';
+                icon = '<i title="Logout: Normal" '+
+                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
+                         'class="fa-duotone fa-flag-pennant fa-lg"></i>';
               }
               else if (status == 3) {
-                icon = '<i title="Logout: Clear" class="fa-duotone fa-flag-swallowtail fa-lg"></i>';
+                icon = '<i title="Logout: Clear" '+
+                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
+                         'class="fa-duotone fa-flag-swallowtail fa-lg"></i>';
               }
               else if (status == 4) {
-                icon = '<i title="Logout: All" class="fa-duotone fa-flag-checkered fa-lg"></i>';
+                icon = '<i title="Logout: All" '+
+                         'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip" '+
+                         'class="fa-duotone fa-flag-checkered fa-lg"></i>';
               }
               return icon;
             }
@@ -1428,9 +1446,18 @@ begin
               return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T'),{zone:"utc"}).setZone("system").toFormat(window.DisplayDateTimeFormat);
             }
         },
-        { title: '<i title="Events" class="fa-duotone fa-computer-mouse fa-fw Swap fa-lg"></i>', field: "log_events", width: 42, hozAlign: "center" },
-        { title: '<i title="Changes" class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i>', field: "log_changes", width: 42, hozAlign: "center" },
-        { title: '<i title="Errors" class="fa-duotone fa-bug fa-fw fa-lg"></i>', field: "log_errors", width: 42, hozAlign: "center" },
+        { title: '<div title="Events" '+
+                   'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip"> '+
+                   '<i class="fa-duotone fa-computer-mouse fa-fw Swap fa-lg"></i></div>',
+                 field: "log_events", width: 42, hozAlign: "center" },
+        { title: '<div title="Changes" '+
+                   'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip"> '+
+                   '<i class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i></div>',
+                 field: "log_changes", width: 42, hozAlign: "center" },
+        { title: '<div title="Errors" '+
+                   'data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip"> '+
+                   '<i class="fa-duotone fa-hammer fa-fw Swap fa-lg"></i></div>',
+                  field: "log_errors", width: 42, hozAlign: "center" },
         { title: false, field: "person_id", headerSort: false, width: 5, minWidth: 5,
             formatter: function(cell, formatterParams, onRendered) {
               return "";
@@ -2950,8 +2977,6 @@ end;
 
 procedure TForm1.btnSelectActivityLogClick(Sender: TObject);
 begin
-  HideTooltips;
-
   divShade2.Visible := True;
   divSessions.Visible := True;
   divShade2.ElementHandle.style.setProperty('opacity','0.75');
@@ -2967,6 +2992,8 @@ begin
 
   LogAction(' ');
   LogAction('[ Searching Sessions ]');
+
+  HideToolTips;
 end;
 
 procedure TForm1.btnForgotUsernameClick(Sender: TObject);
@@ -3307,7 +3334,7 @@ begin
   Result := '';
 
   // Must have 4-32 characters
-  if (Length(Trim(acct)) < 4) or (Length(Trim(acct)) > 32) then Result := Result + 'L';
+  if (Length(Trim(acct)) < 4) or (Length(Trim(acct)) > 50) then Result := Result + 'L';
 
   // Must not have any blank spaces
   if Pos(' ',acct) > 0 then Result := Result + 'B';
@@ -3328,12 +3355,11 @@ begin
   if Result = '' then
   begin
     btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
-     RequestResponse := await(StringRequest('ISystemService.CheckUnique',[
+     RequestResponse := await(StringRequest('ISystemService.CheckUniqueAccount',[
       acct
     ]));
     if RequestResponse = 'false' then Result := Result + 'U';
     btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
-
   end;
 end;
 
@@ -3341,9 +3367,6 @@ procedure TForm1.editAccountNameChange(Sender: TObject);
 var
   ValidTest: String;
   ValidText: String;
-
-  // THIS NEEDS TO BE FIXED BY THE IDE?!
-
 
 begin
   ValidTest := await(AccountIsValid(editAccountName.Text));
@@ -3359,7 +3382,7 @@ begin
     btnChangeAccountName.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     divChangeAccountName.ElementHandle.classList.Add('pe-none');
     ValidText := 'Invalid Account Name:';
-    if Pos('L', ValidTest) > 0 then ValidText := ValidText + '<br> - Between 4 and 32 characters';
+    if Pos('L', ValidTest) > 0 then ValidText := ValidText + '<br> - Between 4 and 50 characters';
     if Pos('B', ValidTest) > 0 then ValidText := ValidText + '<br> - No spaces';
 //    if Pos('N', ValidTest) > 0 then ValidText := ValidText + '<br> - Must not start with a number';
     if Pos('S', ValidTest) > 0 then ValidText := ValidText + '<br> - No symbols except - . /';
@@ -3461,38 +3484,59 @@ begin
   end;
 end;
 
+function TForm1.EMailIsValid(EMail: String):String;
+var
+  RequestResponse: String;
+
+begin
+
+  Result := 'F';
+  asm
+    // https://www.regextester.com/115911
+    var validformat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+    if (EMail.match(validformat)) {
+      Result = 'P'
+    } else {
+      Result = 'F'
+    }
+  end;
+
+  // Must be unique - only check this when everything else passes
+  if Result = 'P' then
+  begin
+    btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+     RequestResponse := await(StringRequest('ISystemService.CheckUniqueEMail',[
+      EMail
+    ]));
+    if RequestResponse = 'false' then Result := 'U';
+    btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+  end;
+end;
+
 procedure TForm1.editEMailChange(Sender: TObject);
 var
-  EMailValid: Boolean;
-
-  function IsValidEMail(EMail: String):Boolean;
-  begin
-    Result := False;
-    asm
-      // https://www.regextester.com/115911
-      var validformat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
-      if (EMail.match(validformat)) {
-        Result = true;
-      } else {
-        Result = false;
-      }
-    end;
-  end;
+  EMailValid: String;
 
 begin
   editEMailCode.Visible := False;
-  EMailValid := IsValidEmail(editEMail.Text);
+  EMailValid := await(EMailIsValid(editEMail.Text));
   if (Trim(editEMail.Text) = '') or (Trim(editEMail.Text) = User_EMail) then
   begin
     divChangeAccountEMail.ElementHandle.classList.add('pe-none');
     btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
     labelChangeAccountEMail.ElementHandle.innerHTML := 'Enter New E-Mail Address';
   end
-  else if (EmailValid) then
+  else if (EmailValid= 'P') then
   begin
     divChangeAccountEMail.ElementHandle.classList.remove('pe-none');
     btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-paper-plane Swap fa-2x"></i>';
     labelChangeAccountEMail.ElementHandle.innerHTML := 'Send Confirmation Code';
+  end
+  else if (EmailValid= 'U') then
+  begin
+    divChangeAccountEMail.ElementHandle.classList.add('pe-none');
+    btnChangeAccountEMail.Caption := '<i class="fa-duotone fa-xmark Swap fa-2x"></i>';
+    labelChangeAccountEMail.ElementHandle.innerHTML := 'Enter Valid E-Mail Address<br />- E-Mail Address is not available';
   end
   else
   begin
