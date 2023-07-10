@@ -426,6 +426,8 @@ type
     procedure divShade2Click(Sender: TObject);
     procedure btnServerStatsClick(Sender: TObject);
     procedure btnRotateClick(Sender: TObject);
+    function CaptureState: JSValue;
+    procedure RevertState(StateData: JSValue);
 
   private
     { Private declarations }
@@ -435,6 +437,12 @@ type
     Theme: String;        // Current Theme, eg: Dark, Red, Light
     BootstrapTT: String;  // Bootstrap Tooltip HTML to add to icon classes
     Server_URL: String;   // XData server
+
+    // These are used to handle the browser back button situation
+    State: String;
+    StatePosition: Integer;
+    StartPosition: Integer;
+    StateURL : String;
 
     LoggedIn: Boolean;       // Whether there is a current login in place
     JWT: String;             // JWT for current session
@@ -1696,7 +1704,8 @@ begin
       cursor: 'all-scroll',
       minScale: 0.5,
       maxScale: 20,
-      duration: 50
+//      duration: 50,
+      step: 0.1
     });
     divAccountPhoto.addEventListener('wheel',pas.Unit1.Form1.pz.zoomWithWheel);
     divAccountPhoto.addEventListener('panzoomchange', (event) => {
@@ -1722,11 +1731,11 @@ begin
 //      MainForm.Position := window.history.length;
 //      MainForm.StartPosition := MainForm.Position - 1;
       ProcessLogin;
+
       User_Photo := TWebLocalStorage.GetValue('User.Photo.'+User_Account);
       if Trim(User_Photo) = ''
       then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
       btnAccount.ElementHandle.innerHTML := User_Photo;
-
       await(btnAccountClick(Sender));
 
       await(tmrJWTRenewalTimer(Sender));
@@ -1881,6 +1890,22 @@ begin
     }
   end;
 
+
+  // Set our current state as the state we want to go back to
+  State := 'Home';
+  StatePosition := window.history.length;
+  StartPosition := window.history.length;
+  StateURL := window.location.href;
+  window.history.pushState(CaptureState, '', StateURL);
+  StatePosition := window.history.length;
+  window.history.pushState(CaptureState, '', StateURL);
+
+  // What to do when we hit back/forward button
+  asm
+    window.addEventListener('popstate', function(popstateEvent)  {
+      pas.Unit1.Form1.RevertState(popstateEvent.state);
+    });
+  end;
 
   HideTooltips;
   PreventCompilerHint(i);
@@ -2293,6 +2318,39 @@ begin
   btnAccount.Visible := True;
 end;
 
+procedure TForm1.RevertState(StateData: JSValue);
+var
+  PriorState: String;
+begin
+  asm
+    if (StateData !== null) {
+      this.StatePosition = StateData.StatePosition;
+      this.StateURL = StateData.StateURL;
+      PriorState = StateData.CurrentState
+    }
+  end;
+
+  // Disable Back button
+  if StatePosition <= StartPosition then
+  begin
+    StatePosition := StatePosition + 1;
+    window.history.pushState(CaptureState, '', StateURL);
+  end
+  else
+  begin
+
+    if (PriorState <> State) and (PriorState <> '') then
+    begin
+        if      State = 'Account'  then btnAccountCloseClick(nil)
+        else if State = 'Sessions' then divSessionListLabelClick(nil)
+        else if State = 'URL'      then btnURLCancelClick(nil)
+        else if State = 'Login'    then btnLOginCancelClick(nil)
+        else if State = 'Icon'     then btnIconCancelClick(nil)
+        else console.log('Unexpected State: '+State);
+    end;
+  end;
+end;
+
 procedure TForm1.SelectAccountOption(OptionID: Integer);
 var
   CurrentPage: String;
@@ -2420,7 +2478,14 @@ begin
     btnLoginCancelClick(Sender);
 
     ProcessLogin;
-    btnAccountClick(Sender);
+
+    User_Photo := TWebLocalStorage.GetValue('User.Photo.'+User_Account);
+    if Trim(User_Photo) = ''
+    then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
+    btnAccount.ElementHandle.innerHTML := User_Photo;
+    await(btnAccountClick(Sender));
+
+    State := 'Home';
 
   end
   else
@@ -2506,6 +2571,10 @@ begin
 
     LogAction(' ');
     LogAction('[ Account Settings ]');
+
+    State := 'Account';
+    StatePosition := StatePosition + 1;
+    window.history.pushState(CaptureState, '', StateURL);
 
     editAccountName.Text := User_Account;
     editFirstName.Text := User_Firstname;
@@ -2947,8 +3016,9 @@ end;
 
 procedure TForm1.btnPhotoCancelClick(Sender: TObject);
 begin
-  HideTooltips;
-  LogAction('[ Cancelled Photo Change ]');
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnPhotoCancel)
+  then LogAction('[ Cancelled Photo Change ]');
+
   btnPhotoSave.Enabled := False;
   btnPhotoCancel.Enabled := False;
   btnPhotoCancel.Tag := 1;
@@ -2977,6 +3047,8 @@ begin
 
   asm await sleep(100); end;
   btnPhotoCancel.Tag := 0;
+  HideTooltips;
+
 end;
 
 procedure TForm1.btnPhotoClearClick(Sender: TObject);
@@ -3005,6 +3077,10 @@ begin
 
   LogAction(' ');
   LogAction('[ Searching Photo Icons ]');
+
+  State := 'Icons';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
 
   editIconSearch.setFocus;
 
@@ -3090,28 +3166,6 @@ var
 begin
   HideTooltips;
   LogAction('[ Uploading Photo ]');
-
-//  WebOpenDialog1.Accept := '.jpg, .jpeg, .png';
-//
-//  await(string, WebOpenDialog1.Perform);
-//
-//  LogAction('Photos Selected: '+IntToStr(WebOpenDialog1.Files.Count));
-//  i := 0;
-//  while (i < WebOpenDialog1.Files.Count) do
-//  begin
-//    LogAction(' -- Filename: '+WebOpenDialog1.Files.Items[i].Name);
-//    LogAction(' -- MimeType: '+WebOpenDialog1.Files.Items[i].MimeType);
-//    LogAction(' -- Filesize: '+IntToStr(Round(WebOpenDialog1.Files.Items[i].Size / 1024))+' KB');
-//    i := i + 1;
-//  end;
-//
-//  // If files were selected, iterate through them
-//  i := 0;
-//  while (i < WebOpenDialog1.Files.Count) do
-//  begin
-//    WebOpenDialog1.Files.Items[i].GetFileAsBase64;
-//    i := i + 1;
-//  end;
   asm
     fileinput.click();
   end;
@@ -3186,7 +3240,9 @@ begin
     asm divAccountPhoto.firstElementChild.style.removeProperty('transform'); end;
   end;
 
+  LogAction('[ Rotated Photo: '+IntToStr(btnRotate.tag)+'deg ]');
   PhotoChanged;
+  HideToolTips;
 end;
 
 procedure TForm1.btnSearchClick(Sender: TObject);
@@ -3214,6 +3270,10 @@ begin
   LogAction(' ');
   LogAction('[ Searching Sessions ]');
 
+  State := 'Sessions';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
+
   HideToolTips;
 end;
 
@@ -3238,6 +3298,11 @@ begin
 
   divIconSearch.Visible := False;
   divShade2.Visible := False;
+
+  State := 'Account';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
+
 end;
 
 procedure TForm1.btnIconOKClick(Sender: TObject);
@@ -3251,6 +3316,7 @@ begin
     end;
   end;
   btnIconCancelClick(Sender);
+
 end;
 
 procedure TForm1.btnIconSearchClick(Sender: TObject);
@@ -3447,6 +3513,10 @@ begin
 
   divURL.Visible := False;
   divShade2.Visible := False;
+
+  State := 'Account';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
 end;
 
 procedure TForm1.btnURLOKClick(Sender: TObject);
@@ -3507,6 +3577,18 @@ begin
   btnURLCancelClick(Sender);
 end;
 
+function TForm1.CaptureState: JSValue;
+begin
+   // Return state of some kind
+   asm
+     Result = {
+       "StatePosition": this.StatePosition,
+       "StateURL": this.URL,
+       "State": this.State
+     }
+   end;
+end;
+
 procedure TForm1.AddTT(Button: TWebButton);
 begin
   // If Font Awesome Pro is not available, switch to the free version
@@ -3531,6 +3613,10 @@ begin
 
   divSessions.Visible := False;
   divShade2.Visible := False;
+
+  State := 'Account';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
 
 end;
 
@@ -4017,6 +4103,10 @@ begin
   divAccount.ElementHandle.style.removeProperty('transform');
 
   LogAction('[ Account Settings Closed ]');
+
+  State := 'Home';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
 
   await(tmrJWTRenewalTimer(Sender));
 end;

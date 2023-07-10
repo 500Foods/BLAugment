@@ -2686,8 +2686,8 @@ object Form1: TForm1
       OnClick = btnForgotPasswordClick
     end
     object btnLoginOK: TWebButton
-      Left = 273
-      Top = 135
+      Left = 276
+      Top = 131
       Width = 50
       Height = 50
       Hint = 'Login'
@@ -3667,7 +3667,7 @@ object Form1: TForm1
             ElementPosition = epRelative
             ElementFont = efCSS
             HTML.Strings = (
-              '<input type="file" accept=".jpg, .jpeg, .png"  id="fileinput" />')
+              '<input type="file" accept=".jpg, .jpeg, .png"  id="fileinput">')
             Role = ''
           end
           object btnRotate: TWebButton

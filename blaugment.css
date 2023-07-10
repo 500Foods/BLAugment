@@ -448,6 +448,10 @@ button > svg > g > path {
 #divAccountPhotoFG {
   container-type: size;
 }
+#divAccountPhoto > svg,
+#divAccountPhoto > img {
+  transition: transform 0.5s;
+}
 
 .ContainerAuthor {
   overflow: hidden;
