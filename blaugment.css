@@ -212,6 +212,9 @@ html[theme="red"] .BLTooltip {
 #divAuthorProfileName {
   margin-top: -4px;
 }
+#divAuthorProfilePhoto {
+  container-type: size;
+}
 
 
 #divAccountLinksNav {
@@ -238,6 +241,9 @@ html[theme="red"] .BLTooltip {
   left: unset !important;
   right: -4px;
   top: -40px !important;
+}
+#btnAccount {
+  container-type: size;
 }
 
 
@@ -439,6 +445,9 @@ button > svg > g > path {
   min-width: 90px;
   min-height: 90px;
 }
+#divAccountPhotoFG {
+  container-type: size;
+}
 
 .ContainerAuthor {
   overflow: hidden;
@@ -636,6 +645,27 @@ button > svg > g > path {
   color: white !important;
 }
 
+/* Tabulator Group Arrows */
+div .tabulator-row.tabulator-group.tabulator-group-visible .tabulator-arrow {
+  margin-top: -4px;
+  margin-right: 10px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--bl-color-one);
+  border-bottom: 0;
+}
+div .tabulator-row.tabulator-group .tabulator-arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-top: -4px;
+  margin-right: 16px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 0;
+  border-left: 6px solid var(--bl-color-one);
+  vertical-align: middle;
+}
 
 /* Tabulator Defaults: With Column Headers */
 
@@ -677,6 +707,27 @@ button > svg > g > path {
   font-size: 14px;
   width: calc(100% - 32px) !important;
   padding-top: 32px;
+}
+
+#divAccountRoles {
+  border:none;
+  font-family: Cairo !important;
+  font-size: 14px;
+  font-weight: normal;
+  width: calc(100% - 32px) !important;
+  margin-top: -1px;
+}
+#divAccountRoles .tabulator-row.tabulator-group > div {
+  filter: var(--bl-shadow);
+}
+#divAccountRoles .tabulator-row.tabulator-group {
+  border-bottom: 1px solid black;
+  border-right: none;
+  border-top: 1px solid black;
+  padding: 5px 5px 5px 10px;
+  background: var(--bl-color-three) !important;
+  font-weight: normal;
+  min-width: 100%;
 }
 
 #divSessions {

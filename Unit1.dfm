@@ -2933,7 +2933,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 8
+      TabIndex = 2
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -3654,6 +3654,22 @@ object Form1: TForm1
             WidthPercent = 100.000000000000000000
             OnClick = btnPhotoCancelClick
           end
+          object divGetImage: TWebHTMLDiv
+            Left = 318
+            Top = 2
+            Width = 100
+            Height = 41
+            ElementClassName = 'd-none'
+            ElementID = 'divGetImage'
+            HeightStyle = ssAuto
+            WidthStyle = ssAuto
+            ChildOrder = 7
+            ElementPosition = epRelative
+            ElementFont = efCSS
+            HTML.Strings = (
+              '<input type="file" accept=".jpg, .jpeg, .png"  id="fileinput" />')
+            Role = ''
+          end
         end
         object divAccountPhotoHolder: TWebHTMLDiv
           Left = 3
@@ -3683,7 +3699,7 @@ object Form1: TForm1
               Top = 12
               Width = 151
               Height = 88
-              ElementClassName = 'nointeractresize'
+              ElementClassName = 'nointeractresize w-100 h-100'
               ElementID = 'divAccountPhoto'
               HeightStyle = ssAuto
               WidthStyle = ssAuto
@@ -4076,6 +4092,20 @@ object Form1: TForm1
         ChildOrder = 10
         ElementBodyClassName = 'd-flex flex-column'
         ElementFont = efCSS
+        object divAccountRoles: TWebHTMLDiv
+          Left = 0
+          Top = 0
+          Width = 223
+          Height = 400
+          ElementClassName = 'border-0 mb-2'
+          ElementID = 'divAccountRoles'
+          HeightStyle = ssAuto
+          WidthStyle = ssPercent
+          ChildOrder = 2
+          ElementPosition = epRelative
+          ElementFont = efCSS
+          Role = ''
+        end
       end
       object pageAccountActivity: TWebTabSheet
         Left = 0

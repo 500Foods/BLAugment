@@ -136,7 +136,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
   if Query1.RecordCount <> 1 then
@@ -245,7 +245,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
   if Query1.RecordCount <> 1 then
@@ -445,13 +445,13 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: UA');
+      raise EXDataHttpUnauthorized.Create('Internal Error: UE');
     end;
   end;
   if Query1.RowsAffected <> 1 then
   begin
     DBSupport.DisconnectQuery(DBConn, Query1);
-    raise EXDataHttpUnauthorized.Create('Internal Error: UA');
+    raise EXDataHttpUnauthorized.Create('Internal Error: UE');
   end;
 
   // All done.
@@ -492,12 +492,23 @@ end;
 
 function TSystemService.Info(TZ: String):TStream;
 var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+
   ResultJSON: TJSONObject;
+  ResultArray: TJSONArray;
   ServerIPArray: TJSONArray;
   ParametersArray: TJSONArray;
   ClientTimeZone: TBundledTimeZone;
   ValidTimeZone: Boolean;
+
+  ElapsedTime: TDateTime;
 begin
+  // Time this event
+  ElapsedTime := Now;
+
   // Returning JSON, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
 
@@ -530,7 +541,6 @@ begin
   // This gets us a JSON Array of Server IP Addresses
   ServerIPArray := TJSONObject.ParseJSONValue('['+StringReplace(MainForm.IPAddresses.DelimitedText,'  ',' ',[rfReplaceAll])+']') as TJSONArray;
 
-
   ResultJSON.AddPair('Application Name',MainForm.AppName);
   ResultJSON.AddPair('Application Version',MainForm.AppVersion);
   ResultJSON.AddPair('Application Release',FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', MainForm.AppRelease));
@@ -549,15 +559,68 @@ begin
   then ResultJSON.AddPair('Current Time (Client)',FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', ClientTimeZone.ToLocalTime(TTimeZone.Local.ToUniversalTime(Now))))
   else ResultJSON.AddPair('current Time (Client)','Invalid Client TimeZone');
 
+  // Setup DB connection and query
+  try
+    DatabaseName := MainForm.DatabaseName;
+    DatabaseEngine := MainForm.DatabaseEngine;
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Get Role information
+  try
+    {$Include sql\person\role\role.inc}
+    Query1.ParamByName('PERSONID').AsInteger := -1; // Nobody
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: R');
+    end;
+  end;
+  ResultArray := TJSONObject.ParseJSONValue(DBSupport.QueryToJSON(Query1)) as TJSONArray;
+  ResultJSON.AddPair('Roles', ResultArray);
+
   // Not sure if there is another version of this that is more direct?
   Result := TStringStream.Create(ResultJSON.ToString);
 
   // Cleanup
   ResultJSON.Free;
 
-  // These are now part of ResultJSON and get freed when that gets freed
-// ServerIPArray.Free;
-// ParametersArray.Free;
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := 1;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.Info';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := MainForm.AppName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+TZ+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
 
 end;
 
@@ -1028,7 +1091,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
   if Query1.RecordCount <> 1 then
@@ -1087,7 +1150,7 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+      raise EXDataHttpUnauthorized.Create('Internal Error: AHI');
     end;
   end;
 
@@ -1178,7 +1241,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
   if Query1.RecordCount <> 1 then
@@ -1248,7 +1311,7 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+      raise EXDataHttpUnauthorized.Create('Internal Error: AHI');
     end;
   end;
 
@@ -1349,7 +1412,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
   if Query1.RecordCount <> 1 then
@@ -1400,7 +1463,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: JC');
+      raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
   if Query1.RecordCount <> 1 then
@@ -1445,7 +1508,7 @@ begin
   except on E: Exception do
     begin
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: Profile');
+      raise EXDataHttpUnauthorized.Create('Internal Error: P');
     end;
   end;
 
@@ -1539,7 +1602,7 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: AH');
+      raise EXDataHttpUnauthorized.Create('Internal Error: AHI');
     end;
   end;
 
@@ -1777,7 +1840,7 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: TI');
+      raise EXDataHttpUnauthorized.Create('Internal Error: ACI');
     end;
   end;
 
@@ -1935,7 +1998,7 @@ begin
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
-      raise EXDataHttpUnauthorized.Create('Internal Error: TI');
+      raise EXDataHttpUnauthorized.Create('Internal Error: AKV');
     end;
   end;
 
@@ -1962,7 +2025,7 @@ begin
     if Query1.RowsAffected <> 1 then
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
-      raise EXDataHttpUnauthorized.Create('Internal Error: CP');
+      raise EXDataHttpUnauthorized.Create('Internal Error: CEU');
     end;
 
   end;

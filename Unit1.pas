@@ -6,6 +6,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.DateUtils,
+  System.StrUtils,
 
   JS,
   Web,
@@ -337,6 +338,8 @@ type
     divSessionListHolder: TWebHTMLDiv;
     divSessionList: TWebHTMLDiv;
     btnServerStats: TWebButton;
+    divAccountRoles: TWebHTMLDiv;
+    divGetImage: TWebHTMLDiv;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
@@ -471,26 +474,27 @@ type
     LastAction: String;              // Used to prevent adding duplicate lines (particularly blank lines)
     Current_ActionLog: String;       // The selected action long in the Accounts Activity page
 
+    User_ID: Integer;          // Used as the primary identifier
+    User_Account: String;      // Mainly used for login and display
     User_FirstName: String;
     User_MiddleName: String;
     User_LastName: String;
+    User_Name: String;         // Names combined into one
     User_Birthdate: String;
     User_Description: String;
-    User_Name: String;
     User_EMail: String;
+    User_Photo: String;        // Data URI - could be <svg> or <img src=http> or <img src="data"> for example
 
-    User_Photo: String;
-    User_Account: String;
-    User_ID: Integer;
-    User_Roles: TStringList;
+    Roles: JSValue;             // All Available Roles (JSON)
+    User_Roles: TStringList;    // List of roles from JWT
 
     tabAccountOptions: JSValue;
-    tabAccountRoles: JSValue;
     tabAccountHistory: JSValue;
     tabAccountLinks: JSValue;
     LinksData: JSValue;
     LinksDataBackup: JSValue;
     tabAccountSessions: JSValue;
+    tabAccountRoles: JSValue;
 
     // Simplebar References
     scrollAccountName: JSValue;
@@ -778,6 +782,7 @@ var
   ConfigResponse: TJSXMLHttpRequest;
   ConfigData: TJSONObject;
   ConfigURL: String;
+  ResponseString: String;
 begin
 
   // Default Theme
@@ -911,7 +916,6 @@ begin
     this.App_Browser = JSON.stringify(browser);
   end;
 
-
   // Log what we're doing in the application
   ActionLog := TStringList.Create;
   ActionLog.Delimiter := chr(10);
@@ -991,6 +995,7 @@ begin
     begin
     end
   end;
+
   if (Server_URL = '') then
   begin
     Server_URL := 'http://localhost:44444/tms/xdata';
@@ -1004,6 +1009,24 @@ begin
   LogAction('Attempting Connection');
   await(XDataConnect);
   LogAction(' ');
+
+  // Load up Basic info from the server
+  ResponseString := await(JSONRequest('ISystemService.Info',[App_TZ]));
+  asm
+    var data = JSON.parse(ResponseString);
+    this.Roles = data['Roles'];
+
+    this.LogAction(' ')
+    this.LogAction('============================================================');
+    this.LogAction(' -- Server Name: '+data['Application Name']);
+    this.LogAction(' -- Server Version: '+data['Application Version']);
+    this.LogAction(' -- Server Release: '+data['Application Release']);
+    this.LogAction(' -- Server Release(UTC): '+data['Application Release (UTC)']);
+    this.LogAction(' -- ');
+    this.LogAction(' -- Available Roles: '+this.Roles.length);
+    this.LogAction('============================================================');
+    this.LogAction(' ')
+  end;
 
 // Configure buttons to use Bootstrap tooltips
   AddTT(btnSearch);
@@ -1091,21 +1114,13 @@ begin
   AddTT(btnActivityLogTimeZone);
   AddTT(btnSelectActivityLog);
 
-
-  // Convert all tooltips to Bootstrap tooltips
-  asm
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
-    var tooltipList = tooltipTriggerList.map( function(tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl, {
-        trigger : 'hover'
-      });
-    });
-  end;
-
   // JavaScript Sleep Function
   asm window.sleep = async function(msecs) {return new Promise((resolve) => setTimeout(resolve, msecs)); } end;
 
+
+  asm
+    document.body.style.setProperty('opacity','1');
+  end;
 
   // Tabulator Defaults
   asm
@@ -1113,6 +1128,7 @@ begin
     Tabulator.defaultOptions.selectable = 1;
     Tabulator.defaultOptions.columnHeaderSortMulti = true,
     Tabulator.defaultOptions.clipboard = "copy";
+    Tabulator.defaultOptions.groupToggleElement = "header",
     Tabulator.defaultOptions.headerSortElement = function(column, dir) {
       switch(dir){
         case "asc":  return "<i class='fa-duotone fa-sort-up DropShadow'>";
@@ -1484,6 +1500,41 @@ begin
     });
   end;
 
+  // Account Roles
+  asm
+    this.tabAccountRoles = new Tabulator("#divAccountRoles", {
+      index: "role_id",
+      layout: "fitColumns",
+      selectable: 1,
+      headerVisible: false,
+      groupBy: 'category',
+      groupHeader:function(value, count, data, group){
+        if (count == 1) {
+          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 16px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' item )</span>';
+        } else {
+          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 16px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' items )</span>';
+        }
+      },
+      columnDefaults:{
+        resizable: false
+      },
+      columns: [
+        { title: false, field:"role_id", headerSort: false, width: 5, minWidth: 5, formatter: function(cell, formatterParams, onRendered) {return "";}},
+        { title: "category", field: "category", visible: false },
+        { title: false, field: "icon", width: 35, minWidth: 35,
+            formatter: function(cell, formatterParams, onRendered) {
+              return '<i class="fa-duotone '+cell.getValue().replace(':','')+' fa-xl fa-fw"></i>';
+            }
+        },
+        { title: "Role", field: "name" },
+        { title: "Access", field: "valid_from" }
+      ]
+    });
+    this.tabAccountRoles.on('rowClick', function(e, row){
+      pas.Unit1.Form1.tabAccountRoles.selectRow([row]);
+    });
+  end;
+
 
   // This is used to adjust the size and position of "windows"
   asm
@@ -1648,6 +1699,8 @@ begin
   end;
 
 
+
+
   // Autologin if possible
   if (TWebLocalStorage.GetValue('Login.Expiry') <> '') then
   begin
@@ -1757,11 +1810,78 @@ begin
   end;
 
 
+  // Image Selecttion
   asm
-    document.body.style.setProperty('opacity','1');
+    var SquareImage = 1024; // This is our working image size
+
+    function getBase64Image(img, width, height) {
+      var canvas = document.createElement("canvas");
+      canvas.width = SquareImage;
+      canvas.height = SquareImage;
+      var ctx = canvas.getContext("2d");
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      var dataURL = canvas.toDataURL("image/png");
+      return dataURL;
+    }
+    document.getElementById('fileinput').onchange = function () {
+      var This = pas.Unit1.Form1;
+      This.LogAction(' -- Original Image Name: '+this.files[0].name);
+      This.LogAction(' -- Original Image Size: '+parseInt(this.files[0].size / 1024).toLocaleString()+' KB');
+      This.LogAction(' -- Original Image Type: '+this.files[0].type);
+
+      loadImage(this.files[0], {meta: true, canvas: true, contain: true, cover: false })
+        .then(function (data) {
+
+          var width = data.image.width;
+          var height = data.image.height;
+          if (width > height) {
+            if (width > SquareImage) {
+              height *= SquareImage / width;
+              width = SquareImage
+            }
+          } else {
+            if (height > SquareImage) {
+              width *= SquareImage / height;
+              height = SquareImage;
+            }
+          }
+
+          var dataURI = getBase64Image(data.image, width, height);
+          divAccountPhoto.innerHTML = '<img style="position: absolute; width: 100%; top: 0px; left: 0px;" src="'+dataURI+'">';
+
+          This.LogAction(' -- Original Image Width: '+data.originalWidth);
+          This.LogAction(' -- Original Image Height: '+data.originalHeight);
+          This.LogAction(' -- Uploaded Image Size: '+parseInt(dataURI.length / 1024).toLocaleString()+' KB');
+          This.LogAction(' -- Uploaded Image Width: '+width);
+          This.LogAction(' -- Uploaded Image Height: '+height);
+
+          This.pz.zoom(1);
+          if (width < SquareImage) {
+            This.pz.pan(((SquareImage - width) / SquareImage) * (divAccountPhoto.getBoundingClientRect().width / 2),0);
+          } else if (height < 1024) {
+            This.pz.pan(0, ((SquareImage - height) / SquareImage) * (divAccountPhotoFG.getBoundingClientRect().height / 2));
+          } else {
+            This.pz.pan(0,0);
+          }
+        })
+        .catch(function (err) {
+          console.log(err)
+        });
+
+//    // load any meta data that can be found in the image
+//    loadImage.parseMetaData(this.files[0],{})
+//      .then(function (data) {
+//        console.log('Original image head: ', data.imageHead);
+//        console.log('EXIF data: ', data.exif);
+//        console.log('IPTC data: ', data.iptc);
+//      });
+
+    }
   end;
 
 
+  HideTooltips;
   PreventCompilerHint(i);
 end;
 
@@ -2109,7 +2229,7 @@ end;
 procedure TForm1.ProcessJWT(aJWT: String);
 var
   JWTClaims: TJSONObject;
-//  i: Integer;
+  i: Integer;
 begin
   JWT := aJWT;
 
@@ -2151,7 +2271,14 @@ begin
   LogAction(' -- Name: '+StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]));
   LogAction(' -- Account: '+User_Account);
   LogAction(' -- EMail: '+User_Email);
-  LogAction(' -- Roles: '+User_Roles.CommaText);
+  LogAction(' -- Active Roles:');
+  i := 0;
+  while i < User_Roles.Count do
+  begin
+    asm this.LogAction(' ----- ' + i.toString().padStart(3,' ') + ': ' + this.Roles.find(x => x.role_id == i).category + ' / ' + this.Roles.find(x => x.role_id == i).name ); end;
+    i := i + 1;
+  end;
+
   LogAction(' -- Expires: '+(JWTClaims.GetValue('unt') as TJSONString).Value);
   LogAction(' -- Token Processed.');
 
@@ -2218,6 +2345,12 @@ begin
       pas.Unit1.Form1.tabAccountLinks.redraw(true);
       memoAuthorDescription.dispatchEvent(new Event('input'));
     end;
+  end
+  else if pcAccount.ActivePage.Name = 'pageAccountRoles' then
+  begin
+    asm
+      pas.Unit1.Form1.tabAccountRoles.redraw(true);
+    end
   end;
 end;
 
@@ -2442,7 +2575,6 @@ begin
       }
       btnAccount.innerHTML = this.User_Photo;
 
-
       // Account Page - Logins
       this.tabAccountOptions.getRow(9).getCell('Entries').setValue(data['RecentLogins'].length.toLocaleString());
       this.tabAccountHistory.setData(data['RecentLogins']);
@@ -2473,11 +2605,33 @@ begin
       this.tabAccountLinks.setData(this.LinksData);
       this.LinksDataBackup = JSON.parse(JSON.stringify(this.LinksData));
       this.UpdateAccountLinks();
+
+      // Account Page - Roles
+      count = 0;
+      i = 0;
+      var iconcache = '<div style="width:0px; height:0px; overflow:hidden;">';
+      while (i < data['Role'].length) {
+        if ((data['Role'][i]['valid_after'] !== null) && (data['Role'][i]['valid_until'] !== null)) {
+          var valid_now = luxon.DateTime.now();
+          var valid_after = luxon.DateTime.fromISO(data['Role'][i]['valid_after'].split(' ').join('T'),{zone:"utc"}).setZone("system");
+          var valid_until = luxon.DateTime.fromISO(data['Role'][i]['valid_until'].split(' ').join('T'),{zone:"utc"}).setZone("system");
+          if ((valid_after < valid_now) && (valid_until > valid_now)) {
+            count += 1;
+          }
+          iconcache += '<i class="fa-duotone '+data['Role'][i]['icon'].replace(':','')+'"></i>';
+        }
+        i += 1;
+      }
+      iconcache += '</div>';
+      divShade.innerHTML += iconcache;
+      this.tabAccountOptions.getRow(7).getCell('Entries').setValue(count);
+      this.tabAccountRoles.setData(data['Role']);
+
     end;
   end;
 
   // Update "window" header icon
-  labelAccountTitle.HTML := '<div style="width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
+  labelAccountTitle.HTML := '<div style="container-type: size; osition: relative; width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
                             '<div class="DropShadow mt-1">'+User_Name+'</div>';
 
   // Author Page
@@ -2793,27 +2947,24 @@ end;
 procedure TForm1.btnPhotoCancelClick(Sender: TObject);
 begin
   HideTooltips;
+  LogAction('[ Cancelled Photo Change ]');
   asm
     divAccountPhoto.innerHTML = this.User_Photo;
     if (btnAccount.firstElementChild !== null) {
       var MoveTransform = btnAccount.firstElementChild.style.getPropertyValue('transform');
       if (MoveTransform !== '') {
-        divAccountPhoto.style.setProperty('transform','scale(1) transform(0%, 0%)');
-        var Scale = parseFloat(MoveTransform.split(/\(|\)|%|, /)[1]);
-        var LeftOffset = parseFloat(MoveTransform.split(/\(|\)|%|, /)[3]);
-        var TopOffset = parseFloat(MoveTransform.split(/\(|\)|%|, /)[5]);
-
-//        console.log('S: '+Scale+', L: '+LeftOffset+', T: '+TopOffset);
-//        console.log('PanX: '+ (LeftOffset / 100) * (divAccountPhoto.getBoundingClientRect().width / Scale));
-//        console.log('PanY: '+           (TopOffset / 100) * (divAccountPhoto.getBoundingClientRect().height / Scale));
+        divAccountPhoto.style.setProperty('transform','scale(1) transform(0cqh, 0cqh)');
+        var Scale = parseFloat(MoveTransform.split(/\(|\)|cqh|, /)[1]);
+        var LeftOffset = parseFloat(MoveTransform.split(/\(|\)|cqh|, /)[3]);
+        var TopOffset = parseFloat(MoveTransform.split(/\(|\)|cqh|, /)[5]);
 
         this.pz.reset();
         this.pz.zoom(Scale);
-        divAccountPhoto.firstElementChild.style.setProperty('transform','scale(1) translate(0%, 0%)')
+        divAccountPhoto.firstElementChild.style.setProperty('transform','scale(1) translate(0cqh, 0cqh)')
         await sleep(250);
         pas.Unit1.Form1.pz.pan(
-          (LeftOffset / 100) * (divAccountPhoto.getBoundingClientRect().width / Scale),
-          (TopOffset / 100) * (divAccountPhoto.getBoundingClientRect().height / Scale)
+          (LeftOffset / 100) * (divAccountPhotoFG.getBoundingClientRect().width ),
+          (TopOffset / 100) * (divAccountPhotoFG.getBoundingClientRect().height )
         );
       }
     }
@@ -2832,6 +2983,7 @@ begin
     btnPhotoSave.Enabled := True;
     btnPhotoCancel.Enabled := True;
   end;
+  LogAction('[ Cleared Photo ]');
 end;
 
 procedure TForm1.btnPhotoIconsClick(Sender: TObject);
@@ -2856,6 +3008,8 @@ end;
 procedure TForm1.btnPhotoResetClick(Sender: TObject);
 begin
   HideTooltips;
+  LogAction('[ Reset Photo Size / Position ]');
+
   asm
    // Reset Pan/Zoom
     pas.Unit1.Form1.pz.reset();
@@ -2874,22 +3028,26 @@ begin
   LogAction('[ Saving Account Photo ]');
 
   asm
-    var Scale= this.pz.getScale();
-    var TopOffset = 100 * this.pz.getPan().y / divAccountPhoto.getBoundingClientRect().height * Scale;
-    var LeftOffset = 100 * this.pz.getPan().x / divAccountPhoto.getBoundingClientRect().width * Scale;
+    var Scale = this.pz.getScale();
+    var Pan = this.pz.getPan();
+    var br = divAccountPhoto.getBoundingClientRect();
+    var cr = divAccountPhoto.firstElementChild.getBoundingClientRect();
+    var TopOffset = 100 * Scale * Pan.y / br.height;
+    var LeftOffset = 100 * Scale * Pan.x / br.width;
 
     divAuthorProfilePhoto.innerHTML = divAccountPhoto.innerHTML;
     if (divAuthorProfilePhoto.firstElementChild !== null) {
-      divAuthorProfilePhoto.firstElementChild.style.setProperty('transform','scale('+Scale+') translate('+LeftOffset+'%,'+TopOffset+'%)');
+      divAuthorProfilePhoto.firstElementChild.style.setProperty('transform','scale('+Scale+') translate('+LeftOffset+'cqh,'+TopOffset+'cqh)');
       this.User_Photo = divAuthorProfilePhoto.innerHTML;
     } else {
-      this.User_Photo = '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';;
+      this.User_Photo = '<img width="100%" style="transform: scale(1) translate(0cqh, 0cqh);" src="icons/favicon-192x192.png">';;
       divAuthorProfilePhoto.innerHTML = this.User_Photo;
     }
     btnAccount.innerHTML = divAuthorProfilePhoto.innerHTML;
   end;
 
-  labelAccountTitle.HTML := '<div style="width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
+
+  labelAccountTitle.HTML := '<div style="container-type: size; position: relative; width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
                             '<div class="DropShadow mt-1">'+User_Name+'</div>';
 
   TWebLocalStorage.SetValue('User.Photo.'+User_Account, User_Photo);
@@ -2922,17 +3080,31 @@ var
   i: Integer;
 begin
   HideTooltips;
+  LogAction('[ Uploading Photo ]');
 
-  WebOpenDialog1.Accept := 'image/*';
-
-  await(string, WebOpenDialog1.Perform);
-
-  // If files were selected, iterate through them
-  i := 0;
-  while (i < WebOpenDialog1.Files.Count) do
-  begin
-    WebOpenDialog1.Files.Items[i].GetFileAsBase64;
-    i := i + 1;
+//  WebOpenDialog1.Accept := '.jpg, .jpeg, .png';
+//
+//  await(string, WebOpenDialog1.Perform);
+//
+//  LogAction('Photos Selected: '+IntToStr(WebOpenDialog1.Files.Count));
+//  i := 0;
+//  while (i < WebOpenDialog1.Files.Count) do
+//  begin
+//    LogAction(' -- Filename: '+WebOpenDialog1.Files.Items[i].Name);
+//    LogAction(' -- MimeType: '+WebOpenDialog1.Files.Items[i].MimeType);
+//    LogAction(' -- Filesize: '+IntToStr(Round(WebOpenDialog1.Files.Items[i].Size / 1024))+' KB');
+//    i := i + 1;
+//  end;
+//
+//  // If files were selected, iterate through them
+//  i := 0;
+//  while (i < WebOpenDialog1.Files.Count) do
+//  begin
+//    WebOpenDialog1.Files.Items[i].GetFileAsBase64;
+//    i := i + 1;
+//  end;
+  asm
+    fileinput.click();
   end;
 end;
 
