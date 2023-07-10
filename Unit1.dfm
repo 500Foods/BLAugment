@@ -3604,13 +3604,13 @@ object Form1: TForm1
             OnClick = btnPhotoURLClick
           end
           object btnPhotoReset: TWebButton
-            Left = 184
+            Left = 226
             Top = 3
             Width = 40
             Height = 40
             Hint = 'Reset Size & Position'
             Caption = '<i class="fa-duotone fa-crosshairs fa-lg"></i>'
-            ChildOrder = 4
+            ChildOrder = 5
             ElementClassName = 'btn btn-light ButtonUtility'
             ElementID = 'btnPhotoReset'
             ElementFont = efCSS
@@ -3621,13 +3621,13 @@ object Form1: TForm1
             OnClick = btnPhotoResetClick
           end
           object btnPhotoSave: TWebButton
-            Left = 230
+            Left = 272
             Top = 3
             Width = 40
             Height = 40
             Hint = 'Save Changes'
             Caption = '<i class="fa-duotone fa-check fa-xl"></i>'
-            ChildOrder = 5
+            ChildOrder = 6
             ElementClassName = 'btn btn-light ButtonUtility'
             ElementID = 'btnPhotoSave'
             ElementFont = efCSS
@@ -3638,13 +3638,13 @@ object Form1: TForm1
             OnClick = btnPhotoSaveClick
           end
           object btnPhotoCancel: TWebButton
-            Left = 276
+            Left = 318
             Top = 3
             Width = 40
             Height = 40
             Hint = 'Cancel Changes'
             Caption = '<i class="fa-duotone fa-xmark fa-xl"></i>'
-            ChildOrder = 6
+            ChildOrder = 7
             ElementClassName = 'btn btn-light ButtonUtility'
             ElementID = 'btnPhotoCancel'
             ElementFont = efCSS
@@ -3655,9 +3655,9 @@ object Form1: TForm1
             OnClick = btnPhotoCancelClick
           end
           object divGetImage: TWebHTMLDiv
-            Left = 318
+            Left = 364
             Top = 2
-            Width = 100
+            Width = 39
             Height = 41
             ElementClassName = 'd-none'
             ElementID = 'divGetImage'
@@ -3670,12 +3670,30 @@ object Form1: TForm1
               '<input type="file" accept=".jpg, .jpeg, .png"  id="fileinput" />')
             Role = ''
           end
+          object btnRotate: TWebButton
+            Left = 184
+            Top = 3
+            Width = 40
+            Height = 40
+            Hint = 'Select Icon'
+            Caption = '<i class="fa-duotone fa-arrows-spin Swap fa-lg"></i>'
+            ChildOrder = 4
+            ElementClassName = 'btn btn-light ButtonUtility'
+            ElementID = 'btnRotate'
+            ElementFont = efCSS
+            ElementPosition = epIgnore
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnRotateClick
+          end
         end
         object divAccountPhotoHolder: TWebHTMLDiv
           Left = 3
           Top = 58
-          Width = 324
-          Height = 324
+          Width = 366
+          Height = 366
           ElementClassName = 'resize-square ms-2 pe-2 pb-2'
           ElementID = 'divAccountPhotoHolder'
           ChildOrder = 2

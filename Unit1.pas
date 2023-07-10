@@ -340,6 +340,7 @@ type
     btnServerStats: TWebButton;
     divAccountRoles: TWebHTMLDiv;
     divGetImage: TWebHTMLDiv;
+    btnRotate: TWebButton;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
@@ -424,6 +425,7 @@ type
     procedure divShadeClick(Sender: TObject);
     procedure divShade2Click(Sender: TObject);
     procedure btnServerStatsClick(Sender: TObject);
+    procedure btnRotateClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -568,6 +570,7 @@ begin
     divAccountPhoto.innerHTML = ImageData;
     this.pz.reset();
   end;
+  btnRotate.Tag := 0;
 
   PreventCompilerHint(ImageData);
 end;
@@ -626,8 +629,11 @@ end;
 
 procedure TForm1.PhotoChanged;
 begin
-  btnPhotoSave.Enabled := True;
-  btnPhotoCancel.Enabled := True;
+  if btnPhotoCancel.Tag <> 1 then
+  begin
+    btnPhotoSave.Enabled := True;
+    btnPhotoCancel.Enabled := True;
+  end;
 end;
 
 procedure TForm1.PhotoNotChanged;
@@ -1820,7 +1826,7 @@ begin
       canvas.height = SquareImage;
       var ctx = canvas.getContext("2d");
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(img, (SquareImage - width) / 2, (SquareImage- height) / 2, width, height);
       var dataURL = canvas.toDataURL("image/png");
       return dataURL;
     }
@@ -1833,19 +1839,18 @@ begin
       loadImage(this.files[0], {meta: true, canvas: true, contain: true, cover: false })
         .then(function (data) {
 
+          // Size image to 'contain' within SquareImage - stretch or shrink
           var width = data.image.width;
           var height = data.image.height;
-          if (width > height) {
-            if (width > SquareImage) {
-              height *= SquareImage / width;
-              width = SquareImage
-            }
+          if (width >= height) {
+            width = SquareImage;
+            height = SquareImage * data.image.height / data.image.width;
           } else {
-            if (height > SquareImage) {
-              width *= SquareImage / height;
-              height = SquareImage;
-            }
+            height = SquareImage;
+            width = SquareImage * data.image.width / data.image.height;
           }
+          width = parseInt(width);
+          height = parseInt(height);
 
           var dataURI = getBase64Image(data.image, width, height);
           divAccountPhoto.innerHTML = '<img style="position: absolute; width: 100%; top: 0px; left: 0px;" src="'+dataURI+'">';
@@ -1856,14 +1861,8 @@ begin
           This.LogAction(' -- Uploaded Image Width: '+width);
           This.LogAction(' -- Uploaded Image Height: '+height);
 
-          This.pz.zoom(1);
-          if (width < SquareImage) {
-            This.pz.pan(((SquareImage - width) / SquareImage) * (divAccountPhoto.getBoundingClientRect().width / 2),0);
-          } else if (height < 1024) {
-            This.pz.pan(0, ((SquareImage - height) / SquareImage) * (divAccountPhotoFG.getBoundingClientRect().height / 2));
-          } else {
-            This.pz.pan(0,0);
-          }
+          This.pz.reset();
+          This.btnRotate.FTag$1 = 0;
         })
         .catch(function (err) {
           console.log(err)
@@ -1877,6 +1876,8 @@ begin
 //        console.log('IPTC data: ', data.iptc);
 //      });
 
+     // Resets, so the same file can be loaded again if necessary
+     fileinput.value = '';
     }
   end;
 
@@ -2948,9 +2949,13 @@ procedure TForm1.btnPhotoCancelClick(Sender: TObject);
 begin
   HideTooltips;
   LogAction('[ Cancelled Photo Change ]');
+  btnPhotoSave.Enabled := False;
+  btnPhotoCancel.Enabled := False;
+  btnPhotoCancel.Tag := 1;
+
   asm
-    divAccountPhoto.innerHTML = this.User_Photo;
     if (btnAccount.firstElementChild !== null) {
+      divAccountPhoto.innerHTML = btnAccount.firstElementChild.innerHTML;
       var MoveTransform = btnAccount.firstElementChild.style.getPropertyValue('transform');
       if (MoveTransform !== '') {
         divAccountPhoto.style.setProperty('transform','scale(1) transform(0cqh, 0cqh)');
@@ -2960,8 +2965,8 @@ begin
 
         this.pz.reset();
         this.pz.zoom(Scale);
-        divAccountPhoto.firstElementChild.style.setProperty('transform','scale(1) translate(0cqh, 0cqh)')
-        await sleep(250);
+//        divAccountPhoto.firstElementChild.style.setProperty('transform','scale(1) translate(0cqh, 0cqh)')
+//        await sleep(250);
         pas.Unit1.Form1.pz.pan(
           (LeftOffset / 100) * (divAccountPhotoFG.getBoundingClientRect().width ),
           (TopOffset / 100) * (divAccountPhotoFG.getBoundingClientRect().height )
@@ -2969,9 +2974,9 @@ begin
       }
     }
   end;
+
   asm await sleep(100); end;
-  btnPhotoSave.Enabled := False;
-  btnPhotoCancel.Enabled := False;
+  btnPhotoCancel.Tag := 0;
 end;
 
 procedure TForm1.btnPhotoClearClick(Sender: TObject);
@@ -3010,15 +3015,19 @@ begin
   HideTooltips;
   LogAction('[ Reset Photo Size / Position ]');
 
+  btnRotate.Tag := 0;
   asm
    // Reset Pan/Zoom
     pas.Unit1.Form1.pz.reset();
+    btnRotate.Tag = 0;
+    divAccountPhoto.firstElementChild.style.removeProperty('transform');
   end;
 end;
 
 procedure TForm1.btnPhotoSaveClick(Sender: TObject);
 var
   RequestResponse: String;
+  Rotation: Integer;
 
 begin
   HideTooltips;
@@ -3027,20 +3036,20 @@ begin
 
   LogAction('[ Saving Account Photo ]');
 
+  Rotation := btnRotate.Tag;
   asm
     var Scale = this.pz.getScale();
     var Pan = this.pz.getPan();
     var br = divAccountPhoto.getBoundingClientRect();
-    var cr = divAccountPhoto.firstElementChild.getBoundingClientRect();
     var TopOffset = 100 * Scale * Pan.y / br.height;
     var LeftOffset = 100 * Scale * Pan.x / br.width;
 
-    divAuthorProfilePhoto.innerHTML = divAccountPhoto.innerHTML;
+    divAuthorProfilePhoto.innerHTML = '<div style="width: 100%; height: 100%;">'+divAccountPhoto.innerHTML+'</div>';
     if (divAuthorProfilePhoto.firstElementChild !== null) {
       divAuthorProfilePhoto.firstElementChild.style.setProperty('transform','scale('+Scale+') translate('+LeftOffset+'cqh,'+TopOffset+'cqh)');
       this.User_Photo = divAuthorProfilePhoto.innerHTML;
     } else {
-      this.User_Photo = '<img width="100%" style="transform: scale(1) translate(0cqh, 0cqh);" src="icons/favicon-192x192.png">';;
+      this.User_Photo = '<div><img width="100%" style="scale(1) translate(0cqh, 0cqh);" src="icons/favicon-192x192.png"></div>';
       divAuthorProfilePhoto.innerHTML = this.User_Photo;
     }
     btnAccount.innerHTML = divAuthorProfilePhoto.innerHTML;
@@ -3132,6 +3141,52 @@ procedure TForm1.btnRegisterClick(Sender: TObject);
 begin
   // Register Account
 
+end;
+
+procedure TForm1.btnRotateClick(Sender: TObject);
+begin
+  if btnRotate.Tag = 0 then
+  begin
+    btnRotate.Tag := 45;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(45deg)'); end;
+  end
+  else if btnRotate.Tag = 45 then
+  begin
+    btnRotate.Tag := 90;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(90deg)'); end;
+  end
+  else if btnRotate.Tag = 90 then
+  begin
+    btnRotate.Tag := 135;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(135deg)'); end;
+  end
+  else if btnRotate.Tag = 135 then
+  begin
+    btnRotate.Tag := 180;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(180deg)'); end;
+  end
+  else if btnRotate.Tag = 180 then
+  begin
+    btnRotate.Tag := 225;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(225deg)'); end;
+  end
+  else if btnRotate.Tag = 225 then
+  begin
+    btnRotate.Tag := 270;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(270deg)'); end;
+  end
+  else if btnRotate.Tag = 270 then
+  begin
+    btnRotate.Tag := 315;
+    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(315deg)'); end;
+  end
+  else if btnRotate.Tag = 315 then
+  begin
+    btnRotate.Tag := 0;
+    asm divAccountPhoto.firstElementChild.style.removeProperty('transform'); end;
+  end;
+
+  PhotoChanged;
 end;
 
 procedure TForm1.btnSearchClick(Sender: TObject);
