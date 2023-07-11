@@ -32,6 +32,7 @@ body {
   --bl-color-one: cornflowerblue;
   --bl-color-two: #0047AB; /* cobalt blue */
   --bl-color-three: #0047ABCC; /* cobalt blue @80% */
+  --bl-color-four:  #6495ED80; /* cornflowerblue @50% */
   --bl-color-input: white;
 
   --bl-background: black;
@@ -60,6 +61,7 @@ html[theme="light"] {
   --bl-color-one: silver;
   --bl-color-two: dimgray;
   --bl-color-three: #696969CC; /* dimgray @80% */
+  --bl-color-four: #C0C0C080; /* silver @50% */
   --bl-color-input: white;
   --bl-image: url(images/bookshelf.jpg);
   --bl-opacity: 0.85;
@@ -68,7 +70,9 @@ html[theme="light"] {
 html[theme="red"] {
   --bl-color-one: indianred;
   --bl-color-two: crimson;
-  --bl-color-three: #DC143CCC; /* cobalt blue @80% */
+  --bl-color-three: #DC143CCC; /* crimson @80% */
+  --bl-color-four: #CD5C5C80; /* indian red @50% */
+
   --bl-color-input: lightpink;
   --bl-image: url(images/bookshelf_red.jpg);
   --bl-opacity: 0.85;
@@ -192,6 +196,38 @@ html[theme="red"] .BLTooltip {
   height: 75% !important;
   transform: translate(-50%, -50%);
 }
+#divStatistics {
+  z-index: 201;
+  opacity: 0;
+  transition: opacity 0.5s;
+  top: 20px !important;
+  left: 20px !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  width: unset !important;
+  height: unset !important;
+}
+#divStatsHolder {
+  opacity: 0;
+  transition: opacity 0.5s;
+  width: 100% !important;
+  height: 100% !important;
+  position: relative  !important;
+  font-family: Cairo !important;
+  font-style: normal !important;
+  font-size: 16px !important;
+  padding: 0px 2px 2px 2px !important;
+  overflow: hidden !important;
+}
+#divStatisticsHolder {
+  position: absolute;
+  top: 37px !important;
+  left: 0px !important;
+  right: 0px !important;
+  bottom: 0px !important;
+  width: unset !important;
+  height: unset !important;
+}
 #divAccount,
 #divAdd {
   min-width: 450px;
@@ -274,10 +310,17 @@ html[theme="red"] .BLTooltip {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
-#divAccountOptions {
-  height: calc(100% - 2rem - 42px) !important;
-  border-right: var(--bl-border) !important;
+#divStatOptions {
+  border-right: 2px solid var(--bl-color-four) !important;
+  border-top-left-radius: 6px;
 }
+
+#divAccountOptions {
+  border-right: var(--bl-border) !important;
+  height: calc(100% - 2rem - 42px) !important
+}
+
+#divStatOptions .tabulator-row .tabulator-cell,
 #divAccountOptions .tabulator-row .tabulator-cell {
   padding: 3px 0px;
   overflow: visible;
@@ -761,6 +804,18 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   padding-top: 2px;
 }
 
+#divStats {
+  padding: 0px;
+  border: none;
+  font-family: Cairo !important;
+  font-size: 12px;
+}
+
+#divStatisticsBG {
+  height: calc(100% - 38px) !important;
+}
+
+
 /* Adjustments for specific Tabulator columns */
 
 .IconColumn {
@@ -778,6 +833,7 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   padding-top: 6px;
 }
 
+#divStatOptions .tabulator-cell[tabulator-field="Icon"],
 #divAccountOptions .tabulator-cell[tabulator-field="Icon"] {
   padding: 3px 2px 3px 0px;
 }

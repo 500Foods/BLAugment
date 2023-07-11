@@ -341,6 +341,10 @@ type
     divAccountRoles: TWebHTMLDiv;
     divGetImage: TWebHTMLDiv;
     btnRotate: TWebButton;
+    divStatistics: TWebHTMLDiv;
+    divStatisticsBG: TWebHTMLDiv;
+    divStatisticsLabel: TWebHTMLDiv;
+    divStatisticsHolder: TWebHTMLDiv;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
@@ -424,10 +428,11 @@ type
     procedure labelAccountTitleDblClick(Sender: TObject);
     procedure divShadeClick(Sender: TObject);
     procedure divShade2Click(Sender: TObject);
-    procedure btnServerStatsClick(Sender: TObject);
+    [async] procedure btnServerStatsClick(Sender: TObject);
     procedure btnRotateClick(Sender: TObject);
     function CaptureState: JSValue;
     procedure RevertState(StateData: JSValue);
+    [async] procedure divStatisticsLabelClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -437,6 +442,7 @@ type
     Theme: String;        // Current Theme, eg: Dark, Red, Light
     BootstrapTT: String;  // Bootstrap Tooltip HTML to add to icon classes
     Server_URL: String;   // XData server
+    StatsForm: TWEbForm;  // Statistics - only loaded when needed
 
     // These are used to handle the browser back button situation
     State: String;
@@ -549,6 +555,8 @@ var
   Form1: TForm1;
 
 implementation
+
+uses Unit2;
 
 {$R *.dfm}
 
@@ -1909,6 +1917,7 @@ begin
 
   HideTooltips;
   PreventCompilerHint(i);
+  PreventCompilerHint(ResponseString);
 end;
 
 function TForm1.JSONRequest(Endpoint: String; Params: array of JSValue): String;
@@ -1945,7 +1954,7 @@ begin
         } end;
 
         // Log the error, but leave out the URI (because it includes the password)
-        LogAction('ERROR Request Exception Received From'+Endpoint);
+        LogAction('ERROR: Request Exception Received From '+Endpoint);
         LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
@@ -2029,7 +2038,7 @@ begin
         } end;
 
         // Log the error, but leave out the URI (because it includes the password)
-        LogAction('ERROR Request Exception Received From'+Endpoint);
+        LogAction('ERROR: Request Exception Received From '+Endpoint);
         LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
@@ -2341,11 +2350,12 @@ begin
 
     if (PriorState <> State) and (PriorState <> '') then
     begin
-        if      State = 'Account'  then btnAccountCloseClick(nil)
-        else if State = 'Sessions' then divSessionListLabelClick(nil)
-        else if State = 'URL'      then btnURLCancelClick(nil)
-        else if State = 'Login'    then btnLOginCancelClick(nil)
-        else if State = 'Icon'     then btnIconCancelClick(nil)
+        if      State = 'Account'    then btnAccountCloseClick(nil)
+        else if State = 'Sessions'   then divSessionListLabelClick(nil)
+        else if State = 'Statistics' then divStatisticsLabelClick(nil)
+        else if State = 'URL'        then btnURLCancelClick(nil)
+        else if State = 'Login'      then btnLOginCancelClick(nil)
+        else if State = 'Icon'       then btnIconCancelClick(nil)
         else console.log('Unexpected State: '+State);
     end;
   end;
@@ -3158,11 +3168,11 @@ begin
   end;
 
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+
+  PreventCompilerHint(Rotation);
 end;
 
 procedure TForm1.btnPhotoUploadClick(Sender: TObject);
-var
-  i: Integer;
 begin
   HideTooltips;
   LogAction('[ Uploading Photo ]');
@@ -3278,8 +3288,36 @@ begin
 end;
 
 procedure TForm1.btnServerStatsClick(Sender: TObject);
+var
+  ElapsedTime: TDateTime;
+
+  procedure AfterCreate(AForm: TObject);
+  begin
+    LogAction('[ Statistics Loaded ('+IntToStr(MillisecondsBetween(Now, ElapsedTime))+'ms) ]');
+  end;
+
 begin
-  //
+  divShade2.Visible := True;
+  divShade2.ElementHandle.style.setProperty('opacity','0.85');
+  divStatistics.Visible := True;
+  divStatistics.ElementHandle.classList.replace('d-none','d-flex');
+
+  asm await sleep(50); end;
+  divStatistics.ElementHandle.style.setProperty('opacity','1');
+
+
+  // Time this action
+  ElapsedTime := Now;
+
+   // Launch Form
+  StatsForm := TForm2.CreateNew(divStatisticsHolder.ElementID, @AfterCreate);
+
+  State := 'Statistics';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
+
+
+
   HideTooltips;
 end;
 
@@ -3579,6 +3617,7 @@ end;
 
 function TForm1.CaptureState: JSValue;
 begin
+   Result := nil;
    // Return state of some kind
    asm
      Result = {
@@ -3631,6 +3670,27 @@ procedure TForm1.divShadeClick(Sender: TObject);
 begin
   if divAccount.Visible then btnAccountCloseClick(Sender);
   if divLogin.Visible then btnLoginCancelClick(Sender);
+end;
+
+procedure TForm1.divStatisticsLabelClick(Sender: TObject);
+begin
+  // Serves as our close button
+  divShade2.ElementHandle.style.setProperty('opacity','0');
+  divStatistics.ElementHandle.style.setProperty('opacity','0');
+  LogAction('[ Statistics Closed ]');
+
+  asm await sleep(500); end;
+
+  StatsForm.Close();
+  StatsForm := nil;
+
+  divStatistics.Visible := False;
+  divShade2.Visible := False;
+  divStatistics.ElementHandle.classList.replace('d-flex','d-none');
+
+  State := 'Account';
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
 end;
 
 function TForm1.AccountIsValid(acct: String):String;
@@ -4230,6 +4290,7 @@ begin
   begin
     if (divIconSearch.Visible = True) then btnIconCancelClick(Sender)
     else if (divSessions.Visible = True) then divSessionListLabelClick(Sender)
+    else if (divStatistics.Visible = True) then divStatisticsLabelClick(Sender)
     else if (divURL.Visible = True) then btnURLCancelClick(Sender)
     else if (divAccount.Visible = True) then btnAccountCloseClick(Sender);
   end

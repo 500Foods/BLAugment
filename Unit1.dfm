@@ -2933,7 +2933,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 2
+      TabIndex = 0
       ShowTabs = False
       TabOrder = 2
       object pageAccountName: TWebTabSheet
@@ -4899,7 +4899,7 @@ object Form1: TForm1
       Height = 35
       Cursor = crHandPoint
       ElementClassName = 'overflow-hidden'
-      ElementID = 'divURLLabel'
+      ElementID = 'divSessionListLabel'
       ChildOrder = 8
       ElementFont = efCSS
       HTML.Strings = (
@@ -4910,7 +4910,7 @@ object Form1: TForm1
           '<div class="h-100 d-flex justify-content-center align-items-cent' +
           'er" '
         '        style="position: relative;">'
-        '  <div id="editURLLabel" class="DropShadow" '
+        '  <div id="editSessionsLabel" class="DropShadow" '
         
           '          style="font-size: 16px; font-weight: bold; color: var(' +
           '--bl-color-one); font-family: Cairo;">'
@@ -4946,6 +4946,76 @@ object Form1: TForm1
         ElementFont = efCSS
         Role = ''
       end
+    end
+  end
+  object divStatistics: TWebHTMLDiv
+    Left = 795
+    Top = 350
+    Width = 350
+    Height = 81
+    ElementClassName = 
+      'd-none flex-column w-100 h-100 align-items-center justify-conten' +
+      't-center'
+    ElementID = 'divStatistics'
+    ChildOrder = 2
+    ElementFont = efCSS
+    Role = ''
+    Visible = False
+    object divStatisticsBG: TWebHTMLDiv
+      Left = 0
+      Top = 35
+      Width = 350
+      Height = 38
+      Cursor = crHandPoint
+      ElementClassName = 'ContainerBG flex-grow-1 w-100'
+      ElementID = 'divStatisticsBG'
+      HeightStyle = ssAuto
+      WidthStyle = ssAuto
+      ChildOrder = 1
+      ElementPosition = epRelative
+      ElementFont = efCSS
+      Role = ''
+    end
+    object divStatisticsLabel: TWebHTMLDiv
+      Left = 50
+      Top = 0
+      Width = 250
+      Height = 35
+      Cursor = crHandPoint
+      ElementClassName = 'overflow-hidden'
+      ElementID = 'divStatisticsLabel'
+      ElementPosition = epRelative
+      ElementFont = efCSS
+      HTML.Strings = (
+        '<div class="ContainerBGLogin" '
+        '        style="position: absolute; width:100%; height:100%;">'
+        '</div>'
+        
+          '<div class="h-100 d-flex justify-content-center align-items-cent' +
+          'er" '
+        '        style="position: relative;">'
+        '  <div id="editStatisticsLabel" class="DropShadow" '
+        
+          '          style="font-size: 16px; font-weight: bold; color: var(' +
+          '--bl-color-one); font-family: Cairo;">'
+        '  Blaugment Server Statistics'
+        '  </div>'
+        '</div>'
+        '')
+      Role = ''
+      OnClick = divStatisticsLabelClick
+    end
+    object divStatisticsHolder: TWebHTMLDiv
+      Left = 16
+      Top = 41
+      Width = 285
+      Height = 35
+      ElementID = 'divStatisticsHolder'
+      HeightStyle = ssAuto
+      WidthStyle = ssAuto
+      ChildOrder = 6
+      ElementFont = efCSS
+      Role = ''
     end
   end
   object XDataConn: TXDataWebConnection

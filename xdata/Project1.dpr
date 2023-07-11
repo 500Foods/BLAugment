@@ -13,7 +13,9 @@ uses
   DashboardService in 'units\DashboardService.pas',
   DashboardServiceImplementation in 'units\DashboardServiceImplementation.pas',
   ChatService in 'units\ChatService.pas',
-  ChatServiceImplementation in 'units\ChatServiceImplementation.pas';
+  ChatServiceImplementation in 'units\ChatServiceImplementation.pas',
+  StatisticsService in 'units\StatisticsService.pas',
+  StatisticsServiceImplementation in 'units\StatisticsServiceImplementation.pas';
 
 {$R *.res}
 

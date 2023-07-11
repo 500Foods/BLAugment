@@ -5,7 +5,8 @@ program blaugment;
 uses
   Vcl.Forms,
   WEBLib.Forms,
-  Unit1 in 'Unit1.pas' {Form1: TWebForm} {*.html};
+  Unit1 in 'Unit1.pas' {Form1: TWebForm} {*.html},
+  Unit2 in 'Unit2.pas' {Form2: TWebForm} {*.html};
 
 {$R *.res}
 
