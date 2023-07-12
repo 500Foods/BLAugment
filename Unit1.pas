@@ -534,6 +534,7 @@ type
     pz: JSValue;
 
     // Icon Search
+    IconSetsLoaded: Boolean;         // We only need to load these once
     IconSetList: JSValue;            // Icon sets retrieved from server
     IconSetNames: Array of String;   // Icon set names
     IconSetCount: Array of Integer;  // How many icons in each set
@@ -839,6 +840,7 @@ begin
 
   // MainForm Options
   Caption := App_Name;
+  IconSetsLoaded := False;
 
   // Overide some locale options?
   FormatSettings.TimeSeparator := ':';
@@ -1655,6 +1657,40 @@ begin
         ignoreFrom: '.nointeractresize .simplebar-scrollbar'
       });
 
+    interact('.resize-vertical')
+      .resizable({
+        edges: { left: false, right: false, bottom: true, top: false },
+        margin: 20, // size of resizing boundary interaction area
+        listeners: {
+          move (event) {
+            var target = event.target
+            var x = (parseFloat(target.getAttribute('data-x')) || 0)
+            var y = (parseFloat(target.getAttribute('data-y')) || 0)
+//            var x = (parseFloat(target.getAttribute('data-x')) || -target.getBoundingClientRect().width/2)
+//            var y = (parseFloat(target.getAttribute('data-y')) || -target.getBoundingClientRect().height/2)
+            target.style.width = event.rect.width + 'px'
+            target.style.height = event.rect.height + 'px'
+            x += event.deltaRect.left
+            y += event.deltaRect.top
+            target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+
+            var That = pas.Unit1.Form1.StatsForm;
+            That.CreateD3BarChart(That.Current_Chart, That.Current_XData, That.Current_YData);
+
+          }
+        },
+        ignoreFrom: '.nointeractresize .simplebar-scrollbar'
+      })
+//      .draggable({
+//        listeners: { move: dragMoveListener },
+//        ignoreFrom: '.nointeractresize'
+//      })
+      .pointerEvents({
+        ignoreFrom: '.nointeractresize .simplebar-scrollbar'
+      });
+
     function dragMoveListener (event) {
       var target = event.target
       var x = (parseFloat(target.getAttribute('data-x')) || 0 ) + event.dx
@@ -1745,6 +1781,8 @@ begin
       then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
       btnAccount.ElementHandle.innerHTML := User_Photo;
       await(btnAccountClick(Sender));
+      LogAction('Login Complete.');
+      LogAction(' ');
 
       await(tmrJWTRenewalTimer(Sender));
 
@@ -2185,6 +2223,7 @@ var
   ElapsedTime: TDateTime;
   ErrorCode: String;
   ErrorMessage: String;
+  ActionLogSend: String;
 begin
 
   ElapsedTime := Now;
@@ -2198,6 +2237,8 @@ begin
   // Call it again in case it has been disconnected
   await(XDataConnect);
 
+  ActionLogSend := ActionLogCurrent.Text;
+  ActionLogCurrent.Text := '';
 
   if (XDataConn.Connected) then
   begin
@@ -2212,7 +2253,9 @@ begin
         App_IPAddress,
         App_Location,
         App_Device,
-        App_Browser
+        App_Browser,
+        App_Session,
+        ActionLogSend
       ]));
 
       Blob := Response.Result;
@@ -2406,7 +2449,7 @@ begin
   else if pcAccount.ActivePage.Name = 'pageAccountActivity' then
   begin
     divActivityLogHeader.ElementHandle.classList.add('position-fixed');
-    btnAccountRefreshClick(nil);
+    btnActivityLogReloadClick(nil);
   end
   else if pcAccount.ActivePage.Name = 'pageAccountAuthor' then
   begin
@@ -2494,6 +2537,8 @@ begin
     then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
     btnAccount.ElementHandle.innerHTML := User_Photo;
     await(btnAccountClick(Sender));
+    LogAction('Login Complete.');
+    LogAction(' ');
 
     State := 'Home';
 
@@ -2724,37 +2769,41 @@ begin
 
 
   // This intializes the custom icon editor to use the "remote" approach.
-  ResponseString := await(JSONRequest('ISystemService.AvailableIconSets',[]));
-  asm
-    this.IconSets = [];
-    this.IconSetNames = [];
-    this.IconSetCount = [];
-
-    // Load up our Local icon sets
-    this.IconSetList = JSON.parse(ResponseString);
-
-    // Original list is soprted by filename.  Lets sort it by library name instead (case-insensitive)
-    this.IconSetList = this.IconSetList.sort((a, b) => {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) {
-        return -1;
-      }
-    });
-
-    // Get count data from this list
-    for (var i = 0; i < this.IconSetList.length; i++) {
-      var iconcount = this.IconSetList[i].count
-      this.IconSetNames.push(this.IconSetList[i].name+': '+iconcount+' icons');
-      this.IconSetCount.push(iconcount);
-    };
-  end;
-
-  // Populate the listLibraries control
-  count := 0;
-  for i := 0 to Length(IconsetNames)-1 do
+  if IconSetsLoaded = False then
   begin
-    count := count + IconSetCount[i];
+    ResponseString := await(JSONRequest('ISystemService.AvailableIconSets',[]));
+    asm
+      this.IconSets = [];
+      this.IconSetNames = [];
+      this.IconSetCount = [];
+
+      // Load up our Local icon sets
+      this.IconSetList = JSON.parse(ResponseString);
+
+      // Original list is soprted by filename.  Lets sort it by library name instead (case-insensitive)
+      this.IconSetList = this.IconSetList.sort((a, b) => {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) {
+          return -1;
+        }
+      });
+
+      // Get count data from this list
+      for (var i = 0; i < this.IconSetList.length; i++) {
+        var iconcount = this.IconSetList[i].count
+        this.IconSetNames.push(this.IconSetList[i].name+': '+iconcount+' icons');
+        this.IconSetCount.push(iconcount);
+      };
+    end;
+
+    // Populate the listLibraries control
+    count := 0;
+    for i := 0 to Length(IconsetNames)-1 do
+    begin
+      count := count + IconSetCount[i];
+    end;
+    editIconSearch.TextHint := 'Search '+FloatToStrF(count,ffNumber,5,0)+' icons';
+    IconSetsLoaded := True;
   end;
-  editIconSearch.TextHint := 'Search '+FloatToStrF(count,ffNumber,5,0)+' icons';
 
 
 end;
@@ -3661,9 +3710,10 @@ end;
 
 procedure TForm1.divShade2Click(Sender: TObject);
 begin
-  if divSessions.Visible then divSessionListLabelClick(Sender);
-  if divURL.Visible then btnURLCancelClick(Sender);
-  if divIconSearch.Visible then btnIconCancelClick(Sender);
+  if divSessions.Visible then divSessionListLabelClick(Sender)
+  else if divURL.Visible then btnURLCancelClick(Sender)
+  else if divIconSearch.Visible then btnIconCancelClick(Sender)
+  else if divStatistics.Visible then divStatisticsLabelClick(Sender);
 end;
 
 procedure TForm1.divShadeClick(Sender: TObject);
@@ -4341,6 +4391,14 @@ begin
       divAccount.ElementHandle.style.setProperty('left','2px');
       divAccount.ElementHandle.style.setProperty('width',IntToStr(Trunc(innerWidth - 4))+'px');
       divAccount.ElementHandle.style.setProperty('height',IntToStr(Trunc(innerHeight - 4))+'px');
+    end;
+  end;
+
+  if divStatistics.Visible then
+  begin
+    asm
+      var That = pas.Unit1.Form1.StatsForm;
+      That.CreateD3BarChart(That.Current_Chart, That.Current_XData, That.Current_YData);
     end;
   end;
 

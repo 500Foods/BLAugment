@@ -2923,7 +2923,7 @@ object Form1: TForm1
     end
     object pcAccount: TWebPageControl
       Left = 158
-      Top = 49
+      Top = 47
       Width = 400
       Height = 506
       ElementClassName = 'nav nav-tabs m-2'
@@ -4141,7 +4141,7 @@ object Form1: TForm1
           Top = 3
           Width = 397
           Height = 46
-          ElementClassName = 'nointeract d-flex flex-row gap-1 '
+          ElementClassName = 'nointeract d-flex flex-row gap-1 flex-wrap'
           ElementID = 'divActivityLogHeader'
           HeightStyle = ssAuto
           WidthStyle = ssAuto
@@ -4196,7 +4196,6 @@ object Form1: TForm1
             ElementPosition = epIgnore
             HeightStyle = ssAuto
             HeightPercent = 100.000000000000000000
-            Visible = False
             WidthPercent = 100.000000000000000000
             OnClick = btnActivityLogReloadClick
           end

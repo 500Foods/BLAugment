@@ -58,7 +58,7 @@ type
   private
 
     function Info(TZ: String):TStream;
-    function Login(Login_ID: String; Password: String; API_Key: String; TZ: String; IPAddress: String; IPLocation: String; DeviceInfo: String; BrowserInfo: String):TStream;
+    function Login(Login_ID: String; Password: String; API_Key: String; TZ: String; IPAddress: String; IPLocation: String; DeviceInfo: String; BrowserInfo: String; ActionSession: String; ActionLog: String):TStream;
     function Logout(ActionSession: String; ActionLog: String):TStream;
     function LogoutAll(ActionSession: String; ActionLog: String):TStream;
     function Renew(ActionSession: String; ActionLog: String):TStream;
@@ -626,7 +626,7 @@ end;
 
 
 
-function TSystemService.Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo: String): TStream;
+function TSystemService.Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo, ActionSession, ActionLog: String): TStream;
 var
   DBConn: TFDConnection;
   Query1: TFDQuery;
@@ -646,9 +646,12 @@ var
   JWTString: String;
   IssuedAt: TDateTime;
   ExpiresAt: TDateTime;
-//  DStr: String;
-//  DDate: TDateTime;
 
+  LogStatus: Integer;
+  LogEvents: Integer;
+  LogErrors: Integer;
+  LogStart: Integer;
+  LogChanges: Integer;
 begin
   // Returning JWT, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/jwt');
@@ -667,6 +670,7 @@ begin
   if Trim(TZ) = '' then raise EXDataHttpUnauthorized.Create('Timezone cannot be blank.');
 
   // Figure out if we have a valid TZ
+  ClientTimeZone := TBundledTimeZone.GetTimeZone('America/Vancouver');
   try
     ClientTimeZone := TBundledTimeZone.GetTimeZone(TZ);
     ValidTimeZone := True;
@@ -717,21 +721,6 @@ begin
     raise EXDataHttpUnauthorized.Create('API_Key was not validated.');
   end;
   ApplicationName := Query1.FieldByName('application').AsString;
-
-  // Invalid Date Conversin???
-//  DStr := Query1.FieldByName('valid_until').AsString;
-//  DDate := EncodeDateTime(
-//    StrToInt(Copy(DStr,1,4)),
-//    StrToInt(Copy(DStr,6,2)),
-//    StrToInt(Copy(DStr,9,2)),
-//    StrToInt(Copy(DStr,12,2)),
-//    StrToInt(Copy(DStr,15,2)),
-//    StrToInt(Copy(DStr,18,2)),
-//    0
-//  );
-//  if not(Query1.FieldByName('valid_until').IsNull) and
-//     (ExpiresAt > TTimeZone.Local.ToLocalTime(DDate))
-//  then ExpiresAt := TTimeZone.Local.ToLocalTime(DDate);
 
   if not(Query1.FieldByName('valid_until').IsNull) and
      (ExpiresAt > TTimeZone.Local.ToLocalTime(Query1.FieldByName('valid_until').AsDateTime))
@@ -919,6 +908,8 @@ begin
 
   // Login has been authenticated and authorized.
 
+
+
   // Generate a new JWT
   JWT := TJWT.Create;
   try
@@ -926,6 +917,7 @@ begin
     JWT.Claims.Issuer := MainForm.AppName;
     JWT.Claims.SetClaimOfType<string>( 'ver', MainForm.AppVersion );
     JWT.Claims.SetClaimOfType<string>( 'tzn', TZ );
+    JWT.Claims.SetClaimOfType<Integer>( 'tzo', Trunc(ClientTimeZone.GetUTCOffset(Now).TotalMinutes));
     JWT.Claims.SetClaimOfType<integer>('usr', PersonID );
     JWT.Claims.SetClaimOfType<string>( 'app', ApplicationName );
     JWT.Claims.SetClaimOfType<string>( 'dbn', DatabaseName );
@@ -1003,6 +995,50 @@ begin
       DBSupport.DisconnectQuery(DBConn, Query1);
       MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: LCI');
+    end;
+  end;
+
+
+  // Store ActionLog
+  LogStatus := 0;
+  if Pos('Browser Closed', ActionLog) > 0 then LogStatus := 1
+  else if Pos('Logout: Normal', ActionLog) > 0 then LogStatus := 2
+  else if Pos('Logout: Clean', ActionLog) > 0 then LogStatus := 3
+  else if Pos('Logout: All', ActionLog) > 0 then LogStatus := 4;
+
+  LogStart := 0;
+  if Pos('Login Successful', ActionLog) > 0 then LogStart := 1
+  else if Pos('AutoLogin - JWT Time Remaining', ActionLog) > 0 then LogStart := 2;
+
+  LogEvents := DBSupport.Occurrences('[',ActionLog);
+  LogChanges := DBSupport.Occurrences('<<',ActionLog);
+
+  LogErrors := DBSupport.Occurrences('Failed:',ActionLog) +
+               DBSupport.Occurrences('EXCEPTION:',ActionLog);
+
+  // Record Action History
+  try
+    {$Include sql\system\action_history_insert\action_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := PersonID;
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := ApplicationName;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('SESSIONID').AsString := ActionSession;
+    Query1.ParamByName('SESSIONSTART').AsDateTime := DBSupport.DecodeSession(ActionSession);
+    Query1.ParamByName('SESSIONRECORDED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('LOGSTATUS').AsInteger := LogStatus;
+    Query1.ParamByName('LOGERRORS').AsInteger := LogErrors;
+    Query1.ParamByName('LOGEVENTS').AsInteger := LogEvents;
+    Query1.ParamByName('LOGCHANGES').AsInteger := LogChanges;
+    Query1.ParamByName('LOGSTART').AsInteger := LogStart;
+    Query1.ParamByName('ACTIONS').AsString := ActionLog;
+
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: AHI');
     end;
   end;
 
@@ -1520,6 +1556,7 @@ begin
     JWT.Claims.Issuer := MainForm.AppName;
     JWT.Claims.SetClaimOfType<string>( 'ver', User.Claims.Find('ver').asString );
     JWT.Claims.SetClaimOfType<string>( 'tzn', User.Claims.Find('tzn').asString );
+    JWT.Claims.SetClaimOfType<integer>('tzo', User.Claims.Find('tzo').asInteger);
     JWT.Claims.SetClaimOfType<integer>('usr', User.Claims.Find('usr').asInteger);
     JWT.Claims.SetClaimOfType<string>( 'app', User.Claims.Find('app').asString );
     JWT.Claims.SetClaimOfType<string>( 'dbn', User.Claims.Find('dbn').asString );

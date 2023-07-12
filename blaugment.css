@@ -33,6 +33,7 @@ body {
   --bl-color-two: #0047AB; /* cobalt blue */
   --bl-color-three: #0047ABCC; /* cobalt blue @80% */
   --bl-color-four:  #6495ED80; /* cornflowerblue @50% */
+  --bl-color-five: #0047AB20; /* cobalt blue @12.5% */
   --bl-color-input: white;
 
   --bl-background: black;
@@ -62,6 +63,7 @@ html[theme="light"] {
   --bl-color-two: dimgray;
   --bl-color-three: #696969CC; /* dimgray @80% */
   --bl-color-four: #C0C0C080; /* silver @50% */
+  --bl-color-five: #69696920; /* dimgray @12.5% */
   --bl-color-input: white;
   --bl-image: url(images/bookshelf.jpg);
   --bl-opacity: 0.85;
@@ -72,7 +74,7 @@ html[theme="red"] {
   --bl-color-two: crimson;
   --bl-color-three: #DC143CCC; /* crimson @80% */
   --bl-color-four: #CD5C5C80; /* indian red @50% */
-
+  --bl-color-five: #DC143C20; /* crimson @12.5% */
   --bl-color-input: lightpink;
   --bl-image: url(images/bookshelf_red.jpg);
   --bl-opacity: 0.85;
@@ -398,6 +400,42 @@ button > svg > g > path {
   background: var(--bl-color-one);
   transition: background 0.4s !important;
 }
+.ButtonUtilityGroup {
+  padding-left: 6px;
+  padding-right: 8px;
+  top: -1px !important;
+  border-color: var(--bl-color-one);
+  color: var(--bl-color-one);
+  --fa-primary-color: var(--bl-color-one);
+  --bs-btn-color: var(--bl-color-one);
+  --bs-btn-bg: var(--bl-color-three);
+  --bs-btn-border-radius: var(--bl-radius) !important;
+  --bs-btn-hover-bg: var(--bl-color-one);
+  --bs-btn-hover-color: var(--bl-color-input);
+  }
+.ButtonUtilityGroup:hover {
+  transition: background 0.4s !important;
+}
+.ButtonUtilityGroup > div {
+  filter: var(--bl-shadow);
+}
+.ButtonUtilityGroup.Selected > div {
+  filter: none;
+}
+
+.ButtonUtilityGroup.Selected {
+  border-color: var(--bl-color-one);
+  color: black;
+  opacity: 1;
+  --fa-primary-color: var(--bl-color-input);
+  --bs-btn-color: black;
+  --bs-btn-bg: var(--bl-color-four);
+  --bs-btn-hover-bg: var(--bl-color-one);
+  --bs-btn-hover-color: var(--bl-color-two);
+}
+.ButtonUtilityGroup.Selected:hover {
+  transition: background 0.4s !important;
+}
 
 #btnThemeDark,
 #btnThemeLight,
@@ -472,6 +510,8 @@ button > svg > g > path {
   pointer-events: none;
   transition: background 1s, border 1s;
 }
+
+
 .ContainerPhoto {
   top: 0px !important;
   left: 0px !important;
@@ -515,6 +555,30 @@ button > svg > g > path {
 }
 
 
+.ChartHeader {
+  background: var(--bl-color-three);
+  border-top-right-radius: 6px;
+}
+.ChartFooter {
+  background: var(--bl-color-three);
+}
+.Chart {
+  border-top: 2px solid var(--bl-color-four);
+  border-bottom: 2px solid var(--bl-color-four);
+  min-height: 150px;
+  height: 100%;
+}
+.ChartData {
+  border-top: 2px solid var(--bl-color-four);
+  margin-bottom: -2px;
+  min-height: 150px;
+  height: 100%;
+  flex-basis: 0;
+  flex-grow: 1;
+}
+.d3axis text {
+  fill: var(--bl-color-one) !important;
+}
 
 #divSearch {
   flex-grow: 100;
@@ -653,6 +717,14 @@ button > svg > g > path {
   top: 42px !important;
   width: calc(100% - 2rem - 154px) !important;
   height: calc(100% - 2rem - 41px) !important;
+  background: transparent;
+}
+#pcStatistics {
+  position: relative !important;
+  top: 0px !important;
+  left: 0px !important;
+  width: 100% !important;
+  height: 100% !important;
   background: transparent;
 }
 .Page {
@@ -814,7 +886,14 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
 #divStatisticsBG {
   height: calc(100% - 38px) !important;
 }
-
+#divLoginsData {
+  padding: 0px;
+  border: none;
+  font-family: Cairo !important;
+  font-size: 12px;
+  min-Height: 150px;
+  padding-right: 32px;
+}
 
 /* Adjustments for specific Tabulator columns */
 

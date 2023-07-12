@@ -79,8 +79,14 @@ type
     ///  <param name="BrowserInfo">
     ///    UA-supplied client browser.
     ///  </param>
+    ///  <param name="ActionSession">
+    ///    Session identifier unique to the user - just an encoded Unix timestamp.
+    ///  </param>
+    ///  <param name="ActionLog">
+    ///    Client action log. Just a text log.
+    ///  </param>
 
-    [HttpGet] function Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo: String):TStream;
+    [HttpGet] function Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo, ActionSession, ActionLog: String):TStream;
 
     ///  <summary>
     ///    Logout - revoke the JWT.
