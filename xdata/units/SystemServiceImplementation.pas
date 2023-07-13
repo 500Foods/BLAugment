@@ -68,6 +68,7 @@ type
     function CheckUniqueAccount(UniqueAccount: String):Boolean;
     function CheckUniqueEMail(UniqueEMail: String):Boolean;
 
+    function SendEMail(MailSubject: String; MailBody: String; Reason: String):String;
     function SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String):String;
     function VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String):String;
 
@@ -1860,7 +1861,7 @@ begin
   AuthorizationCodeString1 := RightStr('000000'+IntToStr(AuthorizationCode),6);
   AuthorizationCodeString1 := Copy(AuthorizationCodeString1,1,3)+' '+Copy(AuthorizationCodeString1,4,3);
   AuthorizationCodeString2 := RightStr('000000'+IntToStr(AuthorizationCode),6);
-  AuthorizationCodeString2 := '<span>'+Copy(AuthorizationCodeString2,1,3)+'</span><span style="margin-left:10px">'+Copy(AuthorizationCodeString2,4,3)+'</span>';
+  AuthorizationCodeString2 := '<span>'+Copy(AuthorizationCodeString2,1,3)+'</span><span style="margin-left:5px">'+Copy(AuthorizationCodeString2,4,3)+'</span>';
 
   // Store the generated Authorization code for later
   try
@@ -1970,6 +1971,139 @@ begin
     end;
   end;
 end;
+
+function TSystemService.SendEMail(MailSubject, MailBody: String; Reason: String): String;
+var
+  DBConn: TFDConnection;
+  Query1: TFDQuery;
+  DatabaseName: String;
+  DatabaseEngine: String;
+  ElapsedTime: TDateTime;
+
+  User: IUserIdentity;
+  JWT: String;
+
+  SMTP1: TIdSMTP;
+  Msg1: TIdMessage;
+  Addr1: TIdEmailAddressItem;
+  Addr2: TidEMailAddressItem;
+  Html1: TIdMessageBuilderHtml;
+  SMTPResult: WideString;
+
+begin
+  // Time this event
+  ElapsedTime := Now;
+
+  // Returning JSON, so flag it as such
+  TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
+
+  if not(MainForm.MailServerAvailable)
+  then raise EXDataHttpUnauthorized.Create('Mail Services Not Configured');
+
+  // Get data from the JWT
+  User := TXDataOperationContext.Current.Request.User;
+  JWT := TXDataOperationContext.Current.Request.Headers.Get('Authorization');
+  if (User = nil) then raise EXDataHttpUnauthorized.Create('Missing authentication');
+
+  // Setup DB connection and query
+  DatabaseName := MainForm.DatabaseName;
+  DatabaseEngine := MainForm.DatabaseEngine;
+  try
+    DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
+    end;
+  end;
+
+  // Send the email
+  Msg1  := nil;
+  Addr1 := nil;
+  SMTP1 := TIdSMTP.Create(nil);
+  SMTP1.Host     := MainForm.MailServerHost;
+  SMTP1.Port     := MainForm.MailServerPort;
+  SMTP1.Username := MainForm.MailServerUser;
+  SMTP1.Password := MainForm.MailServerPass;
+
+  try
+    Html1 := TIdMessageBuilderHtml.Create;
+    try
+      Html1.Html.Add(MailBody);
+      Html1.HtmlCharSet := 'utf-8';
+
+      Msg1 := Html1.NewMessage(nil);
+      Msg1.Subject := MailSubject;
+      Msg1.From.Text := MainForm.MailServerFrom;
+      Msg1.From.Name := MainForm.MailServerName;
+
+      Addr1 := Msg1.Recipients.Add;
+      Addr1.Address := User.Claims.Find('eml').AsString;
+
+      Addr2 := Msg1.BCCList.Add;
+      Addr2.Address := MainForm.MailServerFrom;
+
+      SMTP1.Connect;
+      try
+        try
+          SMTP1.Send(Msg1);
+        except on E: Exception do
+          begin
+            SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+          end;
+        end;
+      finally
+        SMTP1.Disconnect();
+      end;
+    finally
+      Addr1.Free;  // Shouldn't have to free this?
+      Msg1.Free;   // Shouldn't have to free this?
+      Html1.Free;  // Should have to free this!
+    end;
+  except on E: Exception do
+    begin
+      SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+    end;
+  end;
+  SMTP1.Free; // Should have to free this!
+
+  if SMTPResult = ''
+  then Result := 'Sent'
+  else Result := 'Send Failed: '+SMTPResult;
+
+  // Keep track of endpoint history
+  try
+    {$Include sql\system\endpoint_history_insert\endpoint_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := User.Claims.Find('usr').AsInteger;
+    Query1.ParamByName('ENDPOINT').AsString := 'SystemService.SendEMail';
+    Query1.ParamByName('ACCESSED').AsDateTime := TTimeZone.local.ToUniversalTime(ElapsedTime);
+    Query1.ParamByName('IPADDRESS').AsString := TXDataOperationContext.Current.Request.RemoteIP;
+    Query1.ParamByName('APPLICATION').AsString := User.Claims.Find('app').AsString;
+    Query1.ParamByName('VERSION').AsString := MainForm.AppVersion;
+    Query1.ParamByName('DATABASENAME').AsString := DatabaseName;
+    Query1.ParamByName('DATABASEENGINE').AsString := DatabaseEngine;
+    Query1.ParamByName('EXECUTIONMS').AsInteger := MillisecondsBetween(Now,ElapsedTime);
+    Query1.ParamByName('DETAILS').AsString := '['+Reason+']';
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
+    end;
+  end;
+
+  // All Done
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
+    end;
+  end;
+end;
+
 
 function TSystemService.VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String): String;
 var

@@ -86,7 +86,7 @@ type
     ///    Client action log. Just a text log.
     ///  </param>
 
-    [HttpGet] function Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo, ActionSession, ActionLog: String):TStream;
+    [HttpPost] function Login(Login_ID, Password, API_Key, TZ, IPAddress, IPLocation, DeviceInfo, BrowserInfo, ActionSession, ActionLog: String):TStream;
 
     ///  <summary>
     ///    Logout - revoke the JWT.
@@ -249,7 +249,7 @@ type
     ///    confirmation E-Mails to random accounts.
     ///  </param>
 
-    [HttpGet] function SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String):String;
+    [HttpPost] function SendConfirmationCode(Reason, EMailAddress, EMailSubject, EMailBody, SessionCode, APIKey: String):String;
 
     ///  <summary>
     ///    Checks if the six-digit confirmation code is one that has been sent to the same e-mail address recently.
@@ -278,6 +278,24 @@ type
 
     [HttpGet] function VerifyConfirmationCode(EMailAddress, SessionCode, ConfirmationCode, APIKey, Reason: String):String;
 
+
+    ///  <summary>
+    ///    Sends an e-mail to the user's account
+    ///  </summary>
+    ///  <remarks>
+    ///    Nothing fancy - e-mai is sent to the user's JWT-supplied e-mail, so not much chance of abuse here.
+    ///  </remarks>
+    ///  <param name="MailSubject">
+    ///    Subject of E-Mail
+    ///  </param>
+    ///  <param name="MailBody">
+    ///    Body of E-Mail
+    ///  </param>
+    ///  <param name="Reason">
+    ///    Why is this email being sent?  Action log, chart, etc.
+    ///  </param>
+
+    [Authorize] [HttpPost] function SendEMail(MailSubject: String; MailBody: String; Reason: String):String;
   end;
 
 implementation

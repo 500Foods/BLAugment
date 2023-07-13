@@ -46,6 +46,8 @@ type
     divLoginsRecords: TWebLabel;
     btnLogins3mo: TWebButton;
     btnLogins1y: TWebButton;
+    btnLoginsClose: TWebButton;
+    memoChartRounding: TWebMemo;
     procedure WebFormCreate(Sender: TObject);
     [async] procedure SelectStatOption(OptionID: Integer);
     [async] procedure UpdateStatsNumbers;
@@ -57,11 +59,15 @@ type
     procedure btnLogins1dClick(Sender: TObject);
     procedure btnLogins7dClick(Sender: TObject);
     procedure btnLogins1moClick(Sender: TObject);
-    procedure btnLoginsExportClick(Sender: TObject);
+    [async] procedure btnLoginsExportClick(Sender: TObject);
     [async] procedure btnLoginsRefreshClick(Sender: TObject);
     procedure btnLogins3moClick(Sender: TObject);
     procedure btnLogins1yClick(Sender: TObject);
     procedure CreateD3BarChart(Chart:TWebHTMLDiv; XData: String; YData: String);
+    procedure btnLoginsExportPrintClick(Sender: TObject);
+    procedure btnLoginsPrintClick(Sender: TObject);
+    procedure btnLoginsCloseClick(Sender: TObject);
+    [async] procedure btnLoginsEMailClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -69,6 +75,10 @@ type
     { Public declarations }
 
     CurrentStatsPage: String;
+
+    ChartRounding: String;  // This is intentionally bizzare - a block of JS code in a TMemo field
+                            // so we don't have to contend with the IDE complaining about backticks
+                            // and all the invalid hexadecimal errors that are generated
 
     tabStatOptions: JSValue;
     tabLogins: JSValue;
@@ -97,6 +107,7 @@ var
   ChartID: String;
   ChartWidth: Integer;
   ChartHeight: Integer;
+  ChartRoundingCode: String;
 const
   ChartMargin = 10;
 
@@ -105,6 +116,8 @@ begin
   Current_Chart := Chart;
   Current_XData := XData;
   Current_YData := YData;
+
+  ChartRoundingCode := ChartRounding;
 
   ChartID := Chart.ElementID+'-D3';
   Chart.ELementHandle.innerHTML := '';
@@ -132,9 +145,9 @@ begin
     svg.attr("viewBox", [0, 0, width, height])
        .call(zoom);
 
-    // Change the axes to be white
+    // Change the axes to be silver
     d3.select("#"+ChartID+"SVG")
-      .style("color", "var(--bl-color-input)")
+      .style("color", "silver")
 
     // Gradient Bars
     var gradient = svg.append("svg:defs")
@@ -166,11 +179,11 @@ begin
                       .filter(function(d, i) { return !((i + 1) % Math.floor(x.domain().length /  ( width / 175 )    )); });
 
     var xAxis = g => g
-        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .attr("transform", "translate(0,"+(height - margin.bottom)+")")
         .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(tickValues))
 
     var yAxis = g => g
-        .attr("transform", `translate(${margin.left},0)`)
+        .attr("transform", "translate("+margin.left+",0)")
         .call(d3.axisLeft(y))
 
     var tooltips = d3.select('#'+ChartID+"SVG");
@@ -206,14 +219,8 @@ begin
        .attr("d", (d,i) => {
            if (y(ydat[i]) == (height - margin.bottom)) {rx = 0; ry = 0; return ""} else {rx = 8; ry = 8;}
            if (x.bandwidth() < 16) {rx = x.bandwidth() / 2; ry = x.bandwidth() / 2;} else {rx = 8; ry = 8};
-           return (`
-             M${x(xdat[i])},${y(ydat[i]) + ry}
-             a${rx},${ry} 0 0 1 ${rx},${-ry}
-             h${x.bandwidth() - 2 * rx}
-             a${rx},${ry} 0 0 1 ${rx},${ry}
-             v${height - margin.bottom - y(ydat[i]) - ry}
-             h${-x.bandwidth()}Z
-           `)})
+           return eval(ChartRoundingCode);
+       })
        .on('mouseover', function(d,i) {
          var n = xdat.indexOf(i);
          tooltip.select('.label').html('<div style="color: var(--bl-color-one);">Period: <span style="color: var(--bl-color-input);">'+i+'</span></div>');
@@ -251,18 +258,12 @@ begin
         svg.selectAll(".bars path").attr("d",(d,i) => {
           if (y(ydat[i]) == (height - margin.bottom)) {rx = 0; ry = 0; return ""} else {rx = 8; ry = 8;}
           if (x.bandwidth() < 16) {rx = x.bandwidth() / 2; ry = x.bandwidth() / 2;} else {rx = 8; ry = 8};
-          return( `
-            M${x(xdat[i])},${y(ydat[i]) + ry}
-            a${rx},${ry} 0 0 1 ${rx},${-ry}
-            h${x.bandwidth() - 2 * rx}
-            a${rx},${ry} 0 0 1 ${rx},${ry}
-            v${height - margin.bottom - y(ydat[i]) - ry}
-            h${-x.bandwidth()}Z
-          `)});
+          return eval(ChartRoundingCode);
+        });
 
         var tickValues = x.domain()
                           .filter(function(d, i) { return !((i + 1) % Math.floor(x.domain().length /  ( event.transform.k * (width / 175) )    )); });
-        var xAxis = g => g.attr("transform", `translate(0,${height - margin.bottom})`)
+        var xAxis = g => g.attr("transform", "translate(0,"+(height - margin.bottom)+")")
                           .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(tickValues))
         svg.selectAll(".x-axis").call(xAxis);
       }
@@ -374,25 +375,174 @@ begin
   btnLogins1y.ElementHandle.classList.remove('Selected');
 end;
 
+procedure TForm2.btnLoginsCloseClick(Sender: TObject);
+begin
+  Form1.divStatisticsLabelClick(Sender);
+end;
+
+procedure TForm2.btnLoginsEMailClick(Sender: TObject);
+var
+  RequestResponse: String;
+  MailSubject: String;
+  MailBody: TStringList;
+  MailFont: TStringList;
+  MailIcon: TStringList;
+  MailImage: String;
+
+begin
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+  if divLoginsChoices.Tag = 1
+  then MailSubject := MailSubject + 'Users Chart'
+  else MailSubject := MailSubject + 'Logins Chart';
+  MailSubject := MailSubject + ' ('+Aggregates[divLoginsAggChoices.Tag]+') ';
+
+  FOrm1.LogAction('[ E-Mail Chart:  '+MailSubject+']');
+
+  MailSubject := '['+Form1.App_Short+'/'+Form1.User_Account+'] '+MailSubject+FormatDateTime('yyyy-MMM-dd HH:nn:ss',Now);
+
+  MailFont := TStringList.Create;
+  MailFont.LoadFromFile('fonts/cairo.woff.base64');
+  MailIcon := TStringList.Create;
+  MailIcon.LoadFromFile('icons/favicon-512x512.png.base64');
+
+  MailImage := '';
+  asm MailImage = await modernScreenshot.domToPng(document.querySelector('#divLoginsChart')); end;
+
+  MailBody := TStringList.Create;
+  MailBody.Add('<!DOCTYPE html>');
+  MailBody.Add('<html lang="en">');
+  MailBody.Add('  <head>');
+  MailBody.Add('  <style>');
+// Alternatives to DataURI-supplied fonts.  Less success with these.  The current approach works great!
+//   MailBody.Add('  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">');
+//   MailBody.Add('    @import url("https://fonts.googleapis.com/css2?family=Cairo&display=swap");');
+//   MailBody.Add('      src: url(https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1PiKg.woff) format("woff");');
+  MailBody.Add('    @font-face {');
+  MailBody.Add('      font-family: "Cairo";');
+  MailBody.Add('      font-style: normal;');
+  MailBody.Add('      font-weight: 400;');
+  MailBody.Add('      src: url('+MailFont.Text+') format("woff");');
+  MailBody.Add('   }');
+  MailBody.Add('  </style>');
+  MailBody.Add('  </head>');
+  MailBody.Add('  <body>');
+
+  MailBody.Add('<div style="font-family: Cairo, Verdana, sans-serif; font-size: 16px; line-height: 1.2;">');
+
+    MailBody.Add('Hello!');
+    MailBody.Add('<p style="font-family: Cairo, Verdana; font-size: 16px; line-height: 1.2;">A request was just made by '+Form1.User_Account+' at <a href="'+FOrm1.App_URLLink+'">'+Form1.App_Short+'</a> for this chart.</p>');
+
+    MailBody.Add('<img width="100%" src="'+MailImage+'">');
+
+    MailBody.Add('<div style="margin: 16px 0px 32px 0px; display: flex;">');
+      MailBody.Add('<div style="display: flex; justify-content: center; align-items: center; padding-top: 4px; width: 60px;">');
+        MailBody.Add('<a title="'+Form1.App_URL+'" href="'+Form1.App_URLLink+'">');
+          MailBody.Add('<img width="100%" src="'+MailIcon.Text+'">');
+        MailBody.Add('</a>');
+      MailBody.Add('</div>');
+      MailBody.Add('<div style="display: flex; align-items: start; justify-content: center; margin-left: 10px; flex-direction: column;">');
+        MailBody.Add('<div>Warmest Regards,</div>');
+        MailBody.Add('<div>The '+Form1.App_Short+' Concierge.</div>');
+        MailBody.Add('<div><a href="'+Form1.App_URLLink+'">'+Form1.App_URL+'</a></div>');
+      MailBody.Add('</div>');
+    MailBody.Add('</div>');
+  MailBody.Add('</div>');
+
+  MailBody.Add('<p><pre style="font-size:10px; line-height:70%;">');
+  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+Form1.App_TZ+'<br />');
+  MailBody.Add('Ref &raquo; '+Form1.App_OS_Short+'/'+Form1.App_Browser_short+'/'+Form1.App_IPAddress+'/'+Form1.App_Session+'<br />');
+  MailBody.Add('Res &raquo; '+Form1.App_Country+'/'+Form1.App_Region+'/'+Form1.App_City);
+  MailBody.Add('</pre></p>');
+
+  MailBody.Add('  </body>');
+  MailBody.Add('</html>');
+
+  RequestResponse := await(Form1.StringRequest('ISystemService.SendEMail',[
+    MailSubject,
+    MailBody.Text,
+    'StatChart'
+  ]));
+
+  if RequestResponse = 'Sent' then
+  begin
+    Form1.LogAction('Chart E-Mail Sent');
+  end
+  else
+  begin
+    Form1.LogAction('Chart E-Mail Failed:');
+    Form1.LogAction(RequestResponse);
+  end;
+
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+
+  Form1.PreventCompilerHint(MailSubject);
+  Form1.PreventCompilerHint(MailBody);
+  Form1.PreventCompilerHint(MailImage);
+end;
+
 procedure TForm2.btnLoginsExportClick(Sender: TObject);
 begin
 
   if btnLoginsExport.Tag = 0 then
   begin
     btnLoginsExport.Tag := 1;
-    btnLoginsExportCSV.Visible := True;
-    btnLoginsExportXLS.Visible := True;
-    btnLoginsExportJSON.Visible := True;
-    btnLoginsExportPDF.Visible := True;
+    asm
+      btnLoginsExportCSV.classList.replace('d-none','d-inline');
+      btnLoginsExportXLS.classList.replace('d-none','d-inline');
+      btnLoginsExportJSON.classList.replace('d-none','d-inline');
+      btnLoginsExportPDF.classList.replace('d-none','d-inline');
+
+      await sleep(50);
+
+      btnLoginsExportCSV.style.setProperty('width','75px');
+      btnLoginsExportXLS.style.setProperty('width','75px');
+      btnLoginsExportJSON.style.setProperty('width','85px');
+      btnLoginsExportPDF.style.setProperty('width','75px');
+    end;
   end
   else
   begin
     btnLoginsExport.Tag := 0;
-    btnLoginsExportCSV.Visible := False;
-    btnLoginsExportXLS.Visible := False;
-    btnLoginsExportJSON.Visible := False;
-    btnLoginsExportPDF.Visible := False;
+    asm
+      btnLoginsExportCSV.style.setProperty('width','0px');
+      btnLoginsExportXLS.style.setProperty('width','0px');
+      btnLoginsExportJSON.style.setProperty('width','0px');
+      btnLoginsExportPDF.style.setProperty('width','0px');
+
+      await sleep(300);
+      btnLoginsExportCSV.classList.replace('d-inline', 'd-none');
+      btnLoginsExportXLS.classList.replace('d-inline', 'd-none');
+      btnLoginsExportJSON.classList.replace('d-inline', 'd-none');
+      btnLoginsExportPDF.classList.replace('d-inline', 'd-none');
+    end;
   end;
+
+end;
+
+procedure TForm2.btnLoginsExportPrintClick(Sender: TObject);
+var
+  ExportName: String;
+begin
+  ExportName := 'Blaugment-Stats-';
+
+  if divLoginsChoices.Tag = 1
+  then ExportName := ExportName + 'Users-'
+  else ExportName := ExportName + 'Logins-';
+
+  ExportName := ExportName + Aggregates[divLoginsAggChoices.Tag];
+
+  if (Sender is TWebButton)
+  then Form1.LogAction('[ Exported Chart: '+ExportName+' ('+StringReplace(((Sender as TWebButton).ElementID),'btnLoginsExport','',[])+') ]')
+  else Form1.LogAction('[ Exported Chart: '+ExportName+' ]');
+
+  ExportName := ExportName + FormatDateTime('yyyyMMdd-HHnnss',Now);
+
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportCSV)   then asm this.tabLogins.download("csv",  ExportName+".csv" ); end;
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportXLS)   then asm this.tabLogins.download("xlsx", ExportName+".xlsx"); end;
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportJSON)  then asm this.tabLogins.download("json", ExportName+".json"); end;
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportPDF)   then asm this.tabLogins.download("pdf",  ExportName+".pdf" ); end;
+  if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportPrint) then asm this.tabLogins.deselectRow(); this.tabLogins.print("active", true); end;
 
 end;
 
@@ -401,6 +551,34 @@ begin
   divLoginsChoices.Tag := 2;
   btnLoginsUniqueLogins.ElementHandle.classList.remove('Selected');
   btnLoginsLogins.ElementHandle.classList.add('Selected');
+end;
+
+procedure TForm2.btnLoginsPrintClick(Sender: TObject);
+var
+  PageHeader: String;
+
+begin
+
+  PageHeader := Form1.App_Name+' / '+Form1.App_Version+' / '+Form1.User_Account+' / Chart / ';
+
+  if divLoginsChoices.Tag = 1
+  then PageHeader := PageHeader + 'Users / '
+  else PageHeader := PageHeader + 'Logins / ';
+
+  PageHeader := PageHeader + Aggregates[divLoginsAggChoices.Tag]+' / ';
+  PageHeader := PageHeader + FormatDateTime('yyyyMMdd-HHnnss',Now);
+
+  Form1.LogAction('[ Print Chart: '+PageHeader+' ]');
+
+  asm {
+    printJS({
+      printable: 'divLoginsChart',
+      type: 'html',
+      header: PageHeader,
+      headerStyle: 'font-size: 14px; font-weight: bold; font-family: sans-serif;'
+    });
+  } end;
+
 end;
 
 procedure TForm2.btnLoginsRefreshClick(Sender: TObject);
@@ -553,6 +731,21 @@ begin
   Current_XData := '[]';
   Current_YData := '[]';
 
+  // Just using the memo to hold an IDE-incompatible string that we'll need later.
+  // It is actually JavaScript code that is used to produce the rounding on D3 bar charts.
+  // Other ways to do this would be to replace the JS backtick code with non-backtick code.
+  ChartRounding := memoChartRounding.Lines.Text;
+  memoChartRounding.ElementHandle.remove();
+
+  // These buttons are hidden initially
+  asm
+    btnLoginsExportCSV.style.setProperty('width','0px');
+    btnLoginsExportXLS.style.setProperty('width','0px');
+    btnLoginsExportJSON.style.setProperty('width','0px');
+    btnLoginsExportPDF.style.setProperty('width','0px');
+  end;
+
+
   // Statistics Tabulator
   asm
     var dataSO = [
@@ -613,10 +806,10 @@ begin
         resizable: false
       },
       columns: [
-        { title: "Spacer", width: 5, minWidth: 5},
-        { title: "Period", field: "period", width: 140 },
+        { title: "", width: 5, minWidth: 5},
+        { title: "Period", field: "period", width: 150 },
         { title: "Logins", field: "logins", width: 10, hozAlign: "right" },
-        { title: "Filler", }
+        { title: "" }
       ]
     });
     this.tabLogins.on('rowClick', function(e, row){

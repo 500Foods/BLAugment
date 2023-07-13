@@ -412,6 +412,8 @@ button > svg > g > path {
   --bs-btn-border-radius: var(--bl-radius) !important;
   --bs-btn-hover-bg: var(--bl-color-one);
   --bs-btn-hover-color: var(--bl-color-input);
+  transition: width 300ms linear;
+  overflow: hidden;
   }
 .ButtonUtilityGroup:hover {
   transition: background 0.4s !important;

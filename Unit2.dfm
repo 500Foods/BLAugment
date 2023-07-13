@@ -301,6 +301,7 @@ object Form2: TForm2
               HeightPercent = 100.000000000000000000
               WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsEMailClick
             end
             object btnLoginsPrint: TWebButton
               Left = 95
@@ -316,7 +317,26 @@ object Form2: TForm2
               HeightPercent = 100.000000000000000000
               WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsPrintClick
             end
+          end
+          object btnLoginsClose: TWebButton
+            Left = 41
+            Top = 100
+            Width = 50
+            Height = 50
+            Hint = 'Close Stats Window'
+            Caption = '<i class="fa-duotone fa-xmark Swap fa-xl"></i>'
+            ChildOrder = 4
+            ElementClassName = 'btn btn-link ms-auto'
+            ElementID = 'btnLoginsClose'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            HeightStyle = ssAuto
+            HeightPercent = 100.000000000000000000
+            WidthStyle = ssAuto
+            WidthPercent = 100.000000000000000000
+            OnClick = btnLoginsCloseClick
           end
         end
         object divLoginsChart: TWebHTMLDiv
@@ -369,7 +389,7 @@ object Form2: TForm2
             Tag = 1
             Left = 3
             Top = 3
-            Width = 282
+            Width = 292
             Height = 44
             ElementClassName = 'DropShadow d-flex flex-row bg-none gap-0 p-0 m-0'
             HeightStyle = ssAuto
@@ -397,74 +417,70 @@ object Form2: TForm2
             object btnLoginsExportCSV: TWebButton
               Left = 49
               Top = 0
-              Width = 40
+              Width = 50
               Height = 40
               Caption = 
                 '<i class="fa-duotone fa-file-csv fa-xl me-2"></i><div style="dis' +
                 'play:inline-block;">CSV</div>'
               ChildOrder = 1
-              ElementClassName = 'btn btn-light ButtonUtilityGroup px-2'
+              ElementClassName = 'd-none btn btn-light ButtonUtilityGroup px-0'
               ElementID = 'btnLoginsExportCSV'
               ElementFont = efCSS
               ElementPosition = epRelative
               HeightPercent = 100.000000000000000000
-              Visible = False
-              WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsExportPrintClick
             end
             object btnLoginsExportXLS: TWebButton
               Left = 95
               Top = 1
-              Width = 40
+              Width = 50
               Height = 40
               Caption = 
                 '<i class="fa-duotone fa-file-excel fa-xl me-2"></i><div style="d' +
                 'isplay:inline-block;">XLS</div>'
               ChildOrder = 2
-              ElementClassName = 'btn btn-light ButtonUtilityGroup px-2'
+              ElementClassName = 'd-none btn btn-light ButtonUtilityGroup px-0'
               ElementID = 'btnLoginsExportXLS'
               ElementFont = efCSS
               ElementPosition = epRelative
               HeightPercent = 100.000000000000000000
-              Visible = False
-              WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsExportPrintClick
             end
             object btnLoginsExportPDF: TWebButton
               Left = 187
               Top = 1
-              Width = 40
+              Width = 50
               Height = 40
               Caption = 
                 '<i class="fa-duotone fa-file-pdf fa-xl me-2"></i><div style="dis' +
                 'play:inline-block;">PDF</div>'
               ChildOrder = 4
-              ElementClassName = 'btn btn-light ButtonUtilityGroup px-2'
+              ElementClassName = 'd-none btn btn-light ButtonUtilityGroup px-0'
               ElementID = 'btnLoginsExportPDF'
               ElementFont = efCSS
               ElementPosition = epRelative
               HeightPercent = 100.000000000000000000
-              Visible = False
-              WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsExportPrintClick
             end
             object btnLoginsExportJSON: TWebButton
               Left = 141
               Top = 1
-              Width = 40
+              Width = 50
               Height = 40
               Caption = 
                 '<i class="fa-duotone fa-file-code fa-xl me-2"></i><div style="di' +
                 'splay:inline-block;">JSON</div>'
               ChildOrder = 3
-              ElementClassName = 'btn btn-light ButtonUtilityGroup px-2'
+              ElementClassName = 'd-none btn btn-light ButtonUtilityGroup px-0'
               ElementID = 'btnLoginsExportJSON'
               ElementFont = efCSS
               ElementPosition = epRelative
               HeightPercent = 100.000000000000000000
-              Visible = False
-              WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsExportPrintClick
             end
             object btnLoginsExportPrint: TWebButton
               Left = 233
@@ -482,6 +498,7 @@ object Form2: TForm2
               HeightPercent = 100.000000000000000000
               WidthStyle = ssAuto
               WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsExportPrintClick
             end
           end
         end
@@ -561,5 +578,29 @@ object Form2: TForm2
         end
       end
     end
+  end
+  object memoChartRounding: TWebMemo
+    Left = 11
+    Top = 544
+    Width = 198
+    Height = 96
+    AutoSize = False
+    ElementClassName = 'd-none'
+    ElementID = 'memoChartRounding'
+    ElementFont = efCSS
+    HeightPercent = 100.000000000000000000
+    Lines.Strings = (
+      '`'
+      'M${x(xdat[i])},${y(ydat[i]) + ry}'
+      'a${rx},${ry} 0 0 1 ${rx},${-ry}'
+      'h${x.bandwidth() - 2 * rx}'
+      'a${rx},${ry} 0 0 1 ${rx},${ry}'
+      'v${height - margin.bottom - y(ydat[i]) - ry}'
+      'h${-x.bandwidth()}Z'
+      '`')
+    SelLength = 0
+    SelStart = 201
+    WidthPercent = 100.000000000000000000
+    WordWrap = False
   end
 end

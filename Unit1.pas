@@ -691,7 +691,10 @@ procedure TForm1.btnActivityLogEMailClick(Sender: TObject);
 var
   RequestResponse: String;
   LogStamp: String;
-  LogMessage: String;
+  MailSubject: String;
+  MailBody: TStringList;
+  MailFont: TStringList;
+  MailIcon: TStringList;
 
 begin
   // Change Account Name
@@ -699,24 +702,66 @@ begin
   divChangeAccountName.ElementHandle.classList.Add('pe-none');
   LogAction('[ E-Mail Activity Log ]');
 
-  LogMessage :=
-      '<p>Hello!</p>'+
-      '<p>A request was just made by '+User_Account+' at <a href="'+App_URLLink+'">'+App_Short+'</a> for this activity log.</p>'+
-      divActionLog.ElementHandle.innerHTML+
-      '<p>Warmest Regards,<br >'+
-      'The '+App_Short+' Conciege<br >'+
-      '<a href="'+App_URLLink+'">'+App_URL+'</a><br /></p><br />'+
-      '<p><pre style="font-size:smallest;">'+
-        'Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+App_TZ+'<br />'+
-        'Ref &raquo; '+App_OS_Short+'/'+App_Browser_short+'/'+App_IPAddress+'/'+App_Session+'<br />'+
-        'Res &raquo; '+App_Country+'/'+App_Region+'/'+App_City+
-      '</pre></p>';
+  MailFont := TStringList.Create;
+  MailFont.LoadFromFile('fonts/cairo.woff.base64');
+  MailIcon := TStringList.Create;
+  MailIcon.LoadFromFile('icons/favicon-512x512.png.base64');
 
-  LogStamp := btnSelectActivityLog.Caption;
+  MailSubject := '['+Form1.App_Short+'/'+Form1.User_Account+'] Acitivity Log for '+btnSelectActivityLog.Caption;
 
-  RequestResponse := await(StringRequest('IPersonService.SendActionLog',[
-    LogMessage,
-    LogStamp
+  MailBody := TStringList.Create;
+  MailBody.Add('<!DOCTYPE html>');
+  MailBody.Add('<html lang="en">');
+  MailBody.Add('  <head>');
+  MailBody.Add('  <style>');
+// Alternatives to DataURI-supplied fonts.  Less success with these.  The current approach works great!
+//   MailBody.Add('  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">');
+//   MailBody.Add('    @import url("https://fonts.googleapis.com/css2?family=Cairo&display=swap");');
+//   MailBody.Add('      src: url(https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1PiKg.woff) format("woff");');
+  MailBody.Add('    @font-face {');
+  MailBody.Add('      font-family: "Cairo";');
+  MailBody.Add('      font-style: normal;');
+  MailBody.Add('      font-weight: 400;');
+  MailBody.Add('      src: url('+MailFont.Text+') format("woff");');
+  MailBody.Add('   }');
+  MailBody.Add('  </style>');
+  MailBody.Add('  </head>');
+  MailBody.Add('  <body>');
+
+  MailBody.Add('<div style="font-family: Cairo, Verdana, sans-serif; font-size: 16px; line-height: 1.2;">');
+
+    MailBody.Add('Hello!');
+    MailBody.Add('<p style="font-family: Cairo, Verdana; font-size: 16px; line-height: 1.2;">A request was just made by '+Form1.User_Account+' at <a href="'+FOrm1.App_URLLink+'">'+Form1.App_Short+'</a> for this activity log.</p>');
+
+    MailBody.Add(divActionLog.ElementHandle.innerHTML);
+
+    MailBody.Add('<div style="margin: 16px 0px 32px 0px; display: flex;">');
+      MailBody.Add('<div style="display: flex; justify-content: center; align-items: center; padding-top: 4px; width: 60px;">');
+        MailBody.Add('<a title="'+Form1.App_URL+'" href="'+Form1.App_URLLink+'">');
+          MailBody.Add('<img width="100%" src="'+MailIcon.Text+'">');
+        MailBody.Add('</a>');
+      MailBody.Add('</div>');
+      MailBody.Add('<div style="display: flex; align-items: start; justify-content: center; margin-left: 10px; flex-direction: column;">');
+        MailBody.Add('<div>Warmest Regards,</div>');
+        MailBody.Add('<div>The '+Form1.App_Short+' Concierge.</div>');
+        MailBody.Add('<div><a href="'+Form1.App_URLLink+'">'+Form1.App_URL+'</a></div>');
+      MailBody.Add('</div>');
+    MailBody.Add('</div>');
+  MailBody.Add('</div>');
+
+  MailBody.Add('<p><pre style="font-size:10px; line-height:70%;">');
+  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+Form1.App_TZ+'<br />');
+  MailBody.Add('Ref &raquo; '+Form1.App_OS_Short+'/'+Form1.App_Browser_short+'/'+Form1.App_IPAddress+'/'+Form1.App_Session+'<br />');
+  MailBody.Add('Res &raquo; '+Form1.App_Country+'/'+Form1.App_Region+'/'+Form1.App_City);
+  MailBody.Add('</pre></p>');
+
+  MailBody.Add('  </body>');
+  MailBody.Add('</html>');
+
+  RequestResponse := await(StringRequest('ISystemService.SendEMail',[
+    MailSubject,
+    MailBody.Text,
+    'ActionLog'
   ]));
 
   if RequestResponse = 'Sent' then
@@ -832,8 +877,8 @@ begin
   App_Short := 'Blaugment';
   App_URL := 'www.blaugment.com';
   App_URLLink := 'https://www.blaugment.com';
-  App_Version := '1.0';
-  App_Release := '2023-Jun-23';
+  App_Version := '1.0.1';
+  App_Release := '2023-Jul-12';
   App_APIKey := '{2DF239F0-8A9D-4531-9BC2-AB911CB40C4E}';
   App_Start := Now();
   App_Start_UTC := TTimeZone.Local.ToUniversalTime(Now);
@@ -2824,6 +2869,10 @@ end;
 procedure TForm1.btnChangeAccountEMailClick(Sender: TObject);
 var
   RequestResponse: String;
+  MailBody: TStringList;
+  MailFont: TStringList;
+  MailIcon: TStringList;
+
 begin
   // Change EMail
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
@@ -2835,28 +2884,71 @@ begin
   else labelChangeAccountEMail.ElementHandle.innerHTML := 'Sending...';
   asm await sleep(1000); end;
 
+  MailFont := TStringList.Create;
+  MailFont.LoadFromFile('fonts/cairo.woff.base64');
+  MailIcon := TStringList.Create;
+  MailIcon.LoadFromFile('icons/favicon-512x512.png.base64');
+
+  MailBody := TStringList.Create;
+  MailBody.Add('<!DOCTYPE html>');
+  MailBody.Add('<html lang="en">');
+  MailBody.Add('  <head>');
+  MailBody.Add('  <style>');
+// Alternatives to DataURI-supplied fonts.  Less success with these.  The current approach works great!
+//   MailBody.Add('  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">');
+//   MailBody.Add('    @import url("https://fonts.googleapis.com/css2?family=Cairo&display=swap");');
+//   MailBody.Add('      src: url(https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1PiKg.woff) format("woff");');
+  MailBody.Add('    @font-face {');
+  MailBody.Add('      font-family: "Cairo";');
+  MailBody.Add('      font-style: normal;');
+  MailBody.Add('      font-weight: 400;');
+  MailBody.Add('      src: url('+MailFont.Text+') format("woff");');
+  MailBody.Add('   }');
+  MailBody.Add('  </style>');
+  MailBody.Add('  </head>');
+  MailBody.Add('  <body>');
+
+  MailBody.Add('<div style="font-family: Cairo, Verdana, sans-serif; font-size: 16px; line-height: 1.2;">');
+
+    MailBody.Add('Hello!');
+    MailBody.Add('<p>A request was just made to change the <a href="'+App_URLLink+'">'+App_Short+'</a> e-mail address linked to the '+User_Account+' account.</p>');
+    MailBody.Add('<p>The current e-mail address for this account is <a href="mailto:'+User_EMail+'">'+User_EMail+'</a>.</p>');
+    MailBody.Add('<p>To confirm this request, please use the following Confirmation Code:</p>');
+    MailBody.Add('<p><br /><span style="font-size:20px; font-style:bold;padding-left: 20px;">{AUTHORIZATION_CODE}</span><br /><br /></p>');
+    MailBody.Add('<p>Additional information:<ul>');
+    MailBody.Add('<li>This code is only valid for 10 minutes.</li>');
+    MailBody.Add('<li>You can use Copy & Paste to enter this code.</li>');
+    MailBody.Add('<li>If you did not make this request, please disregard.</li>');
+    MailBody.Add('</ul></p><br />');
+
+    MailBody.Add('<div style="margin: 16px 0px 32px 0px; display: flex;">');
+      MailBody.Add('<div style="display: flex; justify-content: center; align-items: center; padding-top: 4px; width: 60px;">');
+        MailBody.Add('<a title="'+Form1.App_URL+'" href="'+Form1.App_URLLink+'">');
+          MailBody.Add('<img width="100%" src="'+MailIcon.Text+'">');
+        MailBody.Add('</a>');
+      MailBody.Add('</div>');
+      MailBody.Add('<div style="display: flex; align-items: start; justify-content: center; margin-left: 10px; flex-direction: column;">');
+        MailBody.Add('<div>Warmest Regards,</div>');
+        MailBody.Add('<div>The '+Form1.App_Short+' Concierge.</div>');
+        MailBody.Add('<div><a href="'+Form1.App_URLLink+'">'+Form1.App_URL+'</a></div>');
+      MailBody.Add('</div>');
+    MailBody.Add('</div>');
+  MailBody.Add('</div>');
+
+  MailBody.Add('<p><pre style="font-size:10px; line-height:70%;">');
+  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+Form1.App_TZ+'<br />');
+  MailBody.Add('Ref &raquo; '+Form1.App_OS_Short+'/'+Form1.App_Browser_short+'/'+Form1.App_IPAddress+'/'+Form1.App_Session+'<br />');
+  MailBody.Add('Res &raquo; '+Form1.App_Country+'/'+Form1.App_Region+'/'+Form1.App_City);
+  MailBody.Add('</pre></p>');
+
+  MailBody.Add('  </body>');
+  MailBody.Add('</html>');
+
   RequestResponse := await(StringRequest('ISystemService.SendConfirmationCode',[
     'Change EMail Address',
     editEMail.Text,
-    '[ '+App_Short+' ] E-Mail Change Confirmation Code: {AUTHORIZATION_CODE}',
-    '<p>Hello!</p>'+
-      '<p>A request was just made to change the <a href="'+App_URLLink+'">'+App_Short+'</a> e-mail address linked to the '+User_Account+' account.</p>'+
-      '<p>The current e-mail address for this account is <a href="mailto:'+User_EMail+'">'+User_EMail+'</a>.</p>'+
-      '<p>To confirm this request, please use the following Confirmation Code:</p>'+
-      '<p><br /><span style="font-size:20px; font-style:bold;padding-left: 20px;">{AUTHORIZATION_CODE}</span><br /><br /></p>'+
-      '<p>Additional information:<ul>'+
-        '<li>This code is only valid for 10 minutes.</li>'+
-        '<li>You can use Copy & Paste to enter this code.</li>'+
-        '<li>If you did not make this request, please disregard.</li>'+
-      '</ul></p><br />'+
-      '<p>Warmest Regards,<br >'+
-      'The '+App_Short+' Conciege<br >'+
-      '<a href="'+App_URLLink+'">'+App_URL+'</a><br /></p><br />'+
-      '<p><pre style="font-size:smallest;">'+
-        'Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+App_TZ+'<br />'+
-        'Ref &raquo; '+App_OS_Short+'/'+App_Browser_short+'/'+App_IPAddress+'/'+App_Session+'<br />'+
-        'Res &raquo; '+App_Country+'/'+App_Region+'/'+App_City+
-      '</pre></p>',
+    '['+App_Short+'/'+User_Account+'] E-Mail Change Confirmation Code: {AUTHORIZATION_CODE}',
+    MailBody.Text,
     App_Session,
     App_APIKey
   ]));
