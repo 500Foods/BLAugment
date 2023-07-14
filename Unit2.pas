@@ -48,6 +48,17 @@ type
     btnLogins1y: TWebButton;
     btnLoginsClose: TWebButton;
     memoChartRounding: TWebMemo;
+    btnLoginsCopyChart: TWebButton;
+    btnLoginsDownloadChart: TWebButton;
+    divLoginsDateChoices: TWebPanel;
+    divLoginsCalendar: TWebHTMLDiv;
+    btnLoginsPeriodBefore: TWebButton;
+    btnLoginsPeriod: TWebButton;
+    btnLoginsDateTime1: TWebButton;
+    divLoginsCalendarEdit1: TWebEdit;
+    btnLoginsDateTime2: TWebButton;
+    divLoginsCalendarEdit2: TWebEdit;
+    btnLoginsPeriodAfter: TWebButton;
     procedure WebFormCreate(Sender: TObject);
     [async] procedure SelectStatOption(OptionID: Integer);
     [async] procedure UpdateStatsNumbers;
@@ -64,10 +75,15 @@ type
     procedure btnLogins3moClick(Sender: TObject);
     procedure btnLogins1yClick(Sender: TObject);
     procedure CreateD3BarChart(Chart:TWebHTMLDiv; XData: String; YData: String);
-    procedure btnLoginsExportPrintClick(Sender: TObject);
-    procedure btnLoginsPrintClick(Sender: TObject);
+    [async] procedure btnLoginsExportPrintClick(Sender: TObject);
+    [async] procedure btnLoginsPrintClick(Sender: TObject);
     procedure btnLoginsCloseClick(Sender: TObject);
     [async] procedure btnLoginsEMailClick(Sender: TObject);
+    [async] procedure btnLoginsCopyChartClick(Sender: TObject);
+    [async] procedure btnLoginsDownloadChartClick(Sender: TObject);
+    procedure btnLoginsPeriodStartClick(Sender: TObject);
+    procedure btnLoginsDateTime1Click(Sender: TObject);
+    procedure btnLoginsDateTime2Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -82,6 +98,9 @@ type
 
     tabStatOptions: JSValue;
     tabLogins: JSValue;
+
+    dateLogins1: JSValue;
+    dateLogins2: JSValue;
 
     scrollLogins: JSValue;
 
@@ -269,6 +288,8 @@ begin
       }
     }
   end;
+
+  Form1.PreventCompilerHint(ChartRoundingCode);
 end;
 
 procedure TForm2.btnLogins15mClick(Sender: TObject);
@@ -282,6 +303,7 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins1dClick(Sender: TObject);
@@ -295,6 +317,7 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins1hrClick(Sender: TObject);
@@ -308,6 +331,7 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins1moClick(Sender: TObject);
@@ -321,6 +345,7 @@ begin
   btnLogins1mo.ElementHandle.classList.add('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins1yClick(Sender: TObject);
@@ -334,6 +359,7 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.add('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins3hrClick(Sender: TObject);
@@ -347,6 +373,7 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins3moClick(Sender: TObject);
@@ -360,6 +387,7 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.add('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLogins7dClick(Sender: TObject);
@@ -373,11 +401,85 @@ begin
   btnLogins1mo.ElementHandle.classList.remove('Selected');
   btnLogins3mo.ElementHandle.classList.remove('Selected');
   btnLogins1y.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.btnLoginsCloseClick(Sender: TObject);
 begin
   Form1.divStatisticsLabelClick(Sender);
+end;
+
+procedure TForm2.btnLoginsCopyChartClick(Sender: TObject);
+var
+  ChartName: String;
+begin
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+  if divLoginsChoices.Tag = 1
+  then ChartName := 'Chart-Users'
+  else ChartName := 'Chart-Logins';
+  ChartName := ChartName + '-'+StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll])+'.png';
+
+  Form1.LogAction('[ Copy Chart:  '+ChartName+']');
+
+  asm
+    var blob = await modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'));
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        [blob.type]: blob
+      })
+    ]);
+  end;
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
+end;
+
+procedure TForm2.btnLoginsDateTime1Click(Sender: TObject);
+begin
+  asm
+    divLoginsCalendarEdit1.style.setProperty('left',(btnLoginsDateTime1.getBoundingClientRect().x - divLoginsDateChoices.getBoundingClientRect().x - 10)+'px');
+    divLoginsCalendarEdit1.style.setProperty('top','10px');
+    divLoginsCalendarEdit1.click();
+  end;
+end;
+
+procedure TForm2.btnLoginsDateTime2Click(Sender: TObject);
+begin
+  asm
+    divLoginsCalendarEdit2.style.setProperty('left',(btnLoginsDateTime2.getBoundingClientRect().x - divLoginsDateChoices.getBoundingClientRect().x - 10)+'px');
+    divLoginsCalendarEdit2.style.setProperty('top','10px');
+    divLoginsCalendarEdit2.click();
+  end;
+end;
+
+procedure TForm2.btnLoginsDownloadChartClick(Sender: TObject);
+var
+  ChartName: String;
+begin
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
+  if divLoginsChoices.Tag = 1
+  then ChartName := 'Chart-Users'
+  else ChartName := 'Chart-Logins';
+  ChartName := ChartName + '-'+StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll])+'.png';
+
+  Form1.LogAction('[ Download Chart:  '+ChartName+']');
+
+  asm
+    var blob = await modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'));
+    var streamSaver = window.streamSaver;
+    const fileStream = streamSaver.createWriteStream(ChartName, {
+      size: blob.size // Makes the procentage visiable in the download
+    })
+    const readableStream = blob.stream()
+    window.writer = fileStream.getWriter()
+    const reader = readableStream.getReader()
+    const pump = () => reader.read()
+      .then(res => res.done
+            ? writer.close()
+            : writer.write(res.value).then(pump))
+    pump()
+  end;
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 procedure TForm2.btnLoginsEMailClick(Sender: TObject);
@@ -551,6 +653,13 @@ begin
   divLoginsChoices.Tag := 2;
   btnLoginsUniqueLogins.ElementHandle.classList.remove('Selected');
   btnLoginsLogins.ElementHandle.classList.add('Selected');
+  btnLoginsRefreshClick(Sender);
+end;
+
+procedure TForm2.btnLoginsPeriodStartClick(Sender: TObject);
+begin
+  divLoginsCalendar.ElementHandle.classList.replace('d-none','d-flex');
+
 end;
 
 procedure TForm2.btnLoginsPrintClick(Sender: TObject);
@@ -558,6 +667,7 @@ var
   PageHeader: String;
 
 begin
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
 
   PageHeader := Form1.App_Name+' / '+Form1.App_Version+' / '+Form1.User_Account+' / Chart / ';
 
@@ -570,15 +680,27 @@ begin
 
   Form1.LogAction('[ Print Chart: '+PageHeader+' ]');
 
+
   asm {
+    var MailImage = await modernScreenshot.domToPng(document.querySelector('#divLoginsChart'));
     printJS({
-      printable: 'divLoginsChart',
-      type: 'html',
+      printable: MailImage,
+      type: 'image',
       header: PageHeader,
       headerStyle: 'font-size: 14px; font-weight: bold; font-family: sans-serif;'
     });
   } end;
 
+//  asm {
+//    printJS({
+//      printable: 'divLoginsChart',
+//      type: 'html',
+//      header: PageHeader,
+//      headerStyle: 'font-size: 14px; font-weight: bold; font-family: sans-serif;'
+//    });
+//  } end;
+
+  btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 procedure TForm2.btnLoginsRefreshClick(Sender: TObject);
@@ -679,6 +801,7 @@ begin
   divLoginsChoices.Tag := 1;
   btnLoginsUniqueLogins.ElementHandle.classList.add('Selected');
   btnLoginsLogins.ElementHandle.classList.remove('Selected');
+  btnLoginsRefreshClick(Sender);
 end;
 
 procedure TForm2.SelectStatOption(OptionID: Integer);
@@ -817,6 +940,33 @@ begin
       This.tabLogins.selectRow([row]);
     });
 
+  end;
+
+  // Logins Calendar
+  asm
+    this.dateLogins1 = flatpickr('#divLoginsCalendarEdit1', {
+      weekNumbers: true,
+      enableTime: true,
+      enableSeconds: true,
+      time_24hr: true,
+      dateFormat: "Y-M-d (D) H:i:S",
+      onChange: function(selectedDates, dateStr, instance) {
+        btnLoginsDateTime1.innerHTML = '<div>'+dateStr+'</div>';
+        document.activeElement.blur()
+      }
+    });
+    this.dateLogins2 = flatpickr('#divLoginsCalendarEdit2', {
+      weekNumbers: true,
+      enableTime: true,
+      enableSeconds: true,
+      time_24hr: true,
+      dateFormat: "Y-M-d (D) H:i:S",
+      onChange: function(selectedDates, dateStr, instance) {
+        console.log(selectedDates);
+        btnLoginsDateTime2.innerHTML = '<div>'+dateStr+'</div>';
+        document.activeElement.blur()
+      }
+    });
   end;
 
   // Setup Simplebar Scrollbars

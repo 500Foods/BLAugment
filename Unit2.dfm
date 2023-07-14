@@ -58,7 +58,7 @@ object Form2: TForm2
           Left = 11
           Top = 32
           Width = 673
-          Height = 169
+          Height = 153
           ElementClassName = 'p-1 ChartHeader d-flex flex-row flex-wrap gap-1'
           ElementID = 'divLoginsHeader'
           HeightStyle = ssAuto
@@ -68,7 +68,7 @@ object Form2: TForm2
           Role = ''
           object divLoginsChoices: TWebPanel
             Tag = 1
-            Left = 170
+            Left = 257
             Top = 3
             Width = 114
             Height = 44
@@ -117,7 +117,7 @@ object Form2: TForm2
           end
           object divLoginsAggChoices: TWebPanel
             Tag = 1
-            Left = 3
+            Left = 12
             Top = 50
             Width = 374
             Height = 44
@@ -261,9 +261,9 @@ object Form2: TForm2
             end
           end
           object divLoginsControl: TWebHTMLDiv
-            Left = 3
+            Left = 12
             Top = 3
-            Width = 150
+            Width = 227
             Height = 44
             ElementClassName = 'd-flex flex-row gap-1'
             ElementID = 'divLoginsControl'
@@ -288,12 +288,12 @@ object Form2: TForm2
               OnClick = btnLoginsRefreshClick
             end
             object btnLoginsEMail: TWebButton
-              Left = 49
+              Left = 142
               Top = 1
               Width = 40
               Height = 40
               Caption = '<i class="fa-duotone fa-envelope fa-xl Swap"></i>'
-              ChildOrder = 1
+              ChildOrder = 3
               ElementClassName = 'btn btn-light ButtonUtility border-1'
               ElementID = 'btnLoginsEMail'
               ElementFont = efCSS
@@ -304,12 +304,12 @@ object Form2: TForm2
               OnClick = btnLoginsEMailClick
             end
             object btnLoginsPrint: TWebButton
-              Left = 95
+              Left = 184
               Top = 1
               Width = 40
               Height = 40
               Caption = '<i class="fa-duotone fa-print fa-xl Swap"></i>'
-              ChildOrder = 2
+              ChildOrder = 4
               ElementClassName = 'btn btn-light ButtonUtility border-1'
               ElementID = 'btnLoginsPrint'
               ElementFont = efCSS
@@ -319,10 +319,42 @@ object Form2: TForm2
               WidthPercent = 100.000000000000000000
               OnClick = btnLoginsPrintClick
             end
+            object btnLoginsCopyChart: TWebButton
+              Left = 49
+              Top = 1
+              Width = 40
+              Height = 40
+              Caption = '<i class="fa-duotone fa-copy fa-xl Swap"></i>'
+              ChildOrder = 1
+              ElementClassName = 'btn btn-light ButtonUtility border-1'
+              ElementID = 'btnLoginsCopyChart'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsCopyChartClick
+            end
+            object btnLoginsDownloadChart: TWebButton
+              Left = 95
+              Top = 1
+              Width = 40
+              Height = 40
+              Caption = '<i class="fa-duotone fa-download fa-xl Swap"></i>'
+              ChildOrder = 2
+              ElementClassName = 'btn btn-light ButtonUtility border-1'
+              ElementID = 'btnLoginsDownloadChart'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsDownloadChartClick
+            end
           end
           object btnLoginsClose: TWebButton
-            Left = 41
-            Top = 100
+            Left = 601
+            Top = 3
             Width = 50
             Height = 50
             Hint = 'Close Stats Window'
@@ -337,6 +369,127 @@ object Form2: TForm2
             WidthStyle = ssAuto
             WidthPercent = 100.000000000000000000
             OnClick = btnLoginsCloseClick
+          end
+          object divLoginsDateChoices: TWebPanel
+            Tag = 1
+            Left = 12
+            Top = 97
+            Width = 645
+            Height = 44
+            ElementClassName = 'DropShadow d-flex flex-row bg-none gap-0 p-0 m-0'
+            ElementID = 'divLoginsDateChoices'
+            HeightStyle = ssAuto
+            WidthStyle = ssAuto
+            ChildOrder = 3
+            ElementBodyClassName = 'btn btn-group btn-group-sm p-0 m-0'
+            ElementFont = efCSS
+            ElementPosition = epRelative
+            object btnLoginsDateTime2: TWebButton
+              Tag = 1
+              Left = 401
+              Top = 2
+              Width = 200
+              Height = 40
+              ChildOrder = 4
+              ElementClassName = 'order-4 btn btn-light ButtonUtilityGroup'
+              ElementID = 'btnLoginsDateTime2'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsDateTime2Click
+            end
+            object btnLoginsDateTime1: TWebButton
+              Tag = 1
+              Left = 167
+              Top = 2
+              Width = 200
+              Height = 40
+              ChildOrder = 2
+              ElementClassName = 'order-2 btn btn-light ButtonUtilityGroup '
+              ElementID = 'btnLoginsDateTime1'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLoginsDateTime1Click
+            end
+            object btnLoginsPeriodBefore: TWebButton
+              Left = 8
+              Top = 2
+              Width = 35
+              Height = 40
+              Caption = '<i class="fa-duotone fa-caret-left fa-xl Swap"></i>'
+              ChildOrder = 1
+              ElementClassName = 'order-0 btn btn-light ButtonUtilityGroup'
+              ElementID = 'btnLoginsPeriodBefore'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthPercent = 100.000000000000000000
+            end
+            object btnLoginsPeriod: TWebButton
+              Tag = 1
+              Left = 59
+              Top = 1
+              Width = 102
+              Height = 40
+              Caption = 'This Week'
+              ChildOrder = 6
+              ElementClassName = 'order-1 btn btn-light ButtonUtilityGroup Selected'
+              ElementID = 'btnLoginsPeriod'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+            end
+            object divLoginsCalendarEdit1: TWebEdit
+              Left = 197
+              Top = 7
+              Width = 50
+              Height = 30
+              Alignment = taCenter
+              ChildOrder = 3
+              ElementClassName = 'order-3 opacity-0 pe-none'
+              ElementID = 'divLoginsCalendarEdit1'
+              ElementFont = efCSS
+              HeightStyle = ssAuto
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+            end
+            object divLoginsCalendarEdit2: TWebEdit
+              Left = 408
+              Top = 7
+              Width = 50
+              Height = 30
+              Alignment = taCenter
+              AutoSelect = False
+              ChildOrder = 5
+              ElementClassName = 'order-5 opacity-0 pe-none'
+              ElementID = 'divLoginsCalendarEdit2'
+              ElementFont = efCSS
+              HeightStyle = ssAuto
+              HeightPercent = 100.000000000000000000
+              WidthStyle = ssAuto
+              WidthPercent = 100.000000000000000000
+            end
+            object btnLoginsPeriodAfter: TWebButton
+              Left = 607
+              Top = 2
+              Width = 35
+              Height = 40
+              Caption = '<i class="fa-duotone fa-caret-right fa-xl Swap"></i>'
+              ChildOrder = 6
+              ElementClassName = 'order-6 btn btn-light ButtonUtilityGroup'
+              ElementID = 'btnLoginsPeriodAfter'
+              ElementFont = efCSS
+              ElementPosition = epRelative
+              HeightPercent = 100.000000000000000000
+              WidthPercent = 100.000000000000000000
+              OnClick = btnLogins1yClick
+            end
           end
         end
         object divLoginsChart: TWebHTMLDiv
@@ -529,6 +682,17 @@ object Form2: TForm2
             ElementFont = efCSS
             Role = ''
           end
+        end
+        object divLoginsCalendar: TWebHTMLDiv
+          Left = 336
+          Top = 224
+          Width = 350
+          Height = 200
+          ElementClassName = 'd-none'
+          ElementID = 'divLoginsCalendar'
+          ChildOrder = 2
+          ElementFont = efCSS
+          Role = ''
         end
       end
       object pageSessions: TWebTabSheet

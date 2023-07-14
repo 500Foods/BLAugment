@@ -12,8 +12,8 @@ begin
             'FROM '+
             '  action_history '+
             'WHERE '+
-            '  ((log_start = 1) or (log_start = 2)) '+
-            '  and (session_start >= :SESSIONSTART); '
+//            '  ((log_start = 1) or (log_start = 2)) '+
+            '  (session_start >= :SESSIONSTART); '
            );
 
   end;

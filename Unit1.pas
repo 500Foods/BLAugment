@@ -690,7 +690,6 @@ end;
 procedure TForm1.btnActivityLogEMailClick(Sender: TObject);
 var
   RequestResponse: String;
-  LogStamp: String;
   MailSubject: String;
   MailBody: TStringList;
   MailFont: TStringList;
