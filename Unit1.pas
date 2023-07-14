@@ -854,14 +854,14 @@ begin
 
   // Default Theme
   Theme := TWebLocalStorage.GetValue('Theme');
-  if (Theme <> 'dark'  ) and
-     (Theme <> 'light' ) and
-     (Theme <> 'red'   ) then Theme := 'dark';
+  if (Theme <> 'Dark'  ) and
+     (Theme <> 'Light' ) and
+     (Theme <> 'Red'   ) then Theme := 'Dark';
   TWebLocalStorage.SetValue('Theme',Theme);
 
-  if      Theme = 'dark'  then btnThemeDark.ElementHandle.style.setProperty('opacity','1')
-  else if Theme = 'light' then btnThemeLight.ElementHandle.style.setProperty('opacity','1')
-  else if Theme = 'red'   then btnThemeRed.ElementHandle.style.setProperty('opacity','1');
+  if      Theme = 'Dark'  then btnThemeDark.ElementHandle.style.setProperty('opacity','1')
+  else if Theme = 'Light' then btnThemeLight.ElementHandle.style.setProperty('opacity','1')
+  else if Theme = 'Red'   then btnThemeRed.ElementHandle.style.setProperty('opacity','1');
 
   document.documentElement.setAttribute('theme', Theme);
   BootstrapTT := ' data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-custom-class="BLTooltip">';
@@ -999,6 +999,7 @@ begin
   LogAction(' -- App Started: '+FormatDateTime(App_LogDateTimeFormat, App_Start)+' '+App_TZ);
   LogAction(' -- App Started: '+FormatDateTime(App_LogDateTimeFormat, App_Start_UTC)+' UTC');
   LogAction(' -- App Session: '+App_Session);
+  LogAction(' -- App Theme: '+Theme);
   LogAction(' -- App IP Address: '+App_IPAddress);
   LogAction(' -- App Location: ');
   asm
@@ -3655,23 +3656,23 @@ begin
   HideToolTips;
 
   // Switch Themes - only 'dark' and 'light' for now
-  if Theme = 'dark' then
+  if Theme = 'Dark' then
   begin
     btnThemeDark.ElementHandle.style.setProperty('opacity','0');
     btnThemeRed.ElementHandle.style.setProperty('opacity','1');
-    Theme := 'red';
+    Theme := 'Red';
   end
-  else if Theme = 'red' then
+  else if Theme = 'Red' then
   begin
     btnThemeRed.ElementHandle.style.setProperty('opacity','0');
     btnThemeLight.ElementHandle.style.setProperty('opacity','1');
-    Theme := 'light';
+    Theme := 'Light';
   end
-  else if Theme = 'light' then
+  else if Theme = 'Light' then
   begin
     btnThemeLight.ElementHandle.style.setProperty('opacity','0');
     btnThemeDark.ElementHandle.style.setProperty('opacity','1');
-    Theme := 'dark';
+    Theme := 'Dark';
   end;
 
   // If Font Awesome Pro is not available, switch to the free version
@@ -3680,6 +3681,7 @@ begin
   // this sets the 'theme' attribute in the top-most <html> tag
   document.documentElement.setAttribute('theme', Theme);
   TWebLocalStorage.SetValue('Theme',Theme);
+  LogAction('[ Changed Theme: '+Theme+' ]');
 end;
 
 procedure TForm1.btnURLCancelClick(Sender: TObject);
@@ -4296,7 +4298,7 @@ begin
   divShade.ElementHandle.style.setProperty('opacity','0.0');
   divAccount.ElementHandle.style.setProperty('opacity','0.0');
 
-  asm await sleep(1000); end;
+  asm await sleep(500); end;
   divShade.Visible := False;
   divAccount.Visible := False;
   divAccount.ElementHandle.removeAttribute('data-x');

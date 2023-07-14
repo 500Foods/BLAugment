@@ -56,11 +56,11 @@ body {
   --fa-secondary-color: var(--bl-color-two);
 }
 
-html[theme="dark"] {
+html[theme="Dark"] {
   --bl-image: url(images/bookshelf_blue.jpg);
 }
 
-html[theme="light"] {
+html[theme="Light"] {
   --bl-color-one: silver;
   --bl-color-two: dimgray;
   --bl-color-three: #696969CC; /* dimgray @80% */
@@ -71,7 +71,7 @@ html[theme="light"] {
   --bl-opacity: 0.85;
 }
 
-html[theme="red"] {
+html[theme="Red"] {
   --bl-color-one: indianred;
   --bl-color-two: crimson;
   --bl-color-three: #DC143CCC; /* crimson @80% */
@@ -102,11 +102,11 @@ input:-webkit-autofill:focus {
   --bs-tooltip-bg: #003060;
   --bs-tooltip-color: var(--bl-color-one);
 }
-html[theme="light"] .BLTooltip {
+html[theme="Light"] .BLTooltip {
   --bs-tooltip-bg: #202020;
   --bs-tooltip-color: var(--bl-color-input);
 }
-html[theme="red"] .BLTooltip {
+html[theme="Red"] .BLTooltip {
   --bs-tooltip-bg: hotpink;
   --bs-tooltip-color: var(--bl-color-input);
 }
@@ -1049,7 +1049,7 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   -webkit-box-shadow: none;
   box-shadow: none;
   background: transparent;
-  border: 2px solid var(--bl-color-input);
+  border: 2px solid var(--bl-color-one);
   filter: var(--bl-shadow);
   line-height: 2.5;
 }
@@ -1130,6 +1130,9 @@ span.flatpickr-weekday {
 .flatpickr-months .flatpickr-prev-month > svg, .flatpickr-months .flatpickr-next-month > svg {
   width: 20px;
   height: 20px;
+}
+.flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--bl-color-two);
 }
 
 /* Time */

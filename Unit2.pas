@@ -422,14 +422,27 @@ begin
 
   Form1.LogAction('[ Copy Chart:  '+ChartName+']');
 
+  {$IFNDEF WIN32}
   asm
-    var blob = await modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'));
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        [blob.type]: blob
-      })
-    ]);
+    try {
+      const getChartPromise = async () => {
+        return await new modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'), {type:"image/png"});
+      }
+      await navigator.clipboard.write(
+        [new ClipboardItem({["image/png"]: getChartPromise() })]
+      )
+    }
+    catch {
+      var blob = await modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'));
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ]);
+    }
   end;
+  {$ENDIF}
+
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
@@ -437,7 +450,7 @@ procedure TForm2.btnLoginsDateTime1Click(Sender: TObject);
 begin
   asm
     divLoginsCalendarEdit1.style.setProperty('left',(btnLoginsDateTime1.getBoundingClientRect().x - divLoginsDateChoices.getBoundingClientRect().x - 10)+'px');
-    divLoginsCalendarEdit1.style.setProperty('top','10px');
+    divLoginsCalendarEdit1.style.setProperty('top','15px');
     divLoginsCalendarEdit1.click();
   end;
 end;
@@ -446,7 +459,7 @@ procedure TForm2.btnLoginsDateTime2Click(Sender: TObject);
 begin
   asm
     divLoginsCalendarEdit2.style.setProperty('left',(btnLoginsDateTime2.getBoundingClientRect().x - divLoginsDateChoices.getBoundingClientRect().x - 10)+'px');
-    divLoginsCalendarEdit2.style.setProperty('top','10px');
+    divLoginsCalendarEdit2.style.setProperty('top','15px');
     divLoginsCalendarEdit2.click();
   end;
 end;
@@ -947,9 +960,10 @@ begin
     this.dateLogins1 = flatpickr('#divLoginsCalendarEdit1', {
       weekNumbers: true,
       enableTime: true,
-      enableSeconds: true,
+      defaultHour: 0,
+      defaultMinute: 0,
       time_24hr: true,
-      dateFormat: "Y-M-d (D) H:i:S",
+      dateFormat: "Y-M-d (D) H:i",
       onChange: function(selectedDates, dateStr, instance) {
         btnLoginsDateTime1.innerHTML = '<div>'+dateStr+'</div>';
         document.activeElement.blur()
@@ -958,9 +972,10 @@ begin
     this.dateLogins2 = flatpickr('#divLoginsCalendarEdit2', {
       weekNumbers: true,
       enableTime: true,
-      enableSeconds: true,
+      defaultHour: 23,
+      defaultMinute: 59,
       time_24hr: true,
-      dateFormat: "Y-M-d (D) H:i:S",
+      dateFormat: "Y-M-d (D) H:i",
       onChange: function(selectedDates, dateStr, instance) {
         console.log(selectedDates);
         btnLoginsDateTime2.innerHTML = '<div>'+dateStr+'</div>';

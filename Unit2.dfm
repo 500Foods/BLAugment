@@ -387,8 +387,8 @@ object Form2: TForm2
             object btnLoginsDateTime2: TWebButton
               Tag = 1
               Left = 401
-              Top = 2
-              Width = 200
+              Top = 1
+              Width = 180
               Height = 40
               ChildOrder = 4
               ElementClassName = 'order-4 btn btn-light ButtonUtilityGroup'
@@ -403,7 +403,7 @@ object Form2: TForm2
               Tag = 1
               Left = 167
               Top = 2
-              Width = 200
+              Width = 180
               Height = 40
               ChildOrder = 2
               ElementClassName = 'order-2 btn btn-light ButtonUtilityGroup '
@@ -488,7 +488,6 @@ object Form2: TForm2
               ElementPosition = epRelative
               HeightPercent = 100.000000000000000000
               WidthPercent = 100.000000000000000000
-              OnClick = btnLogins1yClick
             end
           end
         end
