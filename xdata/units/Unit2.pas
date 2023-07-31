@@ -506,6 +506,8 @@ begin
   // Tables added for Blaugment project
   {$Include ddl\authcode\authcode.inc}
   Application.ProcessMessages;
+  {$Include ddl\period\period.inc}
+  Application.ProcessMessages;
 
 
   mmInfo.Lines.Add('Done.');

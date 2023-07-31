@@ -43,7 +43,7 @@ body {
   --bl-border: 2px solid var(--bl-color-one);
   --bl-border-thin: 1px solid var(--bl-color-one);
   --bl-radius: 8px;
-  --bl-opacity: 0.8;
+  --bl-opacity: 0.75;
   --bl-shadow: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black);
   --bl-shadow2: drop-shadow(0px 0px 1px black) drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 3px black) drop-shadow(0px 0px 4px black);
 
@@ -68,7 +68,7 @@ html[theme="Light"] {
   --bl-color-five: #69696920; /* dimgray @12.5% */
   --bl-color-input: white;
   --bl-image: url(images/bookshelf.jpg);
-  --bl-opacity: 0.85;
+  --bl-opacity: 0.75;
 }
 
 html[theme="Red"] {
@@ -79,7 +79,7 @@ html[theme="Red"] {
   --bl-color-five: #DC143C20; /* crimson @12.5% */
   --bl-color-input: lightpink;
   --bl-image: url(images/bookshelf_red.jpg);
-  --bl-opacity: 0.85;
+  --bl-opacity: 0.75;
 }
 
 
@@ -141,8 +141,9 @@ html[theme="Red"] .BLTooltip {
 
 
 /* used to hide layers of UI */
-#divShade {
-  z-index: 100;
+#divShade,
+#divShade2,
+#divShade3 {
   position: absolute;
   background: black;
   margin: 0px;
@@ -154,18 +155,14 @@ html[theme="Red"] .BLTooltip {
   opacity: 0;
   transition: opacity 0.5s;
 }
+#divShade1 {
+  z-index: 100;
+}
 #divShade2 {
   z-index: 200;
-  position: absolute;
-  background: black;
-  margin: 0px;
-  padding: 0px;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.5s;
+}
+#divShade3 {
+  z-index: 300;
 }
 
 
@@ -257,6 +254,30 @@ html[theme="Red"] .BLTooltip {
 }
 
 
+#divPeriods {
+  z-index: 301;
+  opacity: 0;
+  transition: opacity 0.5s;
+  top: 50% !important;
+  left: 50% !important;
+  height: 90% !important;
+  transform: translate(-50%, -50%);
+}
+#divPeriodsBG {
+  top: 34px;
+  height: calc(100% - 38px) !important;
+}
+#divPeriodsPresets {
+  top: 32px;
+  height: calc(100% - 38px) !important;
+  padding-right: 32px;
+}
+#divPeriodsPresets > div.simplebar-wrapper > div.simplebar-mask > div > div > div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 #divAccountLinksNav {
   top: -6px;
   position: Relative;
@@ -315,7 +336,7 @@ html[theme="Red"] .BLTooltip {
   border-top-right-radius: 6px;
 }
 #divStatOptions {
-  border-right: 2px solid var(--bl-color-four) !important;
+  border-right: var(--bl-border) !important;
   border-top-left-radius: 6px;
 }
 
@@ -389,8 +410,8 @@ button > svg > g > path {
   transition: opacity 0.4s !important;
 }
 .ButtonUtility {
-  --fa-primary-color: var(--bl-color-input);
-  color: var(--bl-color-input);
+  --fa-primary-color: var(--bl-color-one);
+  color: var(--bl-color-one);
   border: var(--bl-border);
   border-radius: var(--bl-radius);
   background: var(--bl-color-three);
@@ -402,10 +423,34 @@ button > svg > g > path {
   background: var(--bl-color-one);
   transition: background 0.4s !important;
 }
+.ButtonUtilitySM {
+  --fa-primary-color: var(--bl-color-one);
+  color: var(--bl-color-one);
+  border: 1px solid var(--bl-color-one);
+  border-radius: var(--bl-radius);
+  background: var(--bl-color-three);
+  padding: 4px 4px;
+  margin: 2px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.ButtonUtilitySM > div {
+  filter: var(--bl-shadow);
+}
+.ButtonUtilitySM:hover {
+  color: var(--bl-color-input);
+  background: var(--bl-color-one);
+  transition: background 0.4s !important;
+}
+.ButtonUtilitySM.Selected > div {
+  filter: none;
+  color: black;
+}
 .ButtonUtilityGroup {
   padding-left: 6px;
   padding-right: 8px;
   top: -1px !important;
+  min-height: 40px;
   border-color: var(--bl-color-one);
   color: var(--bl-color-one);
   --fa-primary-color: var(--bl-color-one);
@@ -468,7 +513,7 @@ button > svg > g > path {
   border: var(--bl-border);
   border-radius: var(--bl-radius);
   background: var(--bl-background);
-  opacity: 0.5;
+  opacity: 0.8;
   filter: var(--bl-shadow);
   pointer-events: none;
   transition: background 1s, border 1s;
@@ -479,7 +524,7 @@ button > svg > g > path {
   border-top-right-radius: var(--bl-radius);
   border-bottom: none;
   background: var(--bl-color-two);
-  opacity: 0.5;
+  opacity: 0.8;
   filter: var(--bl-shadow);
   pointer-events: none;
   transition: background 1s, border 1s;
@@ -490,7 +535,7 @@ button > svg > g > path {
   border: var(--bl-border);
   border-radius: var(--bl-radius);
   background: var(--bl-background);
-  opacity: 0.5;
+  opacity: 0.8;
   filter: var(--bl-shadow);
   pointer-events: none;
   transition: background 1s, border 1s;
@@ -562,20 +607,28 @@ button > svg > g > path {
 .ChartHeader {
   background: var(--bl-color-three);
   border-top-right-radius: 6px;
+  padding: 4px 40px 2px 6px !important;
 }
 .ChartFooter {
   background: var(--bl-color-three);
+  padding: 4px 0px 4px 6px !important
+}
+.ChartBorder {
+  border-top: var(--bl-border);
+  border-bottom: var(--bl-border);
+  min-height: 100px;
+  height: 100%;
+  width: 100%;
 }
 .Chart {
-  border-top: 2px solid var(--bl-color-four);
-  border-bottom: 2px solid var(--bl-color-four);
-  min-height: 150px;
+  min-height: 100px;
   height: 100%;
+  transition: opacity 300ms;
 }
 .ChartData {
-  border-top: 2px solid var(--bl-color-four);
+  border-top: var(--bl-border);
   margin-bottom: -2px;
-  min-height: 150px;
+  min-height: 100px;
   height: 100%;
   flex-basis: 0;
   flex-grow: 1;
@@ -838,19 +891,21 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   font-size: 14px;
   font-weight: normal;
   width: calc(100% - 32px) !important;
-  margin-top: -1px;
+  margin-top: -4px;
 }
 #divAccountRoles .tabulator-row.tabulator-group > div {
   filter: var(--bl-shadow);
 }
 #divAccountRoles .tabulator-row.tabulator-group {
-  border-bottom: 1px solid black;
+  border-top: var(--bl-border);
+  border-bottom: var(--bl-border);
   border-right: none;
-  border-top: 1px solid black;
   padding: 5px 5px 5px 10px;
   background: var(--bl-color-three) !important;
   font-weight: normal;
   min-width: 100%;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 #divSessions {
@@ -897,6 +952,35 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   font-size: 12px;
   min-Height: 150px;
   padding-right: 32px;
+}
+#btnLoginsClose {
+  right: 0px;
+  top: 0px !important;
+  left: unset !important;
+}
+
+#divPeriodsHolder {
+  border:none;
+  padding: 0px;
+  border: none;
+  font-family: Cairo !important;
+  font-size: 12px;
+  flex-basis: 100%;
+  font-weight: normal;
+  margin-left: 2px;
+}
+#ddivPeriodsHolder .tabulator-row.tabulator-group > div {
+  filter: var(--bl-shadow);
+}
+#divPeriodsHolder .tabulator-row.tabulator-group {
+  border-top: var(--bl-border);
+  border-bottom: var(--bl-border);
+  border-right: none;
+  padding: 5px 5px 5px 10px;
+  background: var(--bl-color-three) !important;
+  font-weight: normal;
+  min-width: 100%;
+  margin-bottom: 2px;
 }
 
 /* Adjustments for specific Tabulator columns */
@@ -960,7 +1044,7 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
             user-select: text;
 }
 
-
+                                                 f
 /* Customize Simplebar scrollbars */
 
 .simplebar-wrapper {
@@ -973,10 +1057,11 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   width: 32px !important;
   border-bottom-right-radius: 6px;
   margin-bottom: 2px;
+  border-left: var(--bl-border);
 }
 .simplebar-scrollbar::before {
   background: var(--bl-color-input);
-  width: 22px !important;
+  width: 20px !important;
   left: 5px !important;
   margin: 3px 0px 6px 0px !important;
 }
@@ -1011,7 +1096,16 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   border-top-right-radius: 6px;
 }
 
-
+#divPeriodsPresets > div.simplebar-track.simplebar-vertical {
+    cursor: ns-resize !important;
+    background: var(--bl-color-two);
+    opacity: 0.8;
+    width: 32px !important;
+    border-bottom-right-radius: 6px;
+    margin-bottom: 4px;
+    border-left: var(--bl-border);
+    border-top-right-radius: 6px;
+}
 
 /* FlatPicker */
 
@@ -1025,6 +1119,7 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   box-shadow: none;
   -webkit-box-shadow: none;
   background: var(--bl-color-three);
+  font-size: 10px;
 }
 .flatpickr-calendar.animate.open {
   -webkit-animation: none;
@@ -1044,6 +1139,8 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   color: var(--bl-color-one);
   filter: var(--bl-shadow);
   line-height: 2.7;
+  height: 29px;
+  border-radius: 50%;
 }
 .flatpickr-day.today {
   -webkit-box-shadow: none;
@@ -1061,6 +1158,7 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
   border: 3px solid var(--bl-color-two);
   filter: var(--bl-shadow);
   line-height: 2.3;
+  z-index: 1;
 }
 .flatpickr-day.flatpickr-disabled,
 .flatpickr-day.flatpickr-disabled:hover,
@@ -1071,6 +1169,9 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
 }
 .dayContainer {
   padding: 4px;
+  width: 225px;
+  min-width: 225px;
+  max-width: 225px;
 }
 
 /* Week Numbers */
@@ -1081,7 +1182,7 @@ div .tabulator-row.tabulator-group .tabulator-arrow {
 }
 div.flatpickr-weekwrapper span.flatpickr-day, div.flatpickr-weekwrapper span.flatpickr-day:hover {
   color: var(--bl-color-input);
-  line-height: 2.8;
+  line-height: 2.9;
   filter: none;
 }
 .flatpickr-weekwrapper .flatpickr-weeks {
@@ -1093,9 +1194,10 @@ div.flatpickr-weekwrapper span.flatpickr-day, div.flatpickr-weekwrapper span.fla
 }
 .flatpickr-weekwrapper .flatpickr-weekday {
   border-bottom: var(--bl-border-thin);
-  margin-top: -1px;
+  margin-top: 0px;
   color: white;
   filter: none;
+  line-height: 27px;
 }
 
 /* Top Section */
@@ -1113,7 +1215,7 @@ span.flatpickr-weekday {
   filter: var(--bl-shadow);
 }
 .flatpickr-months {
-  height: 40px;
+  height: 30px;
 }
 .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
   text-decoration: none;
@@ -1134,6 +1236,15 @@ span.flatpickr-weekday {
 .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg {
   fill: var(--bl-color-two);
 }
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    margin: 4px 0 0 0;
+    padding: 0 0 0 0;
+    width: 100px;
+}
+.flatpickr-current-month {
+    width: 80%;
+    left: 10%;
+}
 
 /* Time */
 .flatpickr-time {
@@ -1141,6 +1252,10 @@ span.flatpickr-weekday {
   position: relative;
   filter: var(--bl-shadow);
   color: white !important;
+  max-height: 30px;
+  border-bottom-left-radius: var(--bl-radius);
+  border-bottom-right-radius: var(--bl-radius);
+  overflow: hidden;
 }
 .flatpickr-calendar.hasTime .flatpickr-time {
   border-top: var(--bl-border-thin);
@@ -1153,6 +1268,42 @@ span.flatpickr-weekday {
 }
 .flatpickr-time input.flatpickr-hour {
   font-weight: normal;
+}
+.numInputWrapper input, .numInputWrapper span {
+  display: flex;
+}
+.flatpickr-time .numInputWrapper {
+    height: 30px;
+}
+
+/* Up/Down Time */
+.numInputWrapper span {
+  width: 30px;
+  padding: 0 4px 0 5px;
+  border: none;
+}
+.numInputWrapper span.arrowUp:after {
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bl-color-two);
+}
+.flatpickr-time .numInputWrapper span.arrowUp:after {
+  border-bottom-color: var(--bl-color-one);
+}
+.flatpickr-time .numInputWrapper span.arrowDown:after {
+  border-top-color: var(--bl-color-one);
+}
+.numInputWrapper span.arrowDown:after {
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--bl-color-two);
+  top: 40%;
+}
+.numInputWrapper span.arrowDown {
+  top: 35%;
+}
+.numInputWrapper span:hover {
+  filter: none;
 }
 
 

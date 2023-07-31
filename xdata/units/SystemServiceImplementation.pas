@@ -586,6 +586,19 @@ begin
   ResultArray := TJSONObject.ParseJSONValue(DBSupport.QueryToJSON(Query1)) as TJSONArray;
   ResultJSON.AddPair('Roles', ResultArray);
 
+  // Get Period information
+  try
+    {$Include sql\admin\period_past\period_past.inc}
+    Query1.Open;
+  except on E: Exception do
+    begin
+      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      raise EXDataHttpUnauthorized.Create('Internal Error: PP');
+    end;
+  end;
+  ResultArray := TJSONObject.ParseJSONValue(DBSupport.QueryToJSON(Query1)) as TJSONArray;
+  ResultJSON.AddPair('Periods', ResultArray);
+
   // Not sure if there is another version of this that is more direct?
   Result := TStringStream.Create(ResultJSON.ToString);
 

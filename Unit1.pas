@@ -318,10 +318,9 @@ type
     btnURLOK: TWebButton;
     btnURLCancel: TWebButton;
     divURLLabel: TWebHTMLDiv;
-    WebOpenDialog1: TWebOpenDialog;
     btnLinkInsert: TWebButton;
     divIconSearch: TWebHTMLDiv;
-    WebHTMLDiv10: TWebHTMLDiv;
+    divIconSearchBG: TWebHTMLDiv;
     btnIconCancel: TWebButton;
     editIconSearch: TWebEdit;
     divIconSearchLabel: TWebHTMLDiv;
@@ -345,12 +344,63 @@ type
     divStatisticsBG: TWebHTMLDiv;
     divStatisticsLabel: TWebHTMLDiv;
     divStatisticsHolder: TWebHTMLDiv;
+    divPeriods: TWebHTMLDiv;
+    divPeriodsBG: TWebHTMLDiv;
+    divPeriodsLabel: TWebHTMLDiv;
+    divPeriodsPresets: TWebHTMLDiv;
+    divPeriodsDay: TWebHTMLDiv;
+    btnPeriodD1: TWebButton;
+    btnPeriodD2: TWebButton;
+    btnPeriodD3: TWebButton;
+    divPeriodsWeek: TWebHTMLDiv;
+    btnPeriodW1: TWebButton;
+    btnPeriodW2: TWebButton;
+    btnPeriodW3: TWebButton;
+    divPeriodsMonth: TWebHTMLDiv;
+    btnPeriodM1: TWebButton;
+    btnPeriodM2: TWebButton;
+    btnPeriodM3: TWebButton;
+    divPeriodsYear: TWebHTMLDiv;
+    btnPeriodY1: TWebButton;
+    btnPeriodY2: TWebButton;
+    btnPeriodY3: TWebButton;
+    btnPeriodD5: TWebButton;
+    btnPeriodD6: TWebButton;
+    btnPeriodD7: TWebButton;
+    btnPeriodW5: TWebButton;
+    btnPeriodW6: TWebButton;
+    btnPeriodW7: TWebButton;
+    btnPeriodM5: TWebButton;
+    btnPeriodM6: TWebButton;
+    btnPeriodM7: TWebButton;
+    btnPeriodY5: TWebButton;
+    btnPeriodY6: TWebButton;
+    btnPeriodY7: TWebButton;
+    btnPeriodY4: TWebButton;
+    btnPeriodD4: TWebButton;
+    btnPeriodW4: TWebButton;
+    btnPeriodM4: TWebButton;
+    divPeriodsHolder: TWebHTMLDiv;
+    divShade3: TWebHTMLDiv;
+    divPeriodsQuarter: TWebHTMLDiv;
+    btnPeriodQ1: TWebButton;
+    btnPeriodQ2: TWebButton;
+    btnPeriodQ3: TWebButton;
+    btnPeriodQ5: TWebButton;
+    btnPeriodQ6: TWebButton;
+    btnPeriodQ7: TWebButton;
+    btnPeriodQ4: TWebButton;
+    btnPeriodY8: TWebButton;
+    btnPeriodD8: TWebButton;
+    btnPeriodW8: TWebButton;
+    btnPeriodM8: TWebButton;
+    btnPeriodQ8: TWebButton;
 
     procedure FinalRequest;
     procedure btnThemeDarkClick(Sender: TObject);
     [async] procedure WebFormCreate(Sender: TObject);
     procedure btnBlogClick(Sender: TObject);
-    procedure AddTT(Button: TWebButton);
+    procedure AddBootstrapTooltips;
     procedure btnSearchClick(Sender: TObject);
     procedure btnRegisterClick(Sender: TObject);
     procedure btnLoginClick(Sender: TObject);
@@ -415,7 +465,6 @@ type
     [async] procedure btnURLCancelClick(Sender: TObject);
     procedure btnURLOKClick(Sender: TObject);
     function GetFavIcon(FavURL: String): String;
-    procedure WebOpenDialog1GetFileAsBase64(Sender: TObject; AFileIndex: Integer; ABase64: string);
     [async] function AccountIsValid(acct: String):String;
     [async] function EMailIsValid(EMail: String):String;
     procedure btnLinkInsertClick(Sender: TObject);
@@ -433,16 +482,23 @@ type
     function CaptureState: JSValue;
     procedure RevertState(StateData: JSValue);
     [async] procedure divStatisticsLabelClick(Sender: TObject);
+    [async] procedure LoadIconSets;
+    procedure divShade3Click(Sender: TObject);
+    [async] procedure divPeriodsLabelClick(Sender: TObject);
+    procedure btnPeriodSelect(Sender: TObject);
+    procedure GeneratePeriods;
+    procedure SelectPeriodRow(Category, ShortName, LongName, PeriodStart, PeriodEnd, Adjustment: String);
 
   private
     { Private declarations }
 
   public
     { Public declarations }
-    Theme: String;        // Current Theme, eg: Dark, Red, Light
-    BootstrapTT: String;  // Bootstrap Tooltip HTML to add to icon classes
-    Server_URL: String;   // XData server
-    StatsForm: TWEbForm;  // Statistics - only loaded when needed
+    Theme: String;            // Current Theme, eg: Dark, Red, Light
+    BootstrapTT: String;      // Bootstrap Tooltip HTML to add to icon classes
+    Server_URL: String;       // XData server
+    StatsForm: TWEbForm;      // Statistics - only loaded when needed
+    MenusCollapsed: Boolean;  // Applies to all menus
 
     // These are used to handle the browser back button situation
     State: String;
@@ -511,6 +567,7 @@ type
     LinksDataBackup: JSValue;
     tabAccountSessions: JSValue;
     tabAccountRoles: JSValue;
+    tabPeriods: JSValue;
 
     // Simplebar References
     scrollAccountName: JSValue;
@@ -529,6 +586,7 @@ type
     scrollAccountLogout: JSValue;
     scrollIcons: JSValue;
     scrollSessions: JSValue;
+    scrollPeriods: JSValue;
 
     // Account Photo Pan/Zoom object
     pz: JSValue;
@@ -540,6 +598,12 @@ type
     IconSetCount: Array of Integer;  // How many icons in each set
     IconResults: Integer;            // How many total icons
     IconSelected: String;            // The selected Icon
+
+    Periods: JSValue;              // Periods table from server
+    PeriodArray: JSValue;          // Periods table for local values (this month, last month, etc.)
+    PeriodsGenerated: TDateTime;   // Indicates when the local values were last refreshed
+
+
 
     // Use these to help reduce compiler hints about....
     // ...Delphi variables used only in ASM blocks
@@ -561,35 +625,594 @@ uses Unit2;
 
 {$R *.dfm}
 
-procedure TForm1.WebOpenDialog1GetFileAsBase64(Sender: TObject; AFileIndex: Integer; ABase64: string);
+procedure TForm1.GeneratePeriods;
 var
-  ImageFile: String;
-  ImageType: String;
-  ImageData: String;
+  Period: Integer;
+  PeriodShort: String;
+  PeriodLong: String;
+  PeriodStart: TDateTime;
+  PeriodStartDisplay: String;
+  PeriodStartValue: String;
+  PeriodEnd: TDateTime;
+  PeriodEndDisplay: String;
+  PeriodEndValue: String;
+  PeriodAdjustment: String;
+
+  aYear: Word;
+  aMonth: Word;
+  aDay: Word;
+
+  bYear: Word;
+  bMonth: Word;
+  bDay: Word;
+  bHour: Word;
+  bMinute: Word;
+  bSecond: Word;
+  bMillisecond: Word;
+
+  procedure AddPeriod;
+  begin
+    PeriodStartDisplay := FormatDateTime('yyyy-mmm-dd (ddd) hh:nn', PeriodStart);
+    PeriodStartValue := FormatDateTime('yyyy-mm-dd hh:nn:ss', PeriodStart);
+    PeriodEndDisplay := FormatDateTime('yyyy-mmm-dd (ddd) hh:nn', PeriodEnd);
+    PeriodEndValue := FormatDateTime('yyyy-mm-dd hh:nn:ss', PeriodEnd);
+
+    {$IFNDEF WIN32} asm {
+      pas.Unit1.Form1.PeriodArray.push({
+        "id":Period,
+        "long_name": PeriodLong,
+        "short_name": PeriodShort,
+        "start_period" : PeriodStartValue,
+        "end_period": PeriodEndValue,
+        "start_period_display": PeriodStartDisplay,
+        "end_period_display": PeriodEndDisplay,
+        "adjustment": PeriodAdjustment,
+        "group": "local"
+      });
+    } end; {$ENDIF}
+  end;
 
 begin
-  // Figure out what kind of image we have
-  ImageFile := Lowercase(WebOpenDialog1.Files[AFileIndex].Name);
-  if Pos('jpg',  ImageFile) > 0 then ImageType := 'image/jpeg';
-  if Pos('jpeg', ImageFile) > 0 then ImageType := 'image/jpeg';
-  if Pos('png',  ImageFile) > 0 then ImageType := 'image/png';
-  if Pos('gif',  ImageFile) > 0 then ImageType := 'image/gif';
-  if Pos('bmp',  ImageFile) > 0 then ImageType := 'image/bmp';
-  if Pos('webp', ImageFile) > 0 then ImageType := 'image/webp';
-  if Pos('svg',  ImageFile) > 0 then ImageType := 'image/svg+xml';
-  if Pos('ico',  ImageFile) > 0 then ImageType := 'image/x-icon';
+  // These are generated and added to the period table so we don't have
+  // to do as much work to track them down later when trying to find a match
 
-  // Set Form variables
-  ImageData := '<img width="100%" src="data:'+ImageType+';base64,'+ABase64+'">';
+  // This is what we're populating - a JSON array
+  PeriodArray := nil;
+  {$IFNDEF WIN32} asm {
+    this.PeriodArray = [];
+  } end; {$ENDIF}
 
-  // Update interface
-  asm
-    divAccountPhoto.innerHTML = ImageData;
-    this.pz.reset();
+
+  // Make a note of when these were last updated
+  LogAction('Generating Periods (Last Generated: '+IntToStr(MinutesBetween(now, PeriodsGenerated))+'min ago)');
+  PeriodsGenerated := Now;
+
+
+  // Day Periods
+
+  // Today
+  Period := 11;
+  DecodeDate(Now, aYear, aMonth, aDay);
+  PeriodShort := 'Today';
+  PeriodLong := 'Today';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(aYear, aMonth, aDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'day';
+  AddPeriod;
+
+  // Yesterday
+  Period := 12;
+  DecodeDate(Now - 1, aYear, aMonth, aDay);
+  PeriodShort := FormatDateTime('ddd', Now - 1);
+  PeriodLong := FormatDateTime('dddd', Now - 1);
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(aYear, aMonth, aDay, 23, 59, 59, 999);
+  btnPeriodD2.Caption := '<div>'+PeriodShort+'</div>';
+  PeriodAdjustment := 'day';
+  AddPeriod;
+
+  // Previous Day
+  Period := 13;
+  DecodeDate(Now - 2, aYear, aMonth, aDay);
+  PeriodShort := FormatDateTime('ddd', Now - 2);
+  PeriodLong := FormatDateTime('dddd', Now - 2);
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(aYear, aMonth, aDay, 23, 59, 59, 999);
+  btnPeriodD3.Caption := '<div>'+PeriodShort+'</div>';
+  PeriodAdjustment := 'day';
+  AddPeriod;
+
+  // Last Dtd
+  Period := 14;
+  DecodeDate(Now - 1, aYear, aMonth, aday);
+  DecodeTime(Now, bHour, bMinute, bSecond, bMillisecond);
+  PeriodShort := 'Last DTD';
+  PeriodLong := 'Last DTD';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(aYear, aMonth, aDay, bHour, bMinute, bSecond, bMillisecond);
+  PeriodAdjustment := 'day';
+  AddPeriod;
+
+  // Past 1d
+  Period := 15;
+  DecodeDate(Now - 1, aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 1d';
+  PeriodLong := 'Past Day';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'day-start';
+  AddPeriod;
+
+  // Past 2d
+  Period := 16;
+  DecodeDate(Now - 2, aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 2d';
+  PeriodLong := 'Past 2 Days';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'day-start';
+  AddPeriod;
+
+  // Past 3d
+  Period := 17;
+  DecodeDate(Now - 3, aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 3d';
+  PeriodLong := 'Past 3 Days';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'day-start';
+  AddPeriod;
+
+  // Last 2wks Sun-Sat
+  Period := 18;
+  DecodeDate(Now - DayofWeek(Now) - 13, aYear, aMonth, aDay);
+  DecodeDate(Now - DayofWeek(Now), bYear, bMonth, bDay);
+  PeriodShort := 'Last 2w';
+  PeriodLong := 'Last 2 Weeks';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := '2week';
+  AddPeriod;
+
+
+
+  // Week Periods
+
+  // This Week
+  Period := 21;
+  DecodeDate(Now - DayofWeek(Now) + 1, aYear, aMonth, aDay);
+  DecodeDate(Now - DayofWeek(Now) + 7, bYear, bMonth, bDay);
+  PeriodShort := 'This Wk';
+  PeriodLong := 'This Week';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week';
+  AddPeriod;
+
+  // Last Week
+  Period := 22;
+  DecodeDate(Now - DayofWeek(Now) - 6, aYear, aMonth, aDay);
+  DecodeDate(Now - DayofWeek(Now), bYear, bMonth, bDay);
+  PeriodShort := 'Last Wk';
+  PeriodLong := 'Last Week';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week';
+  AddPeriod;
+
+  // Previous Week
+  Period := 23;
+  DecodeDate(Now - DayofWeek(Now) - 13, aYear, aMonth, aDay);
+  DecodeDate(Now - DayofWeek(Now) - 7, bYear, bMonth, bDay);
+  PeriodShort := 'Prev Wk';
+  PeriodLong := 'Previous Week';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week';
+  AddPeriod;
+
+  // Last Wtd
+  Period := 24;
+  DecodeDate(Now - DayofWeek(Now) - 6, aYear, aMonth, aDay);
+  DecodeDate(Now - 7, bYear, bMonth, bDay);
+  PeriodShort := 'Last WTD';
+  PeriodLong := 'Last WTD';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week';
+  AddPeriod;
+
+  // Past 1w
+  Period := 25;
+  DecodeDate(Now - 7, aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 1w';
+  PeriodLong := 'Past Week';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week-start';
+  AddPeriod;
+
+  // Past 2w
+  Period := 26;
+  DecodeDate(Now - 14, aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 2w';
+  PeriodLong := 'Past 2 Weeks';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week-start';
+  AddPeriod;
+
+  // Past 3w
+  Period := 27;
+  DecodeDate(Now - 21, aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 3w';
+  PeriodLong := 'Past 3 Weeks';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'week-start';
+  AddPeriod;
+
+  // Previous 2wks Sun-Sat
+  Period := 28;
+  DecodeDate(Now - DayofWeek(Now) - 27, aYear, aMonth, aDay);
+  DecodeDate(Now - DayofWeek(Now) - 14, bYear, bMonth, bDay);
+  PeriodShort := 'Prev 2w';
+  PeriodLong := 'Previous 2 Weeks';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := '2week';
+  AddPeriod;
+
+
+  // Month Periods
+
+  // This Month
+  Period := 31;
+  DecodeDate(Now, aYear, aMonth, aDay);
+  PeriodShort := FormatDateTime('mmm',Now);
+  PeriodLong := 'This Month';
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(PeriodStart,1) - 1, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'fullmonth';
+  AddPeriod;
+
+  // Last Month
+  Period := 32;
+  DecodeDate(IncMonth(Now,-1), aYear, aMonth, aDay);
+  PeriodShort := FormatDateTime('mmm',IncMonth(Now,-1));
+  PeriodLong := FormatDateTime('mmmm',IncMonth(Now,-1));
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(PeriodStart,1) -1, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  btnPeriodM2.Caption := '<div>'+PeriodShort+'</div>';
+  PeriodAdjustment := 'fullmonth';
+  AddPeriod;
+
+  // Prev Month
+  Period := 33;
+  DecodeDate(IncMonth(Now,-2), aYear, aMonth, aDay);
+  PeriodShort := FormatDateTime('mmm',IncMonth(Now,-2));
+  PeriodLong := FormatDateTime('mmmm',IncMonth(Now,-2));
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(PeriodStart,1) -1, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  btnPeriodM3.Caption := '<div>'+PeriodShort+'</div>';
+  PeriodAdjustment := 'fullmonth';
+  AddPeriod;
+
+  // Last Mtd
+  Period := 34;
+  DecodeDate(IncMonth(Now,-1), aYear, aMonth, aDay);
+  PeriodShort := 'Last MTD';
+  PeriodLong := 'Last MTD';
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(aYear, aMonth, aDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'month';
+  AddPeriod;
+
+  // Past 1 Month
+  Period := 35;
+  DecodeDate(IncMonth(Now, -1), aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 1mo';
+  PeriodLong := 'Past Month';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'month-start';
+  AddPeriod;
+
+  // Past 2 Month
+  Period := 36;
+  DecodeDate(IncMonth(Now, -2), aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 2mo';
+  PeriodLong := 'Past 2 Months';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'month-start';
+  AddPeriod;
+
+  // Past 3 Month
+  Period := 37;
+  DecodeDate(IncMonth(Now, -3), aYear, aMonth, aDay);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodShort := 'Past 3mo';
+  PeriodLong := 'Past 3 Months';
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'month-start';
+  AddPeriod;
+
+  // This Custom Period
+  Period := 38;
+  PeriodAdjustment := 'period';
+  PeriodStartDisplay := '';
+  PeriodEndDisplay := '';
+  {$IFNDEF WIN32} asm {
+    var This = pas.Unit1.Form1;
+    var found = 0;
+    if (This.Periods.length > 0) {
+      for (var i = 0; i < This.Periods.length; i++) {
+        if (This.Periods[i]['adjustment'] == 'period') {
+          found += 1;
+        }
+        if (found == 1) {
+          PeriodShort = This.Periods[i]['name_short'];
+          PeriodLong = This.Periods[i]['name_long'];
+          PeriodStartDisplay = this.Periods[i]['period_start'];
+          PeriodEndDisplay = this.Periods[i]['period_end'];
+        }
+      }
+    }
+  } end; {$ENDIF}
+  if (PeriodStartDisplay <> '') then
+  begin
+    PeriodStart := StrToDateTime(PeriodStartDisplay);
+    PeriodEnd := StrToDateTime(PeriodEndDisplay);
   end;
-  btnRotate.Tag := 0;
+  btnPeriodM8.Caption := '<div>'+PeriodShort+'</div>';
+  AddPeriod;
 
-  PreventCompilerHint(ImageData);
+
+  // Quarter Periods
+
+  // This Quarter
+  Period := 41;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) +1), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(PeriodStart,3) - 1, bYear, bMonth, bDay);
+  PeriodShort := 'This Q';
+  PeriodLong := 'This Quarter';
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'fullquarter';
+  AddPeriod;
+
+  // Last Quarter
+  Period := 42;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) -2), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(PeriodStart,3) - 1, bYear, bMonth, bDay);
+  PeriodShort := 'Last Q';
+  PeriodLong := 'Last Quarter';
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'fullquarter';
+  AddPeriod;
+
+  // This Quarter
+  Period := 43;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) -5), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(PeriodStart,3) - 1, bYear, bMonth, bDay);
+  PeriodShort := 'Prev Q';
+  PeriodLong := 'Previous Quarter';
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodAdjustment := 'fullquarter';
+  AddPeriod;
+
+  // Last Quarter-to-date
+  Period := 44;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) -2), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, 1, 0, 0, 0, 0);
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) +1), bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, 1, 0, 0, 0, 0);
+  DecodeDate(PeriodStart + (Trunc(Now) - PeriodEnd), bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Last QTD';
+  PeriodLong := 'Last QTD';
+  PeriodAdjustment := 'quarter';
+  AddPeriod;
+
+  // Past 1Q
+  Period := 45;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) -2), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Past 1Q';
+  PeriodLong := 'Past Quarter';
+  PeriodAdjustment := 'quarter-start';
+  AddPeriod;
+
+  // Past 2Q
+  Period := 46;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) -5), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Past 2Q';
+  PeriodLong := 'Past 2 Quarters';
+  PeriodAdjustment := 'quarter-start';
+  AddPeriod;
+
+  // Past 3Q
+  Period := 47;
+  DecodeDate(IncMonth(Now,-(MonthOfTheYear(Now) mod 3) -8), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Past 3Q';
+  PeriodLong := 'Past 3 Quarters';
+  PeriodAdjustment := 'quarter-start';
+  AddPeriod;
+
+  // Last CP
+  Period := 48;
+  PeriodAdjustment := 'period';
+  PeriodStartDisplay := '';
+  PeriodEndDisplay := '';
+  {$IFNDEF WIN32} asm {
+    var This = pas.Unit1.Form1;
+    var found = 0;
+    if (This.Periods.length > 0) {
+      for (var i = 0; i < This.Periods.length; i++) {
+        if (This.Periods[i]['adjustment'] == 'period') {
+          found += 1;
+        }
+        if (found == 2) {
+          PeriodShort = This.Periods[i]['name_short'];
+          PeriodLong = This.Periods[i]['name_long'];
+          PeriodStartDisplay = this.Periods[i]['period_start'];
+          PeriodEndDisplay = this.Periods[i]['period_end'];
+        }
+      }
+    }
+  } end; {$ENDIF}
+  if (PeriodStartDisplay <> '') then
+  begin
+    PeriodStart := StrToDateTime(PeriodStartDisplay);
+    PeriodEnd := StrToDateTime(PeriodEndDisplay);
+  end;
+  btnPeriodQ8.Caption := '<div>'+PeriodShort+'</div>';
+  AddPeriod;
+
+  // Year Periods
+
+  // This Year
+  Period := 51;
+  DecodeDate(Now, aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, 1, 1, 0, 0, 0, 0);
+  DecodeDate(IncYear(PeriodStart,1) -1, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'This Yr';
+  PeriodLong := 'This Year';
+  PeriodAdjustment := 'fullyear';
+  AddPeriod;
+
+  // Last Year
+  Period := 52;
+  DecodeDate(IncYear(Now,-1), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, 1, 1, 0, 0, 0, 0);
+  DecodeDate(IncYear(PeriodStart,1) -1, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := FormatDateTime('yyyy',PeriodStart);
+  PeriodLong := FormatDateTime('yyyy',PeriodStart);
+  btnPeriodY2.Caption := '<div>'+PeriodShort+'</div>';
+  PeriodAdjustment := 'fullyear';
+  AddPeriod;
+
+  // Previous Year
+  Period := 53;
+  DecodeDate(IncYear(Now,-2), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, 1, 1, 0, 0, 0, 0);
+  DecodeDate(IncYear(PeriodStart,1) -1, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := FormatDateTime('yyyy',PeriodStart);
+  PeriodLong := FormatDateTime('yyyy',PeriodStart);
+  btnPeriodY3.Caption := '<div>'+PeriodShort+'</div>';
+  PeriodAdjustment := 'fullyear';
+  AddPeriod;
+
+  // Last Year-to-date
+  Period := 54;
+  DecodeDate(IncYear(Now,-1), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, 1, 1, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, 1, 1, 0, 0, 0, 0);
+  DecodeDate(PeriodStart + (Trunc(Now) - PeriodEnd), bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Last YTD';
+  PeriodLong := 'Last YTD';
+  PeriodAdjustment := 'year';
+  AddPeriod;
+
+  // Past Year
+  Period := 55;
+  DecodeDate(IncYear(Now,-1), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, aDay, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Past 1y';
+  PeriodLong := 'Past Year';
+  PeriodAdjustment := 'year-start';
+  AddPeriod;
+
+  // Past 2 Years
+  Period := 56;
+  DecodeDate(IncYear(Now,-2), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, ADay, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Past 2y';
+  PeriodLong := 'Past 2 Years';
+  PeriodAdjustment := 'year-start';
+  AddPeriod;
+
+  // Past 3 Years
+  Period := 57;
+  DecodeDate(IncYear(Now,-3), aYear, aMonth, aDay);
+  PeriodStart := EncodeDateTime(aYear, aMonth, ADay, 0, 0, 0, 0);
+  DecodeDate(Now, bYear, bMonth, bDay);
+  PeriodEnd := EncodeDateTime(bYear, bMonth, bDay, 23, 59, 59, 999);
+  PeriodShort := 'Past 3y';
+  PeriodLong := 'Past 3 Years';
+  PeriodAdjustment := 'year-start';
+  AddPeriod;
+
+  // Previous CP
+  Period := 58;
+  PeriodAdjustment := 'period';
+  PeriodStartDisplay := '';
+  PeriodEndDisplay := '';
+  {$IFNDEF WIN32} asm {
+    var This = pas.Unit1.Form1;
+    var found = 0;
+    if (This.Periods.length > 0) {
+      for (var i = 0; i < This.Periods.length; i++) {
+        if (This.Periods[i]['adjustment'] == 'period') {
+          found += 1;
+        }
+        if (found == 3) {
+          PeriodShort = This.Periods[i]['name_short'];
+          PeriodLong = This.Periods[i]['name_long'];
+          PeriodStartDisplay = this.Periods[i]['period_start'];
+          PeriodEndDisplay = this.Periods[i]['period_end'];
+        }
+      }
+    }
+  } end; {$ENDIF}
+  if (PeriodStartDisplay <> '') then
+  begin
+    PeriodStart := StrToDateTime(PeriodStartDisplay);
+    PeriodEnd := StrToDateTime(PeriodEndDisplay);
+  end;
+  btnPeriodY8.Caption := '<div>'+PeriodShort+'</div>';
+  AddPeriod;
+
+  PreventcompilerHint(Period);
+  PreventCompilerHint(PeriodShort);
+  PreventCompilerHint(PeriodLong);
+  PreventCompilerHint(PeriodStartValue);
+  PreventCompilerHint(PeriodStartDisplay);
+  PreventCompilerHint(PeriodEndValue);
+  PreventCompilerHint(PeriodEndDisplay);
+  PreventcompilerHint(PeriodAdjustment);
 end;
 
 function TForm1.GetFavIcon(FavURL: String): String;
@@ -610,13 +1233,13 @@ begin
   end
   else
   begin
-    asm {
+    {$IFNDEF WIN32} asm {
       try {
         Domain = (new URL(FavURL).hostname.replace('www.',''));
       } catch {
         Domain = 'Missing';
       }
-    } end;
+    } end; {$ENDIF}
 
     if Domain = 'Missing' then
     begin
@@ -661,7 +1284,7 @@ end;
 
 procedure TForm1.HideToolTips;
 begin
-  asm
+  {$IFNDEF WIN32} asm {
     setTimeout(function() {
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
       tooltipTriggerList.forEach( (e) => e.setAttribute('data-bs-delay', '{"show": 1000, "hide": 100}'));
@@ -684,7 +1307,7 @@ begin
         }
       }
     },1250);
-  end;
+  } end; {$ENDIF}
 end;
 
 procedure TForm1.btnActivityLogEMailClick(Sender: TObject);
@@ -786,19 +1409,19 @@ begin
   PageHeader := PageHeader + btnSelectActivityLog.Caption;
   LogAction('[ Activity Log Printed: '+btnSelectActivityLog.Caption+' ]');
 
-  asm {
+  {$IFNDEF WIN32} asm {
     printJS({
       printable: 'divActionLog',
       type: 'html',
       header: PageHeader,
       headerStyle: 'font-size: 14px; font-weight: bold; font-family: sans-serif;'
     });
-  } end;
+  } end; {$ENDIF}
 end;
 
 procedure TForm1.UpdateAccountLinks;
 begin
-  asm
+  {$IFNDEF WIN32} asm {
     this.tabAccountOptions.getRow(3).getCell('Entries').setValue(this.tabAccountLinks.getDataCount().toLocaleString());
     divAuthorProfileLinks.innerHTML = '';
     for (var i = 1; i <= this.tabAccountLinks.getDataCount(); i++) {
@@ -839,8 +1462,8 @@ begin
         tab.selectRow(tab.getRowFromPosition(1));
       }
     }
+  } end; {$ENDIF}
 
-  end;
 end;
 
 procedure TForm1.WebFormCreate(Sender: TObject);
@@ -851,6 +1474,9 @@ var
   ConfigURL: String;
   ResponseString: String;
 begin
+  // This is used to ensure that StrToDateTime works
+  FormatSettings.ShortDateFormat := 'yyyy-mm-dd';
+  FormatSettings.LongTimeFormat := 'hh:nn:ss';
 
   // Default Theme
   Theme := TWebLocalStorage.GetValue('Theme');
@@ -868,6 +1494,13 @@ begin
 
   editSearch.ElementHandle.setAttribute('size','1');
 
+
+  // Global setting for whether menus are normal or collapsed
+  MenusCollapsed := False;
+  if TWebLocalStorage.getValue('MenusCollapsed') = 'True'
+  then MenusCollapsed := True;
+
+
   // If Font Awesome Pro is not available, switch to the free version
   // btnTheme.Caption := StringReplace(btnTheme.Caption,'fa-duotone','fa-solid',[]);
 
@@ -881,6 +1514,7 @@ begin
   App_APIKey := '{2DF239F0-8A9D-4531-9BC2-AB911CB40C4E}';
   App_Start := Now();
   App_Start_UTC := TTimeZone.Local.ToUniversalTime(Now);
+  PeriodsGenerated := Now;
 
   // MainForm Options
   Caption := App_Name;
@@ -889,10 +1523,10 @@ begin
   // Overide some locale options?
   FormatSettings.TimeSeparator := ':';
   FormatSettings.DateSeparator := '-';
-  asm
+  {$IFNDEF WIN32} asm {
     this.App_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
     this.App_TZOffset = new Date().getTimezoneOffset();
-  end;
+  } end; {$ENDIF}
 
   // These are intended for use with Delphi's FormatDateTime
   App_LogDateTimeFormat := 'yyyy-MM-dd HH:nn:ss.zzz';
@@ -903,14 +1537,14 @@ begin
   App_DisplayTimeFormat := 'HH:nn:ss';
 
   // These are intended for use with Luxon's toFormat
-  asm
+  {$IFNDEF WIN32} asm {
     window.LogDateTimeFormat = this.App_LogDateTimeFormat.replace('nn','mm');
     window.DisplayDateTimeFormat = this.App_DisplayDateTimeFormat.replace('nn','mm');
     window.LogDateFormat = this.App_LogDateFormat.replace('nn','mm');
     window.DisplayDateFormat = this.App_DisplayDateFormat.replace('nn','mm');
     window.LogTimeFormat = this.App_LogTimeFormat.replace('nn','mm');
     window.DisplayTimeFormat = this.App_DisplayTimeFormat.replace('nn','mm');
-  end;
+  } end; {$ENDIF}
 
   // JWT Handling
   JWT := '';
@@ -927,12 +1561,16 @@ begin
   User_id := 0;
   User_Roles := TStringList.Create;
 
+  // Page Control defaults
+  pcAccount.TabIndex := 0;
+  pcAccount.Visible := True;
+
   // Create an App Session key - just a custom Base48-encoded timestamp
   // https://github.com/marko-36/base29-shortener
   App_Session := '';
   i := DateTimeToUnix(App_Start_UTC)*1000+MillisecondOf(App_Start_UTC);
 
-  asm
+  {$IFNDEF WIN32} asm {
     // Encode Integer (eg: Unix Timestamp) into String
     const c = ['B','b','C','c','D','d','F','f','G','g','H','h','J','j','K','k','L','M','m','N','n','P','p','Q','q','R','r','S','s','T','t','V','W','w','X','x','Z','z','0','1','2','3','4','5','6','7','8','9'];
     var sLen = Math.floor(Math.log(i)/Math.log(c.length)) +1;
@@ -948,14 +1586,14 @@ begin
     //   i += c.indexOf(s.substring(ex,ex+1)) * Math.pow(c.length,s.length-1-ex);
     // }
     // return i
-  end;
+  } end; {$ENDIF}
 
   // Get some client information
   App_IPAddress := 'Not Defined';
   App_Location := 'Not Defined';
   App_Device := 'Not Defined';
   App_Browser := 'Not Defined';
-  asm
+  {$IFNDEF WIN32} asm {
     var ipdata = await fetch('https://ipapi.co/json/').then(function(response) {return response.json()});
     var uap = new UAParser().getResult();
     var browser = [];
@@ -982,14 +1620,14 @@ begin
     this.App_Location = JSON.stringify(locn);
     this.App_Device = JSON.stringify(uap.device);
     this.App_Browser = JSON.stringify(browser);
-  end;
+  } end; {$ENDIF}
 
   // Log what we're doing in the application
   ActionLog := TStringList.Create;
   ActionLog.Delimiter := chr(10);
   ActionLogCurrent := TStringList.Create;
   ActionLogCurrent.Delimiter := chr(10);
-  LogAction('============================================================');
+  LogAction('=====================================================================');
 
   // Application Details
   LogAction('Application Startup');
@@ -1002,7 +1640,8 @@ begin
   LogAction(' -- App Theme: '+Theme);
   LogAction(' -- App IP Address: '+App_IPAddress);
   LogAction(' -- App Location: ');
-  asm
+
+  {$IFNDEF WIN32} asm {
     var locn = JSON.parse(this.App_Location);
     this.LogAction(' ----- Country Code: '+locn[0]);
     this.LogAction(' ----- Country: '+locn[1]);
@@ -1011,9 +1650,11 @@ begin
     this.LogAction(' ----- Latitude: '+locn[4]);
     this.LogAction(' ----- Longitude: '+locn[5]);
     this.LogAction(' ----- Language: '+locn[6]);
-  end;
+  } end; {$ENDIF}
+
   LogAction(' -- App Device: ');
-  asm {
+
+  {$IFNDEF WIN32} asm {
     try {
       var dvc = JSON.parse(this.App_Device);
     } catch {
@@ -1022,9 +1663,11 @@ begin
     this.LogAction(' ----- Model: '+dvc.model);
     this.LogAction(' ----- Type: '+dvc.type);
     this.LogAction(' ----- Vendor: '+dvc.vendor);
-  } end;
+  } end; {$ENDIF}
+
   LogAction(' -- App Browser: ');
-  asm {
+
+  {$IFNDEF WIN32} asm {
     try {
       var brw = JSON.parse(this.App_Browser);
     } catch {
@@ -1036,15 +1679,19 @@ begin
     this.LogAction(' ----- Version: '+brw[3]);
     this.App_Browser_Short = brw[0];
     this.App_OS_Short = brw[2];
-  } end;
-  LogAction('============================================================');
+  } end; {$ENDIF}
+
+  LogAction('======================================================================');
   LogAction(' ');
 
   // Figure out what our server connection might be
   Server_URL := '';
 
   try
-    asm ConfigURL = window.location.origin+(window.location.pathname.split('/').slice(0,-1).join('/')+'/blaugment_configuration.json').replace('/\/\//g','/'); end;
+    {$IFNDEF WIN32} asm {
+      ConfigURL = window.location.origin+(window.location.pathname.split('/').slice(0,-1).join('/')+'/blaugment_configuration.json').replace('/\/\//g','/');
+    } end; {$ENDIF}
+
     LogAction('Loading Configuration:');
     LogAction(' -- '+ConfigURL);
     WebHTTPRequest1.URL := ConfigURL;
@@ -1068,7 +1715,7 @@ begin
   if (Server_URL = '') then
   begin
     Server_URL := 'http://localhost:44444/tms/xdata';
-     LogAction(' -- Configuration Missing');
+    LogAction(' -- Configuration Missing');
     LogAction('Server (Default):');
     LogAction(' -- '+Server_URL);
   end;
@@ -1078,121 +1725,68 @@ begin
   LogAction('Attempting Connection');
   await(XDataConnect);
   LogAction(' ');
+  await(LoadIconSets);
 
   // Load up Basic info from the server
   ResponseString := await(JSONRequest('ISystemService.Info',[App_TZ]));
-  asm
+  {$IFNDEF WIN32} asm {
     var data = JSON.parse(ResponseString);
+
     this.Roles = data['Roles'];
+    this.Periods = data['Periods'];
+
+    if (this.Roles == undefined) { this.Roles = [] }
+    if (this.Periods == undefined) { this.Periods = [] }
+
+    var rolecategories = this.Roles.reduce( (cat, o) => (cat[o.category] = (cat[o.category] || 0)+1, cat), {});
+    var periodcategories = this.Periods.reduce( (cat, o) => (cat[o.category] = (cat[o.category] || 0)+1, cat), {});
+
+    if (rolecategories == undefined) { rolecategories = {} };
+    if (periodcategories == undefined) { periodcategories = {} };
+
+    // Generate Periods
+    this.LogAction(' ');
+    this.GeneratePeriods();
 
     this.LogAction(' ')
-    this.LogAction('============================================================');
+    this.LogAction('======================================================================');
     this.LogAction(' -- Server Name: '+data['Application Name']);
     this.LogAction(' -- Server Version: '+data['Application Version']);
     this.LogAction(' -- Server Release: '+data['Application Release']);
     this.LogAction(' -- Server Release(UTC): '+data['Application Release (UTC)']);
     this.LogAction(' -- ');
-    this.LogAction(' -- Available Roles: '+this.Roles.length);
-    this.LogAction('============================================================');
+    this.LogAction(' -- Available Roles: '+Object.keys(rolecategories).length.toLocaleString()+' categories, '+this.Roles.length.toLocaleString()+' roles');
+    this.LogAction(' -- Available Periods: '+Object.keys(periodcategories).length.toLocaleString()+' categories, '+this.Periods.length.toLocaleString()+' periods ('+this.PeriodArray.length.toLocaleString()+' local)');
+    this.LogAction(' -- Available Icon Sets: '+this.IconSetList.length.toLocaleString()+' sets, '+this.IconResults.toLocaleString()+' icons');
+    this.LogAction('======================================================================');
     this.LogAction(' ')
-  end;
+  } end; {$ENDIF}
 
-// Configure buttons to use Bootstrap tooltips
-  AddTT(btnSearch);
-  AddTT(btnRegister);
-  AddTT(btnAdd);
-  AddTT(btnAccount);
-  AddTT(btnLogin);
-  AddTT(btnThemeDark);
 
-  AddTT(btnBlogArchitecture);
-  AddTT(btnBlogArt);
-  AddTT(btnBlogAuto);
-  AddTT(btnBlogAviation);
-  AddTT(btnBlogBeauty);
-  AddTT(btnBlogBoat);
-  AddTT(btnBlogBridges);
-  AddTT(btnBlogBusiness);
-  AddTT(btnBlogCats);
-  AddTT(btnBlogClimate);
-  AddTT(btnBlogCycling);
-  AddTT(btnBlogDesign);
-  AddTT(btnBlogDIY);
-  AddTT(btnBlogDogs);
-  AddTT(btnBlogEducation);
-  AddTT(btnBlogFashion);
-  AddTT(btnBlogFinance);
-  AddTT(btnBlogFitness);
-  AddTT(btnBlogFood);
-  AddTT(btnBlogGaming);
-  AddTT(btnBlogGardening);
-  AddTT(btnBlogGovernment);
-  AddTT(btnBlogHealth);
-  AddTT(btnBlogHealthcare);
-  AddTT(btnBlogIndustry);
-  AddTT(btnBlogInteriors);
-  AddTT(btnBlogInvesting);
-  AddTT(btnBlogJustice);
-  AddTT(btnBlogLifestyle);
-  AddTT(btnBlogMotorcycle);
-  AddTT(btnBlogMovies);
-  AddTT(btnBlogMusic);
-  AddTT(btnBlogNews);
-  AddTT(btnBlogParenting);
-  AddTT(btnBlogPeople);
-  AddTT(btnBlogPersonal);
-  AddTT(btnBlogPhotography);
-  AddTT(btnBlogPolitics);
-  AddTT(btnBlogReligion);
-  AddTT(btnBlogScience);
-  AddTT(btnBlogSpace);
-  AddTT(btnBlogSports);
-  AddTT(btnBlogTechnology);
-  AddTT(btnBlogTrain);
-  AddTT(btnBlogTravel);
-  AddTT(btnBlogWellness);
-  AddTT(btnBlogWriting);
 
-  AddTT(btnLinkInsert);
-  AddTT(btnLinkEdit);
-  AddTT(btnLinkDelete);
-  AddTT(btnLinkSave);
-  AddTT(btnLinkCancel);
+  // Configure bootstrap Tooltips - All <button> elements with a Hint assigned
+  AddBootstrapTooltips;
 
-  AddTT(btnLoginOK);
-  AddTT(btnLoginCancel);
-  AddTT(btnForgotUsername);
-  AddTT(btnForgotPassword);
 
-  AddTT(btnPhotoClear);
-  AddTT(btnPhotoURL);
-  AddTT(btnPhotoUpload);
-  AddTT(btnPhotoIcons);
-  AddTT(btnPhotoReset);
-  AddTT(btnPhotoSave);
-  AddTT(btnPhotoCancel);
-
-  AddTT(btnAccountClose);
-  AddTT(btnAccountRefresh);
-  AddTT(btnAccountChange);
-  AddTT(btnServerStats);
-
-  AddTT(btnActivityLogReload);
-  AddTT(btnActivityLogPrint);
-  AddTT(btnActivityLogEMail);
-  AddTT(btnActivityLogTimeZone);
-  AddTT(btnSelectActivityLog);
 
   // JavaScript Sleep Function
-  asm window.sleep = async function(msecs) {return new Promise((resolve) => setTimeout(resolve, msecs)); } end;
+  {$IFNDEF WIN32} asm {
+    window.sleep = async function(msecs) {
+      return new Promise((resolve) => setTimeout(resolve, msecs));
+    }
+  } end; {$ENDIF}
 
 
-  asm
+
+  // Make the page visibile
+  {$IFNDEF WIN32} asm {
     document.body.style.setProperty('opacity','1');
-  end;
+  } end; {$ENDIF}
+
+
 
   // Tabulator Defaults
-  asm
+  {$IFNDEF WIN32} asm {
     Tabulator.defaultOptions.layout = "fitColumns";
     Tabulator.defaultOptions.selectable = 1;
     Tabulator.defaultOptions.columnHeaderSortMulti = true,
@@ -1213,11 +1807,12 @@ begin
       headerSortStartingDir:"desc",
       headerSortTristate:true
     };
-  end;
+  } end; {$ENDIF}
+
 
 
   // Account Options
-  asm
+  {$IFNDEF WIN32} asm {
     var dataAO = [
       { ID:  0, Name: "Contact Info",    Entries: 0, Icon: "<i class='fa-duotone fa-fw fa-xl fa-cat Swap'></i>"           },
       { ID:  1, Name: "Set Password",    Entries: 0, Icon: "<i class='fa-duotone fa-fw fa-xl fa-shield-keyhole'></i>"     },
@@ -1261,16 +1856,35 @@ begin
       ]
     });
     this.tabAccountOptions.on('rowClick', function(e, row){
-      pas.Unit1.Form1.tabAccountOptions.selectRow([row]);
-      pas.Unit1.Form1.SelectAccountOption(row.getCell('ID').getValue());
+      var This = pas.Unit1.Form1;
+      This.tabAccountOptions.selectRow([row]);
+      This.SelectAccountOption(row.getCell('ID').getValue());
     });
-  end;
+    this.tabAccountOptions.on('rowDblClick', function(e, row){
+      var This = pas.Unit1.Form1;
+      This.tabAccountOptions.selectRow([row]);
+      This.SelectAccountOption(row.getCell('ID').getValue());
+      if (This.MenusCollapsed == true) {
+        This.MenusCollapsed = false;
+        localStorage.setItem('MenusCollapsed', 'False');
+        divAccountOptions.style.setProperty('width','150px');
+        pcAccount.style.setProperty('left', '152px','important');
+        pcAccount.style.setProperty('width','calc(100% - 2rem - 154px)', 'important');
+        divActivityLogHeader.style.setProperty('left','174px');
+      }
+      else {
+        This.MenusCollapsed = true;
+        localStorage.setItem('MenusCollapsed', 'True');
+        divAccountOptions.style.setProperty('width','40px');
+        pcAccount.style.setProperty('left', '42px','important');
+        pcAccount.style.setProperty('width','calc(100% - 2rem - 44px)', 'important');
+        divActivityLogHeader.style.setProperty('left','64px');
+      }
+    });
+  } end; {$ENDIF}
 
   // Account Login History
-  // NOTE: Using IFNDEF for this asm block primarily due to the try{}catch{} JavaScript
-  //       code that seems to be what throws the IDE into fits
-  {$IFNDEF WIN32}
-  asm
+  {$IFNDEF WIN32} asm {
     this.tabAccountHistory = new Tabulator("#divAccountHistory",{
       layout: "fitColumns",
       selectable: 1,
@@ -1428,11 +2042,10 @@ begin
     this.tabAccountHistory.on('rowClick', function(e, row){
       pas.Unit1.Form1.tabAccountHistory.selectRow([row]);
     });
-  end;
-  {$ENDIF}
+  } end; {$ENDIF}
 
   // Account links
-  asm
+  {$IFNDEF WIN32} asm {
     this.tabAccountLinks = new Tabulator("#divAccountLinks", {
       index: "ID",
       layout: "fitColumns",
@@ -1484,11 +2097,12 @@ begin
         This.LogAction('[ Edited Account Link: '+cell.getValue()+' ]');
       }
     });
-  end;
+  } end; {$ENDIF}
+
 
 
   // Account Session List
-  asm
+  {$IFNDEF WIN32} asm {
     this.tabAccountSessions = new Tabulator("#divSessionList", {
       layout: "fitColumns",
       selectable: 1,
@@ -1567,10 +2181,11 @@ begin
       This.ActivityLogChange(null);
       This.divSessionListLabelClick(null);
     });
-  end;
+  } end; {$ENDIF}
+
 
   // Account Roles
-  asm
+  {$IFNDEF WIN32} asm {
     this.tabAccountRoles = new Tabulator("#divAccountRoles", {
       index: "role_id",
       layout: "fitColumns",
@@ -1579,9 +2194,9 @@ begin
       groupBy: 'category',
       groupHeader:function(value, count, data, group){
         if (count == 1) {
-          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 16px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' item )</span>';
+          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 14px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' item )</span>';
         } else {
-          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 16px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' items )</span>';
+          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 14px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' items )</span>';
         }
       },
       columnDefaults:{
@@ -1602,11 +2217,69 @@ begin
     this.tabAccountRoles.on('rowClick', function(e, row){
       pas.Unit1.Form1.tabAccountRoles.selectRow([row]);
     });
-  end;
+  } end; {$ENDIF}
+
+
+  // Periods
+  {$IFNDEF WIN32} asm {
+    this.tabPeriods = new Tabulator("#divPeriodsHolder", {
+      layout: "fitColumns",
+      selectable: 1,
+      headerVisible: false,
+      groupBy: 'category',
+      groupStartOpen: false,
+      groupHeader:function(value, count, data, group){
+        if (count == 1) {
+          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 14px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' item )</span>';
+        } else {
+          return '<div style="color: var(--bl-color-input); display: inline-block; font-size: 14px; filter: var(--bl-shadow); padding-right: 15px;">'+value+'</div><span style="color: var(--bl-color-one); filter: var(--bl-shadow);">( ' + count + ' items )</span>';
+        }
+      },
+      columnDefaults:{
+        resizable: false
+      },
+      columns: [
+        { title: false, field: "", headerSort: false, width: 5, minWidth: 5, formatter: function(cell, formatterParams, onRendered) {return "";}},
+        { title: "category", field: "category", visible: false },
+        { title: "Name", field: "name_long" },
+        { title: "SName", field: "name_short", visible: false },
+        { title: "Starts", field: "period_start",
+            formatter: function(cell, formatterParams, onRendered) {
+              return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T')).toFormat('yyyy-MMM-dd');
+            }
+        },
+        { title: "Ends", field: "period_end",
+            formatter: function(cell, formatterParams, onRendered) {
+              return luxon.DateTime.fromISO(cell.getValue().split(' ').join('T')).toFormat('yyyy-MMM-dd');
+            }
+        },
+        { title: "Adjustment", field: "adjustment", visible: false },
+      ]
+    });
+    this.tabPeriods.on('tableBuilt', function() {
+      pas.Unit1.Form1.tabPeriods.setData(pas.Unit1.Form1.Periods);
+    });
+    this.tabPeriods.on('rowClick', function(e, row){
+      pas.Unit1.Form1.tabPeriods.selectRow([row]);
+    });
+    this.tabPeriods.on('rowDblClick', function(e, row){
+      var This = pas.Unit1.Form1;
+      var Tab = This.tabPeriods;
+      Tab.selectRow([row]);
+      This.SelectPeriodRow(
+        row.getCell('category').getValue(),
+        row.getCell('name_short').getValue(),
+        row.getCell('name_long').getValue(),
+        row.getCell('period_start').getValue(),
+        row.getCell('period_end').getValue(),
+        row.getCell('adjustment').getValue()
+      );
+    });
+  } end; {$ENDIF}
 
 
   // This is used to adjust the size and position of "windows"
-  asm
+  {$IFNDEF WIN32} asm {
     interact('.resize-drag')
       .resizable({
         edges: { left: true, right: true, bottom: true, top: true },
@@ -1747,10 +2420,10 @@ begin
       target.setAttribute('data-y', y)
     };
     window.dragMoveListener = dragMoveListener
-  end;
+  } end; {$ENDIF}
 
   // Enable Simplebar on Options pages
-  asm
+  {$IFNDEF WIN32} asm {
     this.scrollAccountName       = new SimpleBar(document.getElementById('pageAccountName'        ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountPassword   = new SimpleBar(document.getElementById('pageAccountPassword'    ), { forceVisible: 'y', autoHide: false });
     this.scrollAccountAuthor     = new SimpleBar(document.getElementById('pageAccountAuthor'      ), { forceVisible: 'y', autoHide: false });
@@ -1767,6 +2440,7 @@ begin
     this.scrollAccountLogout     = new SimpleBar(document.getElementById('pageAccountLogout'      ), { forceVisible: 'y', autoHide: false });
     this.scrollIcons             = new SimpleBar(document.getElementById('divIconSearchResults'   ), { forceVisible: 'y', autoHide: false });
     this.scrollSessions          = new SimpleBar(document.getElementById('divSessionListHolder'   ), { forceVisible: 'y', autoHide: false });
+    this.scrollPeriods           = new SimpleBar(document.getElementById('divPeriodsPresets'      ), { forceVisible: 'y', autoHide: false });
 
     // Fix tabulator headers to top
 
@@ -1784,10 +2458,12 @@ begin
         + 'px');
     }, {capture: true, passive: true});
 
-  end;
+  } end; {$ENDIF}
+
+
 
   // This loads up pan/zoom functionality
-  asm
+  {$IFNDEF WIN32} asm {
     this.pz = Panzoom(divAccountPhoto, {
       animate: true,
       cursor: 'all-scroll',
@@ -1800,12 +2476,12 @@ begin
     divAccountPhoto.addEventListener('panzoomchange', (event) => {
       pas.Unit1.Form1.PhotoChanged();
     });
-  end;
-
+  } end; {$ENDIF}
 
 
 
   // Autologin if possible
+  LoggedIn := False;
   if (TWebLocalStorage.GetValue('Login.Expiry') <> '') then
   begin
     JWT_Expiry := StrToFloat(TWebLocalStorage.GetValue('Login.Expiry'));
@@ -1830,24 +2506,32 @@ begin
       LogAction(' ');
 
       await(tmrJWTRenewalTimer(Sender));
-
-
     end
     else
     begin
-      LoggedIn := False;
+      LogAction('Automatic Login Skipped: Login Token Expired');
+      LogAction(' ');
     end;
+  end
+  else
+  begin
+    LogAction('Automatic Login Skipped: No Login Token Found');
+    LogAction(' ');
   end;
 
+
+
   // AutoLogout if possible - what to do if the browser closes unexpectedly
-  asm
+  {$IFNDEF WIN32} asm {
     window.addEventListener('beforeunload', async function (e) {
       pas.Unit1.Form1.FinalRequest();
     });
-  end;
+  } end; {$ENDIF}
+
+
 
   // Disable edit scrolling
-  asm
+  {$IFNDEF WIN32} asm {
     document.querySelectorAll('.Edit').forEach(function(item){
       item.addEventListener('wheel', preventScroll, {passive: false});
     });
@@ -1856,10 +2540,12 @@ begin
       e.target.parentElement.parentElement.parentElement.scrollTop += e.deltaY;
       return false;
     }
-  end;
+  } end; {$ENDIF}
+
+
 
   // TWebMemo auto resizing
-  asm
+  {$IFNDEF WIN32} asm {
     // https://stephanwagner.me/auto-resizing-textarea-with-vanilla-javascript
     function addAutoResize() {
       document.querySelectorAll('[data-autoresize]').forEach(function (element) {
@@ -1877,14 +2563,13 @@ begin
     memoAuthorDescription.setAttribute('data-autoresize','');
     memoAuthorDescription.setAttribute('rows','1');
     memoAuthorDescription.setAttribute('maxlength','5000');
-
     addAutoResize();
-  end;
+  } end; {$ENDIF}
 
 
 
   // Icon Selection
-  asm
+  {$IFNDEF WIN32} asm {
     divIconSearchResultsInner.addEventListener('click', (e) => {
 
       // Remove current highlight
@@ -1913,11 +2598,12 @@ begin
           '</div>';
       }
     });
-  end;
+  } end; {$ENDIF}
+
 
 
   // Image Selecttion
-  asm
+  {$IFNDEF WIN32} asm {
     var SquareImage = 1024; // This is our working image size
 
     function getBase64Image(img, width, height) {
@@ -1979,7 +2665,8 @@ begin
      // Resets, so the same file can be loaded again if necessary
      fileinput.value = '';
     }
-  end;
+  } end; {$ENDIF}
+
 
 
   // Set our current state as the state we want to go back to
@@ -1992,11 +2679,13 @@ begin
   window.history.pushState(CaptureState, '', StateURL);
 
   // What to do when we hit back/forward button
-  asm
+  {$IFNDEF WIN32} asm {
     window.addEventListener('popstate', function(popstateEvent)  {
       pas.Unit1.Form1.RevertState(popstateEvent.state);
     });
-  end;
+  } end; {$ENDIF}
+
+
 
   HideTooltips;
   PreventCompilerHint(i);
@@ -2025,16 +2714,18 @@ begin
       Response := await(ClientConn.RawInvokeAsync(Endpoint, Params));
 
       Blob := Response.Result;
-      asm Result = await Blob.text(); end;
+      {$IFNDEF WIN32} asm {
+        Result = await Blob.text();
+      } end; {$ENDIF}
 
     except on E: Exception do
       begin
         // Get the error message we created in XData
-        asm {
+        {$IFNDEF WIN32} asm {
           var ErrorDetail = JSON.parse( await E.FErrorResult.FResponse.$o.FXhr.response.text() );
           ErrorCode = ErrorDetail.error.code;
           ErrorMessage = ErrorDetail.error.message;
-        } end;
+        } end; {$ENDIF}
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('ERROR: Request Exception Received From '+Endpoint);
@@ -2108,7 +2799,7 @@ begin
     except on E: Exception do
       begin
         // Get the error message we created in XData
-        asm {
+        {$IFNDEF WIN32} asm {
           try {
             var ErrorDetail = JSON.parse(await E.FErrorResult.FResponse.$o.FXhr.responseText );
             ErrorCode = ErrorDetail.error.code;
@@ -2118,7 +2809,7 @@ begin
             ErrorCode = 'Configuration Error';
             ErrorMessage = 'Endpoint Call Failed';
           }
-        } end;
+        } end; {$ENDIF}
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('ERROR: Request Exception Received From '+Endpoint);
@@ -2168,10 +2859,10 @@ begin
     else await(JSONRequest('ISystemService.Logout',[App_Session, FinalLog]));
 
     // Hide the page, remove the history
-    asm
+    {$IFNDEF WIN32} asm {
       window.history.replaceState(null,null,window.location.href.split('#')[0]);
       document.body.style.setProperty('opacity','0');
-    end;
+    } end; {$ENDIF}
 
     // This effectively ends the current session
     JWT := '';
@@ -2235,6 +2926,53 @@ end;
 procedure TForm1.XDataConnRequest(Args: TXDataWebConnectionRequest);
 begin
   Args.Request.Headers.SetValue('Authorization', JWT);
+end;
+
+procedure TForm1.LoadIconSets;
+var
+  i: Integer;
+  count: integer;
+  ResponseString: String;
+begin
+  // This intializes the custom icon editor to use the "remote" approach.
+  if IconSetsLoaded = False then
+  begin
+    ResponseString := await(JSONRequest('ISystemService.AvailableIconSets',[]));
+    {$IFNDEF WIN32} asm {
+      this.IconSets = [];
+      this.IconSetNames = [];
+      this.IconSetCount = [];
+
+      // Load up our Local icon sets
+      this.IconSetList = JSON.parse(ResponseString);
+
+      // Original list is soprted by filename.  Lets sort it by library name instead (case-insensitive)
+      this.IconSetList = this.IconSetList.sort((a, b) => {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) {
+          return -1;
+        }
+      });
+
+      // Get count data from this list
+      for (var i = 0; i < this.IconSetList.length; i++) {
+        var iconcount = this.IconSetList[i].count
+        this.IconSetNames.push(this.IconSetList[i].name+': '+iconcount+' icons');
+        this.IconSetCount.push(iconcount);
+      };
+    } end; {$ENDIF}
+
+    // Populate the listLibraries control
+    count := 0;
+    for i := 0 to Length(IconsetNames)-1 do
+    begin
+      count := count + IconSetCount[i];
+    end;
+    editIconSearch.TextHint := 'Search '+FloatToStrF(count,ffNumber,5,0)+' icons';
+    IconSetsLoaded := True;
+    IconResults := count;
+  end;
+
+  PreventCompilerHint(ResponseString);
 end;
 
 procedure TForm1.LogAction(Action: String);
@@ -2304,16 +3042,18 @@ begin
       ]));
 
       Blob := Response.Result;
-      asm NewJWT = await Blob.text(); end;
+      {$IFNDEF WIN32} asm {
+        NewJWT = await Blob.text();
+      } end; {$ENDIF}
 
     except on E: Exception do
       begin
         // Get the error message we created in XData
-        asm {
+        {$IFNDEF WIN32} asm {
           var ErrorDetail = JSON.parse( await E.FErrorResult.FResponse.$o.FXhr.response.text() );
           ErrorCode = ErrorDetail.error.code;
           ErrorMessage = ErrorDetail.error.message;
-        } end;
+        } end; {$ENDIF}
 
         // Log the error, but leave out the URI (because it includes the password)
         LogAction('Login Exception:');
@@ -2398,7 +3138,9 @@ begin
   i := 0;
   while i < User_Roles.Count do
   begin
-    asm this.LogAction(' ----- ' + i.toString().padStart(3,' ') + ': ' + this.Roles.find(x => x.role_id == i).category + ' / ' + this.Roles.find(x => x.role_id == i).name ); end;
+    {$IFNDEF WIN32} asm {
+      this.LogAction(' ----- ' + i.toString().padStart(3,' ') + ': ' + this.Roles.find(x => x.role_id == i).category + ' / ' + this.Roles.find(x => x.role_id == i).name );
+    } end; {$ENDIF}
     i := i + 1;
   end;
 
@@ -2419,13 +3161,13 @@ procedure TForm1.RevertState(StateData: JSValue);
 var
   PriorState: String;
 begin
-  asm
+  {$IFNDEF WIN32} asm {
     if (StateData !== null) {
       this.StatePosition = StateData.StatePosition;
       this.StateURL = StateData.StateURL;
       PriorState = StateData.CurrentState
     }
-  end;
+  } end; {$ENDIF}
 
   // Disable Back button
   if StatePosition <= StartPosition then
@@ -2444,6 +3186,7 @@ begin
         else if State = 'URL'        then btnURLCancelClick(nil)
         else if State = 'Login'      then btnLOginCancelClick(nil)
         else if State = 'Icon'       then btnIconCancelClick(nil)
+        else if State = 'Periods'    then divPeriodsLabelClick(nil)
         else console.log('Unexpected State: '+State);
     end;
   end;
@@ -2460,17 +3203,32 @@ begin
   if (pcAccount.TabIndex <> OptionID) then
   begin
     pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','0');
-    asm await sleep(200); end;
+    {$IFNDEF WIN32} asm { await sleep(200); } end; {$ENDIF}
   end;
 
   pcAccount.TabIndex := OptionID;
   pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
   LogAction('[ Account Settings: '+StringReplace(pcAccount.ActivePage.Name,'pageAccount','',[])+' ]');
 
+  {$IFNDEF WIN32} asm {
+    if (this.MenusCollapsed == true) {
+      divAccountOptions.style.setProperty('width','40px');
+      pcAccount.style.setProperty('left', '42px','important');
+      pcAccount.style.setProperty('width','calc(100% - 2rem - 44px)', 'important');
+      divActivityLogHeader.style.setProperty('left','64px');
+    }
+    else {
+      divAccountOptions.style.setProperty('width','150px');
+      pcAccount.style.setProperty('left', '152px','important');
+      pcAccount.style.setProperty('width','calc(100% - 2rem - 154px)', 'important');
+      divActivityLogHeader.style.setProperty('left','174px');
+    }
+  } end; {$ENDIF}
+
   if pcAccount.ActivePage.Name = 'pageAccountName' then
   begin
     editAccountName.SetFocus;
-    editEMailChange(nil);
+//    editEMailChange(nil);
     labelFirstName.SetFocus;
   end
   else if (pcAccount.ActivePage.Name = 'pageAccountPassword') then
@@ -2484,12 +3242,12 @@ begin
   end
   else if pcAccount.ActivePage.Name = 'pageAccountHistory' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       pas.Unit1.Form1.tabAccountHistory.redraw(true);
       divAccountHistory.firstElementChild.style.setProperty('position','absolute');
       divAccountHistory.firstElementChild.style.setProperty('z-index', '10');
       divAccountHistory.firstElementChild.style.setProperty('top', '0px');
-    end;
+    } end; {$ENDIF}
   end
   else if pcAccount.ActivePage.Name = 'pageAccountActivity' then
   begin
@@ -2498,17 +3256,36 @@ begin
   end
   else if pcAccount.ActivePage.Name = 'pageAccountAuthor' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       pas.Unit1.Form1.tabAccountLinks.redraw(true);
       memoAuthorDescription.dispatchEvent(new Event('input'));
-    end;
+    } end; {$ENDIF}
   end
   else if pcAccount.ActivePage.Name = 'pageAccountRoles' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       pas.Unit1.Form1.tabAccountRoles.redraw(true);
-    end
+    } end; {$ENDIF}
   end;
+end;
+
+procedure TForm1.SelectPeriodRow(Category, ShortName, LongName,  PeriodStart, PeriodEnd, Adjustment: String);
+begin
+  // Status - Logins
+  if (divPeriods.Tag = 0) and (ShortName <> '') then
+  begin
+    {$IFNDEF WIN32} asm {
+      var That = pas.Unit1.Form1.StatsForm;
+      That.dateLoginsAdjustment = Adjustment;
+      That.btnLoginsPeriod.GetElementHandle().innerHTML = LongName;
+      That.ModuleInit = true;
+      That.dateLogins1.setDate(PeriodStart, true, 'Y-m-d H:i:s');
+      That.ModuleInit = false;
+      That.dateLogins2.setDate(PeriodEnd, true, 'Y-m-d H:i:s');
+    } end; {$ENDIF}
+  end;
+
+  divPeriodsLabelClick(nil);
 end;
 
 procedure TForm1.tmrJWTRenewalTimer(Sender: TObject);
@@ -2572,7 +3349,7 @@ begin
     TWebLocalStorage.SetValue('Login.PasswordHash', PasswordCheck);
 
     divLoginmessage.HTML.Text := '<div class="DropShadow">Successful... <i class="fa-duotone fa-thumbs-up ms-3 Swap fa-xl"></i></div>';
-    asm await sleep(500); end;
+    {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
     btnLoginCancelClick(Sender);
 
     ProcessLogin;
@@ -2595,7 +3372,7 @@ begin
     if Trim(LoginCheck) = '/'
     then LoginCheck := 'System Error / Server connection could not be established.';
     divLoginMessage.HTML.Text := '<div class="DropShadow">'+Copy(LoginCheck,1,Pos('/',LoginCheck) -2)+'<br/>'+Copy(LoginCheck, Pos('/',LoginCheck)+2,Length(LoginCheck));
-    asm await sleep(5000); end;
+    {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
     divLoginMessage.ElementHandle.classList.replace('d-flex','d-none');
     editPassword.SetFocus;
     editPassword.SelectAll;
@@ -2612,6 +3389,7 @@ begin
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
   TWebLocalStorage.RemoveKey('User.Photo.'+User_Account);
+  TWebLocalStorage.RemoveKey('MenusCollapsed');
   TWebLocalStorage.RemoveKey('Window.Accounts.Top');
   TWebLocalStorage.RemoveKey('Window.Accounts.Left');
   TWebLocalStorage.RemoveKey('Window.Accounts.Width');
@@ -2628,6 +3406,7 @@ begin
   TWebLocalStorage.RemoveKey('Login.Expiry');
   TWebLocalStorage.RemoveKey('Login.PasswordHash');
   TWebLocalStorage.RemoveKey('User.Photo.'+User_Account);
+  TWebLocalStorage.RemoveKey('MenusCollapsed');
   TWebLocalStorage.RemoveKey('Window.Accounts.Top');
   TWebLocalStorage.RemoveKey('Window.Accounts.Left');
   TWebLocalStorage.RemoveKey('Window.Accounts.Width');
@@ -2657,7 +3436,8 @@ var
   ResponseString: String;
 begin
 
-
+  i := 0;
+  count := 0;
 
   // Account Information
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnAccount) then
@@ -2686,12 +3466,12 @@ begin
     btnFirstNameCancel.Enabled := False;
 
     // Make sure first row is selected
-    pcAccount.TabIndex := 0;
-    pcAccount.ActivePage.ElementHandle.style.setProperty('opacity','1');
-    asm
+    SelectAccountOption(0);
+
+    {$IFNDEF WIN32} asm {
       this.tabAccountOptions.deselectRow();
       this.tabAccountOptions.selectRow([0]);
-    end;
+    } end; {$ENDIF}
 
     divAccount.ElementHandle.removeAttribute('data-x');
     divAccount.ElementHandle.removeAttribute('data-y');
@@ -2731,7 +3511,7 @@ begin
   ResponseString := await(JSONRequest('IPersonService.Profile',[]));
   if ResponseString <> '' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       var data = JSON.parse(ResponseString);
 
       // Account
@@ -2783,8 +3563,10 @@ begin
       while (i < data['Role'].length) {
         if ((data['Role'][i]['valid_after'] !== null) && (data['Role'][i]['valid_until'] !== null)) {
           var valid_now = luxon.DateTime.now();
-          var valid_after = luxon.DateTime.fromISO(data['Role'][i]['valid_after'].split(' ').join('T'),{zone:"utc"}).setZone("system");
-          var valid_until = luxon.DateTime.fromISO(data['Role'][i]['valid_until'].split(' ').join('T'),{zone:"utc"}).setZone("system");
+          var utczone = new Object();
+          utczone.zone = 'utc';
+          var valid_after = luxon.DateTime.fromISO(data['Role'][i]['valid_after'].split(' ').join('T'),utczone).setZone('system');
+          var valid_until = luxon.DateTime.fromISO(data['Role'][i]['valid_until'].split(' ').join('T'),utczone).setZone('system');
           if ((valid_after < valid_now) && (valid_until > valid_now)) {
             count += 1;
           }
@@ -2796,8 +3578,7 @@ begin
       divShade.innerHTML += iconcache;
       this.tabAccountOptions.getRow(7).getCell('Entries').setValue(count);
       this.tabAccountRoles.setData(data['Role']);
-
-    end;
+    } end; {$ENDIF}
   end;
 
   // Update "window" header icon
@@ -2811,46 +3592,8 @@ begin
   // Configure Activity Log
   btnActivityLogReloadClick(Sender);
 
-
-
-  // This intializes the custom icon editor to use the "remote" approach.
-  if IconSetsLoaded = False then
-  begin
-    ResponseString := await(JSONRequest('ISystemService.AvailableIconSets',[]));
-    asm
-      this.IconSets = [];
-      this.IconSetNames = [];
-      this.IconSetCount = [];
-
-      // Load up our Local icon sets
-      this.IconSetList = JSON.parse(ResponseString);
-
-      // Original list is soprted by filename.  Lets sort it by library name instead (case-insensitive)
-      this.IconSetList = this.IconSetList.sort((a, b) => {
-        if (a.name.toLowerCase() < b.name.toLowerCase()) {
-          return -1;
-        }
-      });
-
-      // Get count data from this list
-      for (var i = 0; i < this.IconSetList.length; i++) {
-        var iconcount = this.IconSetList[i].count
-        this.IconSetNames.push(this.IconSetList[i].name+': '+iconcount+' icons');
-        this.IconSetCount.push(iconcount);
-      };
-    end;
-
-    // Populate the listLibraries control
-    count := 0;
-    for i := 0 to Length(IconsetNames)-1 do
-    begin
-      count := count + IconSetCount[i];
-    end;
-    editIconSearch.TextHint := 'Search '+FloatToStrF(count,ffNumber,5,0)+' icons';
-    IconSetsLoaded := True;
-  end;
-
-
+  PreventCompilerHint(i);
+  PreventCompilerHint(count);
 end;
 
 procedure TForm1.btnBlogClick(Sender: TObject);
@@ -2882,7 +3625,8 @@ begin
   if editEMailCode.Visible
   then labelChangeAccountEMail.ElementHandle.innerHTML := 'Resending...'
   else labelChangeAccountEMail.ElementHandle.innerHTML := 'Sending...';
-  asm await sleep(1000); end;
+
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
 
   MailFont := TStringList.Create;
   MailFont.LoadFromFile('fonts/cairo.woff.base64');
@@ -3165,6 +3909,106 @@ begin
   editPassword.SetFocus;
 end;
 
+procedure TForm1.btnPeriodSelect(Sender: TObject);
+var
+  Period: Integer;
+  PeriodShort: String;
+  PeriodLong: String;
+  PeriodStartDisplay: String;
+  PeriodStartValue: String;
+  PeriodEndDisplay: String;
+  PeriodEndValue: String;
+  PeriodAdjustment: String;
+
+begin
+
+  if (Sender is TWebButton)  and ((Sender as TWebButton).Tag > 0) then
+  begin
+    Period := (Sender as TWebButton).Tag;
+    PeriodShort := (Sender as TWebButton).Caption;
+    PeriodLong := (Sender as TWebButton).Hint;
+  end
+  else
+  begin
+    if (Sender is TWebButton)
+    then LogAction('Error: Unexpected Period: '+(Sender as TWebButton).Name)
+    else LogAction('Error: Unexpected Period.');
+    exit;
+  end;
+
+  // Update Button Selection
+  {$IFNDEF WIN32} asm {
+    var selected = divPeriodsPresets.querySelectorAll('.Selected');
+    selected.forEach(el => {
+      el.classList.remove('Selected');
+    });
+  } end; {$ENDIF}
+
+  (Sender as TWebButton).ElementHandle.classList.add('Selected');
+
+  PeriodShort := '';
+  PeriodLong := '';
+  PeriodStartValue := '';
+  PeriodStartDisplay := '';
+  PeriodEndValue := '';
+  PeriodEndDisplay := '';
+  PeriodAdjustment := '';
+
+  // This is how PeriodArray is gneerated, for quick reference
+  //   "id":Period,
+  //   "long_name": PeriodLong,
+  //   "short_name": PeriodShort,
+  //   "start_period" : PeriodStartValue,
+  //   "end_period": PeriodEndValue,
+  //   "start_period_display": PeriodStartDisplay,
+  //   "end_period_display": PeriodEndDisplay,
+  //   "adjustment": PeriodAdjustment,
+  //   "group": "local"
+
+  {$IFNDEF WIN32} asm {
+    var This = pas.Unit1.Form1;
+    var selected = This.PeriodArray.find(elem => elem.id === Period);
+    if (selected !== undefined) {
+      PeriodShort = selected['short_name'];
+      PeriodLong = selected['long_name']
+      PeriodStartValue = selected['start_period'];
+      PeriodStartDisplay = selected['start_period_display'];
+      PeriodEndValue = selected['end_period'];
+      PeriodEndDisplay = selected['end_period_display'];
+      PeriodAdjustment = selected['adjustment'];
+      This.LogAction('[ Selected Period: '+PeriodLong+' ]');
+    }
+    else {
+      This.LogAction('Error: Unexpected Period ('+Period+')');
+    }
+  } end; {$ENDIF}
+
+  // Statistics - Logins
+  if (divPeriods.Tag = 0) and (PeriodShort <> '') then
+  begin
+    {$IFNDEF WIN32} asm {
+      var That = pas.Unit1.Form1.StatsForm;
+      That.dateLoginsAdjustment = PeriodAdjustment;
+      That.btnLoginsPeriod.GetElementHandle().innerHTML = PeriodLong;
+      That.ModuleInit = true;
+      That.dateLogins1.setDate(PeriodStartValue, true, 'Y-m-d H:i:s');
+      That.ModuleInit = false;
+      That.dateLogins2.setDate(PeriodEndValue, true, 'Y-m-d H:i:s');
+    } end; {$ENDIF}
+  end;
+
+  divPeriodsLabelClick(Sender);
+
+  PreventCompilerHint(Period);
+  PreventCompilerHint(PeriodShort);
+  PreventCompilerHint(PeriodLong);
+  PreventCompilerHint(PeriodStartValue);
+  PreventCompilerHint(PeriodStartDisplay);
+  PreventCompilerHint(PeriodEndValue);
+  PreventCompilerHint(PeriodEndDisplay);
+  PreventCompilerHint(PeriodAdjustment);
+end;
+
 procedure TForm1.btnPhotoCancelClick(Sender: TObject);
 begin
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnPhotoCancel)
@@ -3174,7 +4018,7 @@ begin
   btnPhotoCancel.Enabled := False;
   btnPhotoCancel.Tag := 1;
 
-  asm
+  {$IFNDEF WIN32} asm {
     if (btnAccount.firstElementChild !== null) {
       divAccountPhoto.innerHTML = btnAccount.firstElementChild.innerHTML;
       var MoveTransform = btnAccount.firstElementChild.style.getPropertyValue('transform');
@@ -3194,9 +4038,9 @@ begin
         );
       }
     }
-  end;
+  } end; {$ENDIF}
 
-  asm await sleep(100); end;
+  {$IFNDEF WIN32} asm { await sleep(100); } end; {$ENDIF}
   btnPhotoCancel.Tag := 0;
   HideTooltips;
 
@@ -3222,9 +4066,8 @@ begin
 
   divShade2.Visible := True;
   divIconSearch.Visible := True;
-  divShade2.ElementHandle.style.setProperty('opacity','0.75');
+  divShade2.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
   divIconSearch.ElementHandle.style.setProperty('opacity','1.0');
-  HideTooltips;
 
   LogAction(' ');
   LogAction('[ Searching Photo Icons ]');
@@ -3243,12 +4086,12 @@ begin
   LogAction('[ Reset Photo Size / Position ]');
 
   btnRotate.Tag := 0;
-  asm
-   // Reset Pan/Zoom
+  {$IFNDEF WIN32} asm {
+    // Reset Pan/Zoom
     pas.Unit1.Form1.pz.reset();
     btnRotate.Tag = 0;
     divAccountPhoto.firstElementChild.style.removeProperty('transform');
-  end;
+  } end; {$ENDIF}
 end;
 
 procedure TForm1.btnPhotoSaveClick(Sender: TObject);
@@ -3264,7 +4107,7 @@ begin
   LogAction('[ Saving Account Photo ]');
 
   Rotation := btnRotate.Tag;
-  asm
+  {$IFNDEF WIN32} asm {
     var Scale = this.pz.getScale();
     var Pan = this.pz.getPan();
     var br = divAccountPhoto.getBoundingClientRect();
@@ -3280,7 +4123,7 @@ begin
       divAuthorProfilePhoto.innerHTML = this.User_Photo;
     }
     btnAccount.innerHTML = divAuthorProfilePhoto.innerHTML;
-  end;
+  } end; {$ENDIF}
 
 
   labelAccountTitle.HTML := '<div style="container-type: size; position: relative; width: 35px; height: 35px; border-radius: 5px; margin:0px 4px 0px 1.51px; padding: 0px; overflow: hidden;">'+btnAccount.ElementHandle.innerHTML+'</div>'+
@@ -3317,23 +4160,24 @@ procedure TForm1.btnPhotoUploadClick(Sender: TObject);
 begin
   HideTooltips;
   LogAction('[ Uploading Photo ]');
-  asm
+  {$IFNDEF WIN32} asm {
     fileinput.click();
-  end;
+  } end; {$ENDIF}
 end;
 
 procedure TForm1.btnPhotoURLClick(Sender: TObject);
 begin
   HideTooltips;
   editURL.Text := '';
-  asm editURLLabel.innerHTML = 'Enter an Image Link'; end;
+  {$IFNDEF WIN32} asm {
+    editURLLabel.innerHTML = 'Enter an Image Link';
+  } end; {$ENDIF}
   btnURLOK.Tag := 1; // Photo URL
 
   divShade2.Visible := True;
   divURL.Visible := True;
-  divShade2.ElementHandle.style.setProperty('opacity','0.75');
+  divShade2.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
   divURL.ElementHandle.style.setProperty('opacity','1.0');
-  HideTooltips;
 
   LogAction(' ');
   LogAction('[ Requesting Photo URL ]');
@@ -3353,42 +4197,58 @@ begin
   if btnRotate.Tag = 0 then
   begin
     btnRotate.Tag := 45;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(45deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(45deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 45 then
   begin
     btnRotate.Tag := 90;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(90deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(90deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 90 then
   begin
     btnRotate.Tag := 135;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(135deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(135deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 135 then
   begin
     btnRotate.Tag := 180;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(180deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(180deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 180 then
   begin
     btnRotate.Tag := 225;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(225deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(225deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 225 then
   begin
     btnRotate.Tag := 270;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(270deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(270deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 270 then
   begin
     btnRotate.Tag := 315;
-    asm divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(315deg)'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.setProperty('transform','rotate(315deg)');
+    } end; {$ENDIF}
   end
   else if btnRotate.Tag = 315 then
   begin
     btnRotate.Tag := 0;
-    asm divAccountPhoto.firstElementChild.style.removeProperty('transform'); end;
+    {$IFNDEF WIN32} asm {
+      divAccountPhoto.firstElementChild.style.removeProperty('transform');
+    } end; {$ENDIF}
   end;
 
   LogAction('[ Rotated Photo: '+IntToStr(btnRotate.tag)+'deg ]');
@@ -3404,19 +4264,24 @@ begin
 end;
 
 procedure TForm1.btnSelectActivityLogClick(Sender: TObject);
+var
+  SessionCount: Integer;
 begin
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
+
   divShade2.Visible := True;
   divSessions.Visible := True;
-  divShade2.ElementHandle.style.setProperty('opacity','0.75');
+  divShade2.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
   divSessions.ElementHandle.style.setProperty('opacity','1.0');
-  HideTooltips;
 
-  asm
-    this.tabAccountSessions.redraw(true);
+  SessionCount := 0;
+  {$IFNDEF WIN32} asm {
+    this.tabAccountSessions.redraw(false);
+    SessionCount = this.tabAccountSessions.getDataCount();
     divSessionList.firstElementChild.style.setProperty('position','absolute');
     divSessionList.firstElementChild.style.setProperty('z-index', '10');
     divSessionList.firstElementChild.style.setProperty('top', 'px');
-  end;
+  } end; {$ENDIF}
 
   LogAction(' ');
   LogAction('[ Searching Sessions ]');
@@ -3425,7 +4290,10 @@ begin
   StatePosition := StatePosition + 1;
   window.history.pushState(CaptureState, '', StateURL);
 
-  HideToolTips;
+  if SessionCount < 100
+  then HideToolTips;
+
+  btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
 procedure TForm1.btnServerStatsClick(Sender: TObject);
@@ -3443,7 +4311,7 @@ begin
   divStatistics.Visible := True;
   divStatistics.ElementHandle.classList.replace('d-none','d-flex');
 
-  asm await sleep(50); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
   divStatistics.ElementHandle.style.setProperty('opacity','1');
 
 
@@ -3473,7 +4341,7 @@ begin
   divShade2.ElementHandle.style.setProperty('opacity','0');
   divIconSearch.ElementHandle.style.setProperty('opacity','0');
 
-  asm await sleep(1000); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
 
   divIconSearch.Visible := False;
   divShade2.Visible := False;
@@ -3488,11 +4356,11 @@ procedure TForm1.btnIconOKClick(Sender: TObject);
 begin
   if IconSelected <> '' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       divAccountPhoto.innerHTML = '';
       this.pz.reset();
       divAccountPhoto.innerHTML = this.IconSelected;
-    end;
+    } end; {$ENDIF}
   end;
   btnIconCancelClick(Sender);
 
@@ -3516,13 +4384,13 @@ begin
   // Must have something to search for and somewhere to search
   if Trim(Search) = '' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       divIconSearchResultsInner.replaceChildren();
-    end;
+    } end; {$ENDIF}
     exit;
   end;
 
-  asm
+  {$IFNDEF WIN32} asm {
 
     // Build a new results array
     var results = [];
@@ -3577,7 +4445,8 @@ begin
       display += displayicon;
     }
     divIconSearchResultsInner.innerHTML = display;
-  end;
+
+  } end; {$ENDIF}
 
   PreventCompilerHint(IconSize);
   PreventCompilerHint(MaxResults);
@@ -3606,10 +4475,10 @@ begin
   begin
 
     Response := await(JSONRequest('IPersonService.ActionLog',[User_ID, Current_ActionLog]));
-    asm
+    {$IFNDEF WIN32} asm {
       var resp = JSON.parse(Response);
       Response = resp['ActionsLog'][0].actions;
-    end;
+    } end; {$ENDIF}
     RemoteActionLog := TStringList.Create;
     RemoteActionLog.Text := Response;
 
@@ -3689,7 +4558,7 @@ begin
   divShade2.ElementHandle.style.setProperty('opacity','0');
   divURL.ElementHandle.style.setProperty('opacity','0');
 
-  asm await sleep(1000); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
 
   divURL.Visible := False;
   divShade2.Visible := False;
@@ -3710,9 +4579,9 @@ begin
   begin
     divAccountPhoto.ElementHandle.style.setProperty('transform','scale(1) translate(0%, 0%)');
     divAccountPhoto.ElementHandle.innerHTML := '<img width="100%" src="'+editURL.Text+'">';
-    asm
+    {$IFNDEF WIN32} asm {
       this.pz.reset();
-    end;
+    } end; {$ENDIF}
     PhotoChanged;
     LogAction('[ New Photo URL Selected ]');
   end
@@ -3722,7 +4591,7 @@ begin
   begin
     RowCount := -1;
     Link := editURL.Text;
-    asm
+    {$IFNDEF WIN32} asm {
       var This = pas.Unit1.Form1;
       var newid = This.tabAccountLinks.getDataCount();
       This.tabAccountLinks.addRow({
@@ -3731,7 +4600,7 @@ begin
         "Link": Link
       });
       RowCount = newid;
-    end;
+    } end; {$ENDIF}
 
     HideTooltips;
     UpdateAccountLinks();
@@ -3743,12 +4612,12 @@ begin
   begin
     RowCount := -1;
     Link := editURL.Text;
-    asm
+    {$IFNDEF WIN32} asm {
       var This = pas.Unit1.Form1;
       var tab = This.tabAccountLinks;
       var rows = tab.getSelectedRows();
       rows[0].getCell('Link').setValue(Link);
-    end;
+    } end; {$ENDIF}
 
     HideTooltips;
     UpdateAccountLinks();
@@ -3759,29 +4628,58 @@ end;
 
 function TForm1.CaptureState: JSValue;
 begin
-   Result := nil;
-   // Return state of some kind
-   asm
-     Result = {
-       "StatePosition": this.StatePosition,
-       "StateURL": this.URL,
-       "State": this.State
-     }
-   end;
+  Result := nil;
+  // Return state of some kind
+  {$IFNDEF WIN32} asm {
+    Result = {
+      "StatePosition": this.StatePosition,
+      "StateURL": this.URL,
+      "State": this.State
+    }
+  } end; {$ENDIF}
 end;
 
-procedure TForm1.AddTT(Button: TWebButton);
+procedure TForm1.AddBootstrapTooltips;
 begin
   // If Font Awesome Pro is not available, switch to the free version
   //Button.Caption := StringReplace(Button.Caption,'fa-duotone','fa-solid',[]);
 
-  Button.ElementHandle.setAttribute('title',Button.Hint);
-  Button.ElementHandle.setAttribute('data-bs-toggle','tooltip');
-  Button.ElementHandle.setAttribute('data-bs-trigger','hover');
-  Button.ElementHandle.setAttribute('data-bs-placement','bottom');
-  Button.ElementHandle.setAttribute('data-bs-delay','{"show": 1000, "hide": 100}');
-  Button.ElementHandle.setAttribute('data-bs-custom-class','BLTooltip');
+  {$IFNDEF WIN32} asm {
+    var elements = document.querySelectorAll('button');
+    var hint = '';
+    for (var i = 0; i < elements.length; i++) {
+      if (elements[i].id !== undefined) {
+        hint = eval('pas.Unit1.Form1.'+elements[i].id+'.FHint');
+        if (hint !== '') {
+          elements[i].setAttribute('title',hint);
+          elements[i].setAttribute('data-bs-toggle','tooltip');
+          elements[i].setAttribute('data-bs-trigger','hover');
+          elements[i].setAttribute('data-bs-placement','bottom');
+          elements[i].setAttribute('data-bs-delay','{"show": 1000, "hide": 100}');
+          elements[i].setAttribute('data-bs-custom-class','BLTooltip');
+        }
+      }
+    }
+  } end; {$ENDIF}
 
+  HideTooltips;
+end;
+
+procedure TForm1.divPeriodsLabelClick(Sender: TObject);
+begin
+  // Serves as our close button
+  divShade3.ElementHandle.style.setProperty('opacity','0');
+  divPeriods.ElementHandle.style.setProperty('opacity','0');
+
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
+
+  divPeriods.Visible := False;
+  divShade3.Visible := False;
+
+  if divPeriods.Tag = 0 then State := 'Statistics';
+
+  StatePosition := StatePosition + 1;
+  window.history.pushState(CaptureState, '', StateURL);
 end;
 
 procedure TForm1.divSessionListLabelClick(Sender: TObject);
@@ -3790,7 +4688,7 @@ begin
   divShade2.ElementHandle.style.setProperty('opacity','0');
   divSessions.ElementHandle.style.setProperty('opacity','0');
 
-  asm await sleep(1000); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
 
   divSessions.Visible := False;
   divShade2.Visible := False;
@@ -3809,6 +4707,11 @@ begin
   else if divStatistics.Visible then divStatisticsLabelClick(Sender);
 end;
 
+procedure TForm1.divShade3Click(Sender: TObject);
+begin
+  if divPeriods.Visible then divPeriodsLabelClick(Sender);
+end;
+
 procedure TForm1.divShadeClick(Sender: TObject);
 begin
   if divAccount.Visible then btnAccountCloseClick(Sender);
@@ -3822,7 +4725,7 @@ begin
   divStatistics.ElementHandle.style.setProperty('opacity','0');
   LogAction('[ Statistics Closed ]');
 
-  asm await sleep(500); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
 
   StatsForm.Close();
   StatsForm := nil;
@@ -4007,7 +4910,7 @@ var
 begin
 
   Result := 'F';
-  asm
+  {$IFNDEF WIN32} asm {
     // https://www.regextester.com/115911
     var validformat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
     if (EMail.match(validformat)) {
@@ -4015,7 +4918,7 @@ begin
     } else {
       Result = 'F'
     }
-  end;
+  } end; {$ENDIF}
 
   // Must be unique - only check this when everything else passes
   if Result = 'P' then
@@ -4085,7 +4988,7 @@ begin
       labelChangeAccountEMail.ElementHandle.innerHTML := 'Code Cofirmed';
       editEMailCode.Visible := False;
 
-      asm await sleep(1000); end;
+      {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
 
       labelChangeAccountEMail.ElementHandle.innerHTML := 'E-Mail Address Updated';
       LogAction('<< E-Mail Address Updated >>');
@@ -4145,12 +5048,13 @@ begin
   then LogAction('[ Revert Account Links ]')
   else LogAction('Reverting Account Links');
 
-  asm
+  {$IFNDEF WIN32} asm {
     var This = pas.Unit1.Form1;
     var tab = This.tabAccountLinks;
     This.LinksData = JSON.parse(JSON.stringify(This.LinksDataBackup));
     tab.setData(This.LinksData);
-  end;
+  } end; {$ENDIF}
+
   HideTooltips;
   UpdateAccountLInks;
   divAccountLinks.SetFocus();
@@ -4161,6 +5065,7 @@ var
   Link: String;
 begin
   Link := 'not defined';
+  {$IFNDEF WIN32}
   asm
     var This = pas.Unit1.Form1;
     var tab = This.tabAccountLinks;
@@ -4181,6 +5086,7 @@ begin
       rows[0].delete();
     }
   end;
+  {$ENDIF}
 
   HideTooltips;
   UpdateAccountLinks;
@@ -4193,24 +5099,26 @@ var
   CurrentLink: String;
 begin
   CurrentLink := 'none';
-  asm
+  {$IFNDEF WIN32} asm {
     var This = pas.Unit1.Form1;
     var tab = This.tabAccountLinks;
     var rows = tab.getSelectedRows();
     if (rows.length == 1) {
       CurrentLink = rows[0].getCell('Link').getValue();
     }
-  end;
+  } end; {$ENDIF}
 
   if CurrentLink <> 'none' then
   begin
     editURL.Text :=  CurrentLink;
-    asm editURLLabel.innerHTML = 'Edit Social Media / Contact Link'; end;
+    {$IFNDEF WIN32} asm {
+      editURLLabel.innerHTML = 'Edit Social Media / Contact Link';
+    } end; {$ENDIF}
     btnURLOK.Tag := 3; // Edit Account Author Profile Link
 
     divShade2.Visible := True;
     divURL.Visible := True;
-    divShade2.ElementHandle.style.setProperty('opacity','0.75');
+    divShade2.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
     divURL.ElementHandle.style.setProperty('opacity','1.0');
     HideTooltips;
 
@@ -4222,12 +5130,14 @@ end;
 procedure TForm1.btnLinkInsertClick(Sender: TObject);
 begin
   editURL.Text := '';
-  asm editURLLabel.innerHTML = 'Enter a Social Media / Contact Link'; end;
+  {$IFNDEF WIN32} asm {
+    editURLLabel.innerHTML = 'Enter a Social Media / Contact Link';
+  } end; {$ENDIF}
   btnURLOK.Tag := 2; // Insert Account Author Profile Link
 
   divShade2.Visible := True;
   divURL.Visible := True;
-  divShade2.ElementHandle.style.setProperty('opacity','0.75');
+  divShade2.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
   divURL.ElementHandle.style.setProperty('opacity','1.0');
   HideTooltips;
 
@@ -4245,9 +5155,9 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-spin fa-xl"></i>';
 
   LinkSave := '';
-  asm
+  {$IFNDEF WIN32} asm {
     LinkSave = JSON.stringify(pas.Unit1.Form1.tabAccountLinks.getData());
-  end;
+  } end; {$ENDIF}
 
   LogAction('[ Saving Account Links ]');
   RequestResponse := await(StringRequest('IPersonService.UpdatePersonLinks',[
@@ -4257,13 +5167,13 @@ begin
 
   if RequestResponse = 'Success' then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       btnLinkSave.setAttribute('disabled','');
       btnLinkCancel.setAttribute('disabled','');
       this.LinksDataBackup = JSON.parse(LinkSave);
       LogAction('<< Account Links Updated >>');
       LogAction(' ');
-    end;
+    } end; {$ENDIF}
   end
   else
   begin
@@ -4281,7 +5191,7 @@ procedure TForm1.btnLoginCancelClick(Sender: TObject);
 begin
   divShade.ElementHandle.style.setProperty('opacity','0.0');
   divLogin.ElementHandle.style.setProperty('opacity','0.0');
-  asm await sleep(500); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
   divShade.Visible := False;
   divLogin.Visible := False;
 end;
@@ -4298,7 +5208,8 @@ begin
   divShade.ElementHandle.style.setProperty('opacity','0.0');
   divAccount.ElementHandle.style.setProperty('opacity','0.0');
 
-  asm await sleep(500); end;
+  {$IFNDEF WIN32} asm { await sleep(500); } end; {$ENDIF}
+
   divShade.Visible := False;
   divAccount.Visible := False;
   divAccount.ElementHandle.removeAttribute('data-x');
@@ -4324,6 +5235,7 @@ begin
   else LogAction('Refreshing Account Settings');
 
   await(btnAccountClick(Sender));
+
   LogAction('Account Settings Refreshed');
   btnActivityLogReloadClick(Sender);
 
@@ -4432,9 +5344,10 @@ begin
   if (Key = VK_ESCAPE) then
   begin
     if (divIconSearch.Visible = True) then btnIconCancelClick(Sender)
+    else if (divPeriods.Visible = True) then divPeriodsLabelClick(Sender)
+    else if (divURL.Visible = True) then btnURLCancelClick(Sender)
     else if (divSessions.Visible = True) then divSessionListLabelClick(Sender)
     else if (divStatistics.Visible = True) then divStatisticsLabelClick(Sender)
-    else if (divURL.Visible = True) then btnURLCancelClick(Sender)
     else if (divAccount.Visible = True) then btnAccountCloseClick(Sender);
   end
 
@@ -4461,7 +5374,7 @@ var
 begin
   if divAccount.Visible then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       innerWidth = divShade.getBoundingClientRect().width;
       innerHeight = divShade.getBoundingClientRect().height;
 
@@ -4470,7 +5383,7 @@ begin
       dialogWidth = divAccount.getBoundingClientRect().width;
       dialogHeight = divAccount.getBoundingClientRect().height;
 //      console.log('t: '+dialogTop+', l: '+dialogLeft+', w: '+dialogWidth+', h: '+dialogHeight+', IW: '+innerWidth+', IH: '+innerHeight);
-    end;
+    } end; {$ENDIF}
 
     if (dialogTop < 0) or
        ((dialogTop + dialogHeight) > innerHeight) or
@@ -4489,10 +5402,10 @@ begin
 
   if divStatistics.Visible then
   begin
-    asm
+    {$IFNDEF WIN32} asm {
       var That = pas.Unit1.Form1.StatsForm;
       That.CreateD3BarChart(That.Current_Chart, That.Current_XData, That.Current_YData);
-    end;
+    } end; {$ENDIF}
   end;
 
 end;
@@ -4508,8 +5421,8 @@ var
   EncodedText: String;
 begin
   EncodedText := '';
-  asm
-var sha256 = function sha256(ascii) {
+  {$IFNDEF WIN32} asm {
+    var sha256 = function sha256(ascii) {
     function rightRotate(value, amount) {
         return (value>>>amount) | (value<<(32 - amount));
     };
@@ -4604,10 +5517,11 @@ var sha256 = function sha256(ascii) {
         }
     }
     return result;
-};
+    };
 
     EncodedText = sha256(Text2Encode);
-  end;
+  } end; {$ENDIF}
+
   Result := EncodedText;
 end;
 

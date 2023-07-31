@@ -2716,10 +2716,10 @@ object Form1: TForm1
       OnClick = btnLoginCancelClick
     end
     object divLoginLabel: TWebHTMLDiv
-      Left = 80
-      Top = 5
-      Width = 190
-      Height = 50
+      Left = 60
+      Top = 0
+      Width = 230
+      Height = 55
       Cursor = crHandPoint
       ElementClassName = 'overflow-hidden'
       ElementID = 'divLoginLabel'
@@ -2733,9 +2733,9 @@ object Form1: TForm1
           '<div class="h-100 d-flex justify-content-center align-items-cent' +
           'er" '
         '        style="position: relative;">'
-        '  <div class="DropShadow2" '
+        '  <div class="DropShadow" '
         
-          '          style="font-size: 32px; padding-bottom: 6px; font-weig' +
+          '          style="font-size: 28px; padding-bottom: 5px; font-weig' +
           'ht: bold; color: var(--bl-color-one); font-family: Cairo;">'
         '    bl<span style="color: var(--bl-color-two)">augment</span>'
         '  </div>'
@@ -2936,6 +2936,7 @@ object Form1: TForm1
       TabIndex = 0
       ShowTabs = False
       TabOrder = 2
+      Visible = False
       object pageAccountName: TWebTabSheet
         Left = 0
         Top = 20
@@ -4712,14 +4713,14 @@ object Form1: TForm1
     ElementFont = efCSS
     Role = ''
     Visible = False
-    object WebHTMLDiv10: TWebHTMLDiv
+    object divIconSearchBG: TWebHTMLDiv
       Left = 0
       Top = 35
       Width = 350
       Height = 30
       Cursor = crHandPoint
       ElementClassName = 'ContainerBG position-absolute'
-      ElementID = 'divLoginBG'
+      ElementID = 'divIconSearchBG'
       HeightStyle = ssPercent
       ChildOrder = 1
       ElementFont = efCSS
@@ -5017,6 +5018,942 @@ object Form1: TForm1
       Role = ''
     end
   end
+  object divPeriods: TWebHTMLDiv
+    Left = 792
+    Top = 441
+    Width = 350
+    Height = 394
+    ElementID = 'divPeriods'
+    ChildOrder = 2
+    ElementFont = efCSS
+    Role = ''
+    Visible = False
+    object divPeriodsBG: TWebHTMLDiv
+      Left = 0
+      Top = 35
+      Width = 350
+      Height = 30
+      Cursor = crHandPoint
+      ElementClassName = 'ContainerBG position-absolute w-100'
+      ElementID = 'divPeriodsBG'
+      HeightStyle = ssAuto
+      WidthStyle = ssAuto
+      ChildOrder = 1
+      ElementPosition = epRelative
+      ElementFont = efCSS
+      Role = ''
+    end
+    object divPeriodsLabel: TWebHTMLDiv
+      Left = 50
+      Top = 0
+      Width = 250
+      Height = 35
+      Cursor = crHandPoint
+      ElementClassName = 'overflow-hidden'
+      ElementID = 'divPeriodsLabel'
+      ChildOrder = 1
+      ElementFont = efCSS
+      HTML.Strings = (
+        '<div class="ContainerBGLogin" '
+        '        style="position: absolute; width:100%; height:100%;">'
+        '</div>'
+        
+          '<div class="h-100 d-flex justify-content-center align-items-cent' +
+          'er" '
+        '        style="position: relative;">'
+        '  <div id="editStatisticsLabel" class="DropShadow" '
+        
+          '          style="font-size: 16px; font-weight: bold; color: var(' +
+          '--bl-color-one); font-family: Cairo;">'
+        'Select Period'
+        '  </div>'
+        '</div>'
+        '')
+      Role = ''
+      OnClick = divPeriodsLabelClick
+    end
+    object divPeriodsPresets: TWebHTMLDiv
+      Left = 3
+      Top = 71
+      Width = 348
+      Height = 298
+      ElementClassName = 'd-flex flex-row mt-1 flex-wrap'
+      ElementID = 'divPeriodsPresets'
+      HeightStyle = ssAuto
+      ChildOrder = 6
+      ElementPosition = epRelative
+      ElementFont = efCSS
+      Role = ''
+      object divPeriodsDay: TWebHTMLDiv
+        Left = 5
+        Top = 5
+        Width = 60
+        Height = 240
+        ElementClassName = 'd-flex flex-column ms-1'
+        ElementID = 'divPeriodsDay'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ElementPosition = epIgnore
+        ElementFont = efCSS
+        Role = ''
+        object btnPeriodD1: TWebButton
+          Tag = 11
+          Left = 0
+          Top = 2
+          Width = 60
+          Height = 25
+          Hint = 'Today'
+          Caption = '<div>Today</div>'
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD1'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD2: TWebButton
+          Tag = 12
+          Left = 0
+          Top = 28
+          Width = 60
+          Height = 25
+          Caption = '<div>Fri</div>'
+          ChildOrder = 1
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD2'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD3: TWebButton
+          Tag = 13
+          Left = -1
+          Top = 54
+          Width = 60
+          Height = 25
+          Caption = '<div>Thu</div>'
+          ChildOrder = 2
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD3'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD5: TWebButton
+          Tag = 15
+          Left = 0
+          Top = 125
+          Width = 60
+          Height = 25
+          Hint = 'Past Day'
+          Caption = '<div>Past 1d</div>'
+          ChildOrder = 4
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD5'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD6: TWebButton
+          Tag = 16
+          Left = 0
+          Top = 151
+          Width = 60
+          Height = 25
+          Hint = 'Past 2 Days'
+          Caption = '<div>Past 2d</div>'
+          ChildOrder = 5
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD6'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD7: TWebButton
+          Tag = 17
+          Left = -1
+          Top = 179
+          Width = 60
+          Height = 25
+          Hint = 'Past 3 Days'
+          Caption = '<div>Past 3d</div>'
+          ChildOrder = 6
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD7'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD4: TWebButton
+          Tag = 14
+          Left = 0
+          Top = 90
+          Width = 60
+          Height = 25
+          Hint = 'Last Day-To-Date'
+          Caption = '<div>DTD</div>'
+          ChildOrder = 3
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD4'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodD8: TWebButton
+          Tag = 18
+          Left = 0
+          Top = 210
+          Width = 60
+          Height = 25
+          Hint = 'Last 2 Weeks'
+          Caption = '<div>Last 2w</div>'
+          ChildOrder = 7
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodD8'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+      end
+      object divPeriodsWeek: TWebHTMLDiv
+        Left = 70
+        Top = 5
+        Width = 60
+        Height = 240
+        ElementClassName = 'd-flex flex-column'
+        ElementID = 'divPeriodsWeek'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ChildOrder = 1
+        ElementPosition = epIgnore
+        ElementFont = efCSS
+        Role = ''
+        object btnPeriodW1: TWebButton
+          Tag = 21
+          Left = 0
+          Top = 2
+          Width = 60
+          Height = 25
+          Hint = 'This Week'
+          Caption = '<div>This Wk</div>'
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW1'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW2: TWebButton
+          Tag = 22
+          Left = 0
+          Top = 28
+          Width = 60
+          Height = 25
+          Hint = 'Last Week'
+          Caption = '<div>Last Wk</div>'
+          ChildOrder = 1
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW2'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW3: TWebButton
+          Tag = 23
+          Left = 0
+          Top = 54
+          Width = 60
+          Height = 25
+          Hint = 'Previous Week'
+          Caption = '<div>Prev Wk</div>'
+          ChildOrder = 2
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW3'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW5: TWebButton
+          Tag = 25
+          Left = 0
+          Top = 125
+          Width = 60
+          Height = 25
+          Hint = 'Past 7 Days'
+          Caption = '<div>Past 1w</div>'
+          ChildOrder = 4
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW5'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW6: TWebButton
+          Tag = 26
+          Left = 0
+          Top = 151
+          Width = 60
+          Height = 25
+          Hint = 'Past 14 Days'
+          Caption = '<div>Past 2w</div>'
+          ChildOrder = 5
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW6'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW7: TWebButton
+          Tag = 27
+          Left = 0
+          Top = 177
+          Width = 60
+          Height = 25
+          Hint = 'Past 21 Days'
+          Caption = '<div>Past 3w</div>'
+          ChildOrder = 6
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW7'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW4: TWebButton
+          Tag = 24
+          Left = 0
+          Top = 90
+          Width = 60
+          Height = 25
+          Hint = 'Last Week-To-Date'
+          Caption = '<div>WTD</div>'
+          ChildOrder = 3
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW4'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodW8: TWebButton
+          Tag = 28
+          Left = 0
+          Top = 208
+          Width = 60
+          Height = 25
+          Hint = 'Previous 2 Weeks'
+          Caption = '<div>Prev 2w</div>'
+          ChildOrder = 7
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodW8'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+      end
+      object divPeriodsMonth: TWebHTMLDiv
+        Left = 135
+        Top = 5
+        Width = 60
+        Height = 240
+        ElementClassName = 'd-flex flex-column'
+        ElementID = 'divPeriodsMonth'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ChildOrder = 2
+        ElementPosition = epIgnore
+        ElementFont = efCSS
+        Role = ''
+        object btnPeriodM1: TWebButton
+          Tag = 31
+          Left = 0
+          Top = 2
+          Width = 60
+          Height = 25
+          Hint = 'This Month'
+          Caption = '<div>This Mo</div>'
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM1'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM2: TWebButton
+          Tag = 32
+          Left = 0
+          Top = 28
+          Width = 60
+          Height = 25
+          Hint = 'Last Month'
+          Caption = '<div>Last Mo</div>'
+          ChildOrder = 1
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM2'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM3: TWebButton
+          Tag = 33
+          Left = 0
+          Top = 54
+          Width = 60
+          Height = 25
+          Hint = 'Previous Month'
+          Caption = '<div>Prev Mo</div>'
+          ChildOrder = 2
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM3'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM5: TWebButton
+          Tag = 35
+          Left = 0
+          Top = 125
+          Width = 60
+          Height = 25
+          Hint = 'Past 30 Days'
+          Caption = '<div>Past 1mo</div>'
+          ChildOrder = 4
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM Selected'
+          ElementID = 'btnPeriodM5'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM6: TWebButton
+          Tag = 36
+          Left = -1
+          Top = 146
+          Width = 60
+          Height = 25
+          Hint = 'Past 60 Days'
+          Caption = '<div>Past 2mo</div>'
+          ChildOrder = 5
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM6'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM7: TWebButton
+          Tag = 37
+          Left = 0
+          Top = 177
+          Width = 60
+          Height = 25
+          Hint = 'Past 90 Days'
+          Caption = '<div>Past 3mo</div>'
+          ChildOrder = 6
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM7'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM4: TWebButton
+          Tag = 34
+          Left = -1
+          Top = 94
+          Width = 60
+          Height = 25
+          Hint = 'Last Month-To-Date'
+          Caption = '<div>MTD</div>'
+          ChildOrder = 3
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM4'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodM8: TWebButton
+          Tag = 38
+          Left = 0
+          Top = 210
+          Width = 60
+          Height = 25
+          Hint = 'This Custom Period'
+          Caption = '<div> This CP</div>'
+          ChildOrder = 7
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodM8'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+      end
+      object divPeriodsYear: TWebHTMLDiv
+        Left = 265
+        Top = 5
+        Width = 60
+        Height = 240
+        ElementClassName = 'd-flex flex-column'
+        ElementID = 'divPeriodsYear'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ChildOrder = 4
+        ElementPosition = epIgnore
+        ElementFont = efCSS
+        Role = ''
+        object btnPeriodY1: TWebButton
+          Tag = 51
+          Left = 1
+          Top = -3
+          Width = 60
+          Height = 25
+          Hint = 'This Year'
+          Caption = '<div>This Yr</div>'
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY1'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY2: TWebButton
+          Tag = 52
+          Left = 0
+          Top = 28
+          Width = 60
+          Height = 25
+          Hint = 'Last Year'
+          Caption = '<div>Last Yr</div>'
+          ChildOrder = 1
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY2'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY3: TWebButton
+          Tag = 53
+          Left = 0
+          Top = 54
+          Width = 60
+          Height = 25
+          Hint = 'Previous Year'
+          Caption = '<div>Prev Yr</div>'
+          ChildOrder = 2
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY3'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY5: TWebButton
+          Tag = 55
+          Left = 0
+          Top = 125
+          Width = 60
+          Height = 25
+          Hint = 'Past Year'
+          Caption = '<div>Past 1y</div>'
+          ChildOrder = 4
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY5'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY6: TWebButton
+          Tag = 56
+          Left = 0
+          Top = 151
+          Width = 60
+          Height = 25
+          Hint = 'Past 2 Years'
+          Caption = '<div>Past 2y</div>'
+          ChildOrder = 5
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY6'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY7: TWebButton
+          Tag = 57
+          Left = 0
+          Top = 177
+          Width = 60
+          Height = 25
+          Hint = 'Past 3 Years'
+          Caption = '<div>Past 3y</div>'
+          ChildOrder = 6
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY7'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY4: TWebButton
+          Tag = 54
+          Left = 0
+          Top = 90
+          Width = 60
+          Height = 25
+          Hint = 'Last Year-To-Date'
+          Caption = '<div>YTD</div>'
+          ChildOrder = 3
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY4'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodY8: TWebButton
+          Tag = 58
+          Left = 0
+          Top = 210
+          Width = 60
+          Height = 25
+          Hint = 'Previous Custom Period'
+          Caption = '<div>Prev CP</div>'
+          ChildOrder = 7
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodY8'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+      end
+      object divPeriodsHolder: TWebHTMLDiv
+        Left = 3
+        Top = 264
+        Width = 302
+        Height = 31
+        ElementClassName = 'd-flex mt-2 mb-2'
+        ElementID = 'divPeriodsHolder'
+        HeightStyle = ssAuto
+        WidthStyle = ssPercent
+        ChildOrder = 4
+        ElementPosition = epRelative
+        ElementFont = efCSS
+        Role = ''
+      end
+      object divPeriodsQuarter: TWebHTMLDiv
+        Left = 200
+        Top = 5
+        Width = 60
+        Height = 240
+        ElementClassName = 'd-flex flex-column'
+        ElementID = 'divPeriodsQuarter'
+        HeightStyle = ssAuto
+        WidthStyle = ssAuto
+        ChildOrder = 3
+        ElementPosition = epIgnore
+        ElementFont = efCSS
+        Role = ''
+        object btnPeriodQ1: TWebButton
+          Tag = 41
+          Left = 0
+          Top = 2
+          Width = 60
+          Height = 25
+          Hint = 'This Quarter'
+          Caption = '<div>This Q</div>'
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ1'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ2: TWebButton
+          Tag = 42
+          Left = 1
+          Top = 23
+          Width = 60
+          Height = 25
+          Hint = 'Last Quarter'
+          Caption = '<div>Last Q</div>'
+          ChildOrder = 1
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ2'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ3: TWebButton
+          Tag = 43
+          Left = 0
+          Top = 54
+          Width = 60
+          Height = 25
+          Hint = 'Pervious Quarter'
+          Caption = '<div>Prev Q</div>'
+          ChildOrder = 2
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ3'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ5: TWebButton
+          Tag = 45
+          Left = 0
+          Top = 125
+          Width = 60
+          Height = 25
+          Hint = 'Past Quarter'
+          Caption = '<div>Past 1q</div>'
+          ChildOrder = 4
+          ElementClassName = 'mt-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ5'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ6: TWebButton
+          Tag = 46
+          Left = 0
+          Top = 151
+          Width = 60
+          Height = 25
+          Hint = 'Past 2 Quarters'
+          Caption = '<div>Past 2q</div>'
+          ChildOrder = 5
+          ElementClassName = 'btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ6'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ7: TWebButton
+          Tag = 47
+          Left = -1
+          Top = 179
+          Width = 60
+          Height = 25
+          Hint = 'Past 3 Quarters'
+          Caption = '<div>Past 3q</div>'
+          ChildOrder = 6
+          ElementClassName = 'mb-1 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ7'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ4: TWebButton
+          Tag = 44
+          Left = 0
+          Top = 90
+          Width = 60
+          Height = 25
+          Hint = 'Last Quarter-To-Date'
+          Caption = '<div>QTD</div>'
+          ChildOrder = 3
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ4'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          ModalResult = 1
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+        object btnPeriodQ8: TWebButton
+          Tag = 48
+          Left = 0
+          Top = 210
+          Width = 60
+          Height = 25
+          Hint = 'Last Custom Period'
+          Caption = '<div>Last CP</div>'
+          ChildOrder = 7
+          ElementClassName = 'my-2 btn btn-light ButtonUtilitySM'
+          ElementID = 'btnPeriodQ8'
+          ElementFont = efCSS
+          ElementPosition = epIgnore
+          HeightStyle = ssAuto
+          HeightPercent = 100.000000000000000000
+          WidthStyle = ssAuto
+          WidthPercent = 100.000000000000000000
+          OnClick = btnPeriodSelect
+        end
+      end
+    end
+  end
+  object divShade3: TWebHTMLDiv
+    Left = 8
+    Top = 395
+    Width = 53
+    Height = 60
+    ElementID = 'divShade3'
+    HeightStyle = ssPercent
+    WidthStyle = ssPercent
+    ChildOrder = 3
+    ElementPosition = epIgnore
+    ElementFont = efCSS
+    HTML.Strings = (
+      '')
+    Role = ''
+    Visible = False
+    OnClick = divShade3Click
+  end
   object XDataConn: TXDataWebConnection
     OnRequest = XDataConnRequest
     Left = 464
@@ -5038,10 +5975,5 @@ object Form1: TForm1
     OnTimer = tmrLogoutTimer
     Left = 1000
     Top = 192
-  end
-  object WebOpenDialog1: TWebOpenDialog
-    OnGetFileAsBase64 = WebOpenDialog1GetFileAsBase64
-    Left = 24
-    Top = 416
   end
 end
