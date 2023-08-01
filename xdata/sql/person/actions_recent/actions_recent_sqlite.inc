@@ -26,7 +26,8 @@ begin
             '  session_id, '+
             '  session_start '+
             'ORDER BY '+
-            '  session_start DESC; '
+            '  session_start DESC '+
+            'LIMIT 100;'
            );
 
   end;

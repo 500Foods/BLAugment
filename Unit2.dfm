@@ -212,7 +212,7 @@ object Form2: TForm2
             end
             object btnLogins1mo: TWebButton
               Left = 233
-              Top = 2
+              Top = 1
               Width = 40
               Height = 40
               Caption = '<div>1m</div>'
@@ -817,9 +817,9 @@ object Form2: TForm2
   end
   object memoChartRounding: TWebMemo
     Left = 11
-    Top = 544
+    Top = 536
     Width = 198
-    Height = 96
+    Height = 104
     AutoSize = False
     ElementClassName = 'd-none'
     ElementID = 'memoChartRounding'

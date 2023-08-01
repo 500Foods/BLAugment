@@ -124,6 +124,8 @@ type
     Current_XData: String;
     Current_YData: String;
 
+    CurrentChartPeriod: String;
+
     XData: String;
     YData: String;
 
@@ -412,6 +414,7 @@ procedure TForm2.btnLogins15mClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 1 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 15m ]');
     divLoginsAggChoices.Tag := 1;
     btnLogins15m.ElementHandle.classList.add('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -429,6 +432,7 @@ procedure TForm2.btnLogins1dClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 4 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 1d ]');
     divLoginsAggChoices.Tag := 4;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -446,6 +450,7 @@ procedure TForm2.btnLogins1hrClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 2 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 1h ]');
     divLoginsAggChoices.Tag := 2;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.add('Selected');
@@ -463,6 +468,7 @@ procedure TForm2.btnLogins1moClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 6 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 1mo ]');
     divLoginsAggChoices.Tag := 6;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -480,6 +486,7 @@ procedure TForm2.btnLogins1yClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 8 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 1y ]');
     divLoginsAggChoices.Tag := 8;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -497,6 +504,7 @@ procedure TForm2.btnLogins3hrClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 3 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 3h ]');
     divLoginsAggChoices.Tag := 3;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -514,6 +522,7 @@ procedure TForm2.btnLogins3moClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 7 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 1q ]');
     divLoginsAggChoices.Tag := 7;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -531,6 +540,7 @@ procedure TForm2.btnLogins7dClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 5 then
   begin
+    Form1.LogAction('[ Changed Aggregate to 1w ]');
     divLoginsAggChoices.Tag := 5;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -569,11 +579,16 @@ begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin fa-xl"></i>';
 
   if divLoginsChoices.Tag = 1
-  then ChartName := 'Chart-Users'
-  else ChartName := 'Chart-Logins';
-  ChartName := ChartName + '-'+StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll])+'.png';
+  then ChartName := Form1.App_Short+'-Chart-Users'
+  else ChartName := Form1.App_Short+'-Chart-Logins';
+  ChartName := ChartName +
+    '-' +
+    StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
+    '-' +
+    StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]) +
+    '.png';
 
-  Form1.LogAction('[ Copy Chart:  '+ChartName+' ]');
+  Form1.LogAction('[ Copy Chart: '+ChartName+' ]');
 
   {$IFNDEF WIN32} asm {
     try {
@@ -622,11 +637,17 @@ begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin fa-xl"></i>';
 
   if divLoginsChoices.Tag = 1
-  then ChartName := 'Chart-Users'
-  else ChartName := 'Chart-Logins';
-  ChartName := ChartName + '-'+StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll])+'.png';
+  then ChartName := Form1.App_Short+'-Chart-Users'
+  else ChartName := Form1.App_Short+'-Chart-Logins';
+  ChartName := ChartName +
+    '-' +
+    StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
+    '-' +
+    StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]) +
+    '-'+FormatDateTime('yyyymmdd-hhnnss',Now)+
+    '.png';
 
-  Form1.LogAction('[ Download Chart:  '+ChartName+']');
+  Form1.LogAction('[ Download Chart: '+ChartName+' ]');
 
   {$IFNDEF WIN32} asm {
     var blob = await modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'));
@@ -661,11 +682,17 @@ begin
   if divLoginsChoices.Tag = 1
   then MailSubject := MailSubject + 'Users Chart'
   else MailSubject := MailSubject + 'Logins Chart';
-  MailSubject := MailSubject + ' ('+Aggregates[divLoginsAggChoices.Tag]+') ';
+  MailSubject := MailSubject +
+    ' (' +
+    StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
+    '/' +
+    StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]) +
+    ')';
 
-  FOrm1.LogAction('[ E-Mail Chart:  '+MailSubject+']');
 
-  MailSubject := '['+Form1.App_Short+'/'+Form1.User_Account+'] '+MailSubject+FormatDateTime('yyyy-MMM-dd HH:nn:ss',Now);
+  FOrm1.LogAction('[ E-Mail Chart: '+MailSubject+' ]');
+
+  MailSubject := '['+Form1.App_Short+'/'+Form1.User_Account+'] '+MailSubject+' '+FormatDateTime('yyyy-MMM-dd HH:nn:ss',Now);
 
   MailFont := TStringList.Create;
   MailFont.LoadFromFile('fonts/cairo.woff.base64');
@@ -792,14 +819,17 @@ begin
   if divLoginsChoices.Tag = 1
   then ExportName := ExportName + 'Users-'
   else ExportName := ExportName + 'Logins-';
-
-  ExportName := ExportName + Aggregates[divLoginsAggChoices.Tag];
+  ExportName := ExportName +
+    '-' +
+    StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
+    '-' +
+    StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]);
 
   if (Sender is TWebButton)
   then Form1.LogAction('[ Exported Chart: '+ExportName+' ('+StringReplace(((Sender as TWebButton).ElementID),'btnLoginsExport','',[])+') ]')
   else Form1.LogAction('[ Exported Chart: '+ExportName+' ]');
 
-  ExportName := ExportName + FormatDateTime('yyyyMMdd-HHnnss',Now);
+  ExportName := ExportName + '-'+FormatDateTime('yyyyMMdd-HHnnss',Now);
 
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportCSV)   then {$IFNDEF WIN32} asm { this.tabLogins.download("csv",  ExportName+".csv" ); } end; {$ENDIF}
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsExportXLS)   then {$IFNDEF WIN32} asm { this.tabLogins.download("xlsx", ExportName+".xlsx"); } end; {$ENDIF}
@@ -819,6 +849,14 @@ procedure TForm2.btnLoginsLoginsClick(Sender: TObject);
 begin
   if divLoginsChoices.Tag <> 2 then
   begin
+    Form1.LogAction('[ Selected Chart: Logins ]');
+
+    // Update Column in Tabulator with a new value
+    {$IFNDEF WIN32} asm {
+      var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+      Tab.updateColumnDefinition("logins", {title:"Logins"});
+    } end; {$ENDIF}
+
     divLoginsChoices.Tag := 2;
     btnLoginsUniqueLogins.ElementHandle.classList.remove('Selected');
     btnLoginsLogins.ElementHandle.classList.add('Selected');
@@ -1114,7 +1152,6 @@ begin
 //    divSessionList.firstElementChild.style.setProperty('top', 'px');
   } end; {$ENDIF}
 
-  Form1.LogAction(' ');
   Form1.LogAction('[ Selecting Period ]');
 
   Form1.State := 'Periods';
@@ -1136,8 +1173,11 @@ begin
   if divLoginsChoices.Tag = 1
   then PageHeader := PageHeader + 'Users / '
   else PageHeader := PageHeader + 'Logins / ';
-
-  PageHeader := PageHeader + Aggregates[divLoginsAggChoices.Tag]+' / ';
+  PageHeader := PageHeader +
+    StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
+    ' / ' +
+    StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]) +
+    ' / ';
   PageHeader := PageHeader + FormatDateTime('yyyyMMdd-HHnnss',Now);
 
   Form1.LogAction('[ Print Chart: '+PageHeader+' ]');
@@ -1174,10 +1214,10 @@ begin
   // How is data aggregated (1 = 15m, 2 = 1hr, 3 = 3hr, 4 = 1d, 5 = 7d, 6 = 1mo, 7 = 3mo, 8 = 1y
   Aggregate := divLoginsAggChoices.Tag;
 
-  QueryName := Query+' / '+Aggregates[Aggregate]+' / '+btnLoginsPeriod.Caption+' / '+dateLogins1Selected+' - '+dateLogins2Selected;
+  QueryName := Query+' / '+CurrentChartPeriod+' / '+Aggregates[Aggregate]+' / '+dateLogins1Selected+' - '+dateLogins2Selected;
 
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsRefresh)
-  then Form1.LogAction('[ Chart: '+QueryName+' ]')
+  then Form1.LogAction('[ Refreshing Chart: '+QueryName+' ]')
   else Form1.LogAction('Updating Chart: '+QueryName);
 
   // Dates are yyyy-MM-dd hh:nn:ss so this should work fine.
@@ -1324,17 +1364,27 @@ procedure TForm2.btnLoginsUniqueLoginsClick(Sender: TObject);
 begin
   if divLoginsChoices.Tag <> 1 then
   begin
+    Form1.LogAction('[ Selected Chart: Users ]');
+
+    // Update Column in Tabulator with a new value
+    {$IFNDEF WIN32} asm {
+      var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+      Tab.updateColumnDefinition("logins", {title:"Users"});
+    } end; {$ENDIF}
+
     divLoginsChoices.Tag := 1;
     btnLoginsUniqueLogins.ElementHandle.classList.add('Selected');
     btnLoginsLogins.ElementHandle.classList.remove('Selected');
     btnLoginsRefreshClick(Sender);
+
   end;
+
 end;
 
 procedure TForm2.SelectStatOption(OptionID: Integer);
 begin
   Form1.HideTooltips;
-  CurrentStatsPage := pcStatistics.ActivePAge.Name;
+  CurrentStatsPage := pcStatistics.ActivePage.Name;
 
   // Fade In/Out between pages
   if (pcStatistics.TabIndex <> OptionID) then
@@ -1354,7 +1404,10 @@ begin
 
   pcStatistics.TabIndex := OptionID;
   pcStatistics.ActivePage.ElementHandle.style.setProperty('opacity','1');
-  Form1.LogAction('[ Statistics: '+StringReplace(pcStatistics.ActivePage.Name,'pageAccount','',[])+' ]');
+  if CurrentStatsPage <> pcStatistics.ActivePage.Name
+  then Form1.LogAction('[ Statistics: '+StringReplace(pcStatistics.ActivePage.Name,'pageAccount','',[])+' ]');
+  CurrentStatsPage := pcStatistics.ActivePage.Name;
+
 
   if pcStatistics.ActivePage.Name = 'pageLogins' then
   begin
@@ -1517,6 +1570,7 @@ begin
   } end; {$ENDIF}
 
   btnLoginsPeriod.Caption := PeriodName;
+  CurrentChartPeriod := PeriodName;
 
   Form1.PreventCompilerHint(EndPeriod);
 end;
@@ -1664,7 +1718,7 @@ begin
       columns: [
         { title: "", width: 5, minWidth: 5},
         { title: "Period", field: "period", width: 150 },
-        { title: "Logins", field: "logins", width: 10, hozAlign: "right" },
+        { title: "Users", field: "logins", width: 10, hozAlign: "right" },
         { title: "" }
       ]
     });
@@ -1696,10 +1750,10 @@ begin
         This.dateLogins1Display = '<div>'+dateStr+'</div>';
         btnLoginsDateTime1.innerHTML = This.dateLogins1Display;
         document.activeElement.blur()
+        This.UpdateLoginsDateAdjustments();
         if (This.ModuleInit == false) {
           This.btnLoginsRefreshClick(null);
         }
-        This.UpdateLoginsDateAdjustments();
       }
     });
     this.dateLogins2 = flatpickr('#divLoginsCalendarEdit2', {
@@ -1715,10 +1769,10 @@ begin
         This.dateLogins2Display = '<div>'+dateStr+'</div>';
         btnLoginsDateTime2.innerHTML = This.dateLogins2Display;
         document.activeElement.blur();
+        This.UpdateLoginsDateAdjustments();
         if (This.ModuleInit == false) {
           This.btnLoginsRefreshClick(null);
         }
-        This.UpdateLoginsDateAdjustments();
       }
     });
     this.dateLoginsAdjustment = 'month-start';

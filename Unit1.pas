@@ -546,19 +546,21 @@ type
     LastAction: String;              // Used to prevent adding duplicate lines (particularly blank lines)
     Current_ActionLog: String;       // The selected action long in the Accounts Activity page
 
-    User_ID: Integer;          // Used as the primary identifier
-    User_Account: String;      // Mainly used for login and display
+    User_Profile_Age: TDateTime; // When was the profile last retrieved
+    User_Profile: String;        // The actual User Profile data
+    User_ID: Integer;            // Used as the primary identifier
+    User_Account: String;        // Mainly used for login and display
     User_FirstName: String;
     User_MiddleName: String;
     User_LastName: String;
-    User_Name: String;         // Names combined into one
+    User_Name: String;           // Names combined into one
     User_Birthdate: String;
     User_Description: String;
     User_EMail: String;
-    User_Photo: String;        // Data URI - could be <svg> or <img src=http> or <img src="data"> for example
+    User_Photo: String;          // Data URI - could be <svg> or <img src=http> or <img src="data"> for example
 
-    Roles: JSValue;             // All Available Roles (JSON)
-    User_Roles: TStringList;    // List of roles from JWT
+    Roles: JSValue;           // All Available Roles (JSON)
+    User_Roles: TStringList;  // List of roles from JWT
 
     tabAccountOptions: JSValue;
     tabAccountHistory: JSValue;
@@ -1552,6 +1554,8 @@ begin
 
   // User Information
   LoggedIn := False;
+  User_Profile := '{}';
+  User_Profile_Age := Now - 1;
   User_FirstName := '';
   User_MiddleName :=  '';
   User_LastName := '';
@@ -1639,7 +1643,7 @@ begin
   LogAction(' -- App Session: '+App_Session);
   LogAction(' -- App Theme: '+Theme);
   LogAction(' -- App IP Address: '+App_IPAddress);
-  LogAction(' -- App Location: ');
+  LogAction(' -- App Location');
 
   {$IFNDEF WIN32} asm {
     var locn = JSON.parse(this.App_Location);
@@ -1652,7 +1656,7 @@ begin
     this.LogAction(' ----- Language: '+locn[6]);
   } end; {$ENDIF}
 
-  LogAction(' -- App Device: ');
+  LogAction(' -- App Device');
 
   {$IFNDEF WIN32} asm {
     try {
@@ -1665,7 +1669,7 @@ begin
     this.LogAction(' ----- Vendor: '+dvc.vendor);
   } end; {$ENDIF}
 
-  LogAction(' -- App Browser: ');
+  LogAction(' -- App Browser');
 
   {$IFNDEF WIN32} asm {
     try {
@@ -1692,7 +1696,7 @@ begin
       ConfigURL = window.location.origin+(window.location.pathname.split('/').slice(0,-1).join('/')+'/blaugment_configuration.json').replace('/\/\//g','/');
     } end; {$ENDIF}
 
-    LogAction('Loading Configuration:');
+    LogAction('Loading Configuration');
     LogAction(' -- '+ConfigURL);
     WebHTTPRequest1.URL := ConfigURL;
     ConfigResponse := await( TJSXMLHttpRequest, WebHTTPRequest1.Perform() );
@@ -1703,7 +1707,7 @@ begin
 
       // Get Server URL - Presumably if we've got a config file, this is defined
       Server_URL := (ConfigData.GetValue('Server') as TJSONString).Value;
-      LogAction('Server (Configured):');
+      LogAction('Server (Configured)');
       LogAction(' -- '+Server_URL);
 
     end;
@@ -1716,7 +1720,7 @@ begin
   begin
     Server_URL := 'http://localhost:44444/tms/xdata';
     LogAction(' -- Configuration Missing');
-    LogAction('Server (Default):');
+    LogAction('Server (Default)');
     LogAction(' -- '+Server_URL);
   end;
 
@@ -2501,11 +2505,15 @@ begin
       if Trim(User_Photo) = ''
       then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
       btnAccount.ElementHandle.innerHTML := User_Photo;
-      await(btnAccountClick(Sender));
-      LogAction('Login Complete.');
-      LogAction(' ');
 
       await(tmrJWTRenewalTimer(Sender));
+      LogAction('Login Complete');
+      LogAction(' ');
+
+      {$IFNDEF WIN32} asm { await sleep(1000); } end; {$ENDIF}
+      await(btnAccountClick(Sender));
+      LogAction(' ');
+
     end
     else
     begin
@@ -2912,7 +2920,7 @@ begin
     try
       LogAction('Connecting to: '+XDataConn.URL);
       await(XDataConn.OpenAsync);
-      LogAction('Connection Established: ('+IntToStr(MillisecondsBetween(Now, ElapsedTime))+'ms)');
+      LogAction('Connection Established ('+IntToStr(MillisecondsBetween(Now, ElapsedTime))+'ms)');
     except on E: Exception do
       begin
         LogAction('Connection Unsuccessful: '+XDataConn.URL);
@@ -3056,7 +3064,7 @@ begin
         } end; {$ENDIF}
 
         // Log the error, but leave out the URI (because it includes the password)
-        LogAction('Login Exception:');
+        LogAction('Login Exception');
         LogAction(' -- EXCEPTION: '+E.ClassName);
         LogAction(' -- '+Copy(E.Message,1,Pos('Uri:',E.Message)-2));
         LogAction(' -- '+Copy(E.Message,Pos('Status code:',E.Message),16));
@@ -3130,11 +3138,11 @@ begin
   TWebLocalStorage.SetValue('Login.JWT', JWT);
   TWebLocalStorage.SetValue('Login.Expiry', FloatToStr(JWT_Expiry));
 
-  LogAction('Processing Token:');
+  LogAction('Processing Token');
   LogAction(' -- Name: '+StringReplace(User_FirstName+' '+User_MiddleName+' '+User_LastName,'  ',' ',[rfReplaceAll]));
   LogAction(' -- Account: '+User_Account);
   LogAction(' -- EMail: '+User_Email);
-  LogAction(' -- Active Roles:');
+  LogAction(' -- Active Roles');
   i := 0;
   while i < User_Roles.Count do
   begin
@@ -3145,7 +3153,7 @@ begin
   end;
 
   LogAction(' -- Expires: '+(JWTClaims.GetValue('unt') as TJSONString).Value);
-  LogAction(' -- Token Processed.');
+  LogAction(' -- Token Processed');
 
 end;
 
@@ -3271,13 +3279,16 @@ end;
 
 procedure TForm1.SelectPeriodRow(Category, ShortName, LongName,  PeriodStart, PeriodEnd, Adjustment: String);
 begin
+  LogAction('[ Selected Period: '+LongName+' ]');
   // Status - Logins
   if (divPeriods.Tag = 0) and (ShortName <> '') then
   begin
+    (StatsForm as TForm2).btnLoginsPeriod.Caption := LongName;
+    (StatsForm as TForm2).CurrentChartPeriod := LongName;
+
     {$IFNDEF WIN32} asm {
       var That = pas.Unit1.Form1.StatsForm;
       That.dateLoginsAdjustment = Adjustment;
-      That.btnLoginsPeriod.GetElementHandle().innerHTML = LongName;
       That.ModuleInit = true;
       That.dateLogins1.setDate(PeriodStart, true, 'Y-m-d H:i:s');
       That.ModuleInit = false;
@@ -3297,7 +3308,6 @@ begin
 
   if LoggedIn then
   begin
-    LogAction(' ');
     LogAction('Renew JWT');
   end;
 
@@ -3309,7 +3319,6 @@ begin
   begin
     await(ProcessJWT(ResponseString));
     LogAction('JWT Renewed');
-    LogAction(' ');
   end
   else
   begin
@@ -3358,8 +3367,11 @@ begin
     if Trim(User_Photo) = ''
     then User_Photo := '<img width="100%" style="transform: scale(1) translate(0%, 0%);" src="icons/favicon-192x192.png">';
     btnAccount.ElementHandle.innerHTML := User_Photo;
+    LogAction('Login Complete');
+    LogAction(' ');
+
+    {$IFNDEF WIN32} asm { await sleep(1000); } end; {$ENDIF}
     await(btnAccountClick(Sender));
-    LogAction('Login Complete.');
     LogAction(' ');
 
     State := 'Home';
@@ -3508,7 +3520,18 @@ begin
   divAuthorProfileName.ElementHandle.innerHTML := '<div class="LabelAlt DropShadow ps-1 pe-5" style="width: auto; overflow: hidden; text-overflow: ellipsis;">'+User_Name+'</div>';
 
   // Get other Account Information
-  ResponseString := await(JSONRequest('IPersonService.Profile',[]));
+  if User_Profile_Age < IncMinute(Now, -5) then
+  begin
+    LogAction('Retrieving Account Information');
+    ResponseString := await(JSONRequest('IPersonService.Profile',[]));
+    User_Profile := ResponseString;
+    User_Profile_Age := Now;
+  end
+  else
+  begin
+    ResponseString := User_Profile;
+  end;
+
   if ResponseString <> '' then
   begin
     {$IFNDEF WIN32} asm {
@@ -3932,7 +3955,7 @@ begin
   begin
     if (Sender is TWebButton)
     then LogAction('Error: Unexpected Period: '+(Sender as TWebButton).Name)
-    else LogAction('Error: Unexpected Period.');
+    else LogAction('Error: Unexpected Period');
     exit;
   end;
 
@@ -4276,7 +4299,7 @@ begin
 
   SessionCount := 0;
   {$IFNDEF WIN32} asm {
-    this.tabAccountSessions.redraw(false);
+    this.tabAccountSessions.redraw(true);
     SessionCount = this.tabAccountSessions.getDataCount();
     divSessionList.firstElementChild.style.setProperty('position','absolute');
     divSessionList.firstElementChild.style.setProperty('z-index', '10');
@@ -4302,7 +4325,8 @@ var
 
   procedure AfterCreate(AForm: TObject);
   begin
-    LogAction('[ Statistics Loaded ('+IntToStr(MillisecondsBetween(Now, ElapsedTime))+'ms) ]');
+    LogAction('[ Server Statistics ]');
+    LogAction('Statistics Form Loaded ('+IntToStr(MillisecondsBetween(Now, ElapsedTime))+'ms)');
   end;
 
 begin
@@ -5036,7 +5060,7 @@ end;
 procedure TForm1.FinalRequest;
 begin
   LogAction(' ');
-  LogAction('Browser Closed.');
+  LogAction('Browser Closed');
   LogAction('Session Duration: '+FormatDateTime('h"h "m"m "s"s"', Now - App_Start));
   LoggedIn := False;
   tmrJWTRenewalTimer(nil);
@@ -5217,6 +5241,7 @@ begin
   divAccount.ElementHandle.style.removeProperty('transform');
 
   LogAction('[ Account Settings Closed ]');
+  LogAction(' ');
 
   State := 'Home';
   StatePosition := StatePosition + 1;
@@ -5234,6 +5259,7 @@ begin
   then LogAction('[ Account Settings Refresh ]')
   else LogAction('Refreshing Account Settings');
 
+  User_Profile_Age := Now - 1;
   await(btnAccountClick(Sender));
 
   LogAction('Account Settings Refreshed');
