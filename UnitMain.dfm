@@ -1,4 +1,4 @@
-object Form1: TForm1
+object FormMain: TFormMain
   Width = 1361
   Height = 1091
   Caption = 'blaugment'
@@ -2933,7 +2933,7 @@ object Form1: TForm1
       ElementTabActiveClassName = 'nav-link active'
       ElementTabItemClassName = 'nav-item'
       ElementFont = efCSS
-      TabIndex = 8
+      TabIndex = 0
       ShowTabs = False
       TabOrder = 2
       Visible = False

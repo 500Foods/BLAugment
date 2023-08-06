@@ -20,7 +20,7 @@ object MainForm: TMainForm
   TextHeight = 13
   object mmInfo: TMemo
     Left = 8
-    Top = 39
+    Top = 40
     Width = 727
     Height = 454
     Anchors = [akLeft, akTop, akRight, akBottom]
@@ -82,5 +82,18 @@ object MainForm: TMainForm
     OnTimer = tmrInitTimer
     Left = 352
     Top = 240
+  end
+  object NetHTTPClient1: TNetHTTPClient
+    Asynchronous = False
+    ConnectionTimeout = 10000
+    ResponseTimeout = 10000
+    HandleRedirects = False
+    AllowCookies = False
+    UserAgent = 'Embarcadero URI Client/1.0'
+    SecureProtocols = [SSL3, TLS12]
+    OnValidateServerCertificate = NetHTTPClient1ValidateServerCertificate
+    OnRequestError = NetHTTPClient1RequestError
+    Left = 184
+    Top = 424
   end
 end

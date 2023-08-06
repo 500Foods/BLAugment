@@ -1,4 +1,4 @@
-unit Unit2;
+unit UnitStats;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls, WEBLib.StdCtrls, WEBLib.ComCtrls, WEBLib.ExtCtrls;
 
 type
-  TForm2 = class(TWebForm)
+  TFormStats = class(TWebForm)
     divStatsHolder: TWebHTMLDiv;
     divStatOptions: TWebHTMLDiv;
     pcStatistics: TWebPageControl;
@@ -133,7 +133,7 @@ type
   end;
 
 var
-  Form2: TForm2;
+  FormStats: TFormStats;
 
 const
   Aggregates: Array[1..8] of String = ('15 mins', '1 hour', '3 hours', '1 day', '1 week', '1 month', '1 quarter', '1 year');
@@ -142,10 +142,10 @@ implementation
 
 {$R *.dfm}
 
-uses Unit1;
+uses UnitMain;
 
 
-procedure TForm2.CreateD3BarChart(Chart: TWebHTMLDiv; XData: String; YData: String; Quick: Boolean);
+procedure TFormStats.CreateD3BarChart(Chart: TWebHTMLDiv; XData: String; YData: String; Quick: Boolean);
 var
   NewChart: TWebHTMLDiv;
   ChartID: String;
@@ -273,7 +273,7 @@ begin
 
     var rx = 8;
     var ry = 8;
-    var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+    var Tab = pas.UnitMain.FormMain.StatsForm.tabLogins;
     var rows = [];
 
     svg.append("g")
@@ -319,18 +319,18 @@ begin
        })
        .on('click', function(d) {
          d3.select(this).attr("fill", function(d) {
-           var rows = pas.Unit1.Form1.StatsForm.tabLogins.searchRows('period','=',d);
+           var rows = pas.UnitMain.FormMain.StatsForm.tabLogins.searchRows('period','=',d);
            if (rows.length > 0) {
              rows[0].toggleSelect();
              if (rows[0].isSelected()) {
 
                // This doesn't work because we've setup an external scroll mechanism - SimpleBar
                // This means that Tabulator always thinks its rows are all visible, and no scrolling is required
-               // pas.Unit1.Form1.StatsForm.tabLogins.scrollToRow(rows[0], "top", true);
+               // pas.UnitMain.FormMain.StatsForm.tabLogins.scrollToRow(rows[0], "top", true);
 
                // Instead, we find out where the row is and scroll SimpleBar to that position instead
-               var toprow = pas.Unit1.Form1.StatsForm.tabLogins.getRowPosition(rows[0]) - 1;
-               pas.Unit1.Form1.StatsForm.scrollLogins.getScrollElement().scrollTo(0,toprow * 24)
+               var toprow = pas.UnitMain.FormMain.StatsForm.tabLogins.getRowPosition(rows[0]) - 1;
+               pas.UnitMain.FormMain.StatsForm.scrollLogins.getScrollElement().scrollTo(0,toprow * 24)
 
                return "url(#gradient-highlight"+ChartID+")";
              } else {
@@ -348,7 +348,7 @@ begin
        .attr("class", "y-axis d3axis")
        .call(yAxis);
 
-    pas.Unit1.Form1.StatsForm.CurrentChart = svg;
+    pas.UnitMain.FormMain.StatsForm.CurrentChart = svg;
 
     function zoom(svg) {
       const extent = [[margin.left, margin.top], [width - margin.right, height - margin.top]];
@@ -381,10 +381,10 @@ begin
     Chart.ElementHandle.style.setProperty('opacity','1');
   end;
 
-  Form1.PreventCompilerHint(ChartRoundingCode);
+  FormMain.PreventCompilerHint(ChartRoundingCode);
 end;
 
-procedure TForm2.AddStatsBootstrapTooltips;
+procedure TFormStats.AddStatsBootstrapTooltips;
 begin
   // If Font Awesome Pro is not available, switch to the free version
   //Button.Caption := StringReplace(Button.Caption,'fa-duotone','fa-solid',[]);
@@ -394,7 +394,7 @@ begin
     var hint = '';
     for (var i = 0; i < elements.length; i++) {
       if (elements[i].id !== undefined) {
-        hint = eval('pas.Unit1.Form1.StatsForm.'+elements[i].id+'.FHint');
+        hint = eval('pas.UnitMain.FormMain.StatsForm.'+elements[i].id+'.FHint');
         if (hint !== '') {
           elements[i].setAttribute('title',hint);
           elements[i].setAttribute('data-bs-toggle','tooltip');
@@ -407,14 +407,14 @@ begin
     }
   } end; {$ENDIF}
 
-  Form1.HideTooltips;
+  FormMain.HideTooltips;
 end;
 
-procedure TForm2.btnLogins15mClick(Sender: TObject);
+procedure TFormStats.btnLogins15mClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 1 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 15m ]');
+    FormMain.LogAction('[ Changed Aggregate to 15m ]');
     divLoginsAggChoices.Tag := 1;
     btnLogins15m.ElementHandle.classList.add('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -428,11 +428,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins1dClick(Sender: TObject);
+procedure TFormStats.btnLogins1dClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 4 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 1d ]');
+    FormMain.LogAction('[ Changed Aggregate to 1d ]');
     divLoginsAggChoices.Tag := 4;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -446,11 +446,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins1hrClick(Sender: TObject);
+procedure TFormStats.btnLogins1hrClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 2 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 1h ]');
+    FormMain.LogAction('[ Changed Aggregate to 1h ]');
     divLoginsAggChoices.Tag := 2;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.add('Selected');
@@ -464,11 +464,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins1moClick(Sender: TObject);
+procedure TFormStats.btnLogins1moClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 6 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 1mo ]');
+    FormMain.LogAction('[ Changed Aggregate to 1mo ]');
     divLoginsAggChoices.Tag := 6;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -482,11 +482,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins1yClick(Sender: TObject);
+procedure TFormStats.btnLogins1yClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 8 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 1y ]');
+    FormMain.LogAction('[ Changed Aggregate to 1y ]');
     divLoginsAggChoices.Tag := 8;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -500,11 +500,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins3hrClick(Sender: TObject);
+procedure TFormStats.btnLogins3hrClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 3 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 3h ]');
+    FormMain.LogAction('[ Changed Aggregate to 3h ]');
     divLoginsAggChoices.Tag := 3;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -518,11 +518,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins3moClick(Sender: TObject);
+procedure TFormStats.btnLogins3moClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 7 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 1q ]');
+    FormMain.LogAction('[ Changed Aggregate to 1q ]');
     divLoginsAggChoices.Tag := 7;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -536,11 +536,11 @@ begin
   end;
 end;
 
-procedure TForm2.btnLogins7dClick(Sender: TObject);
+procedure TFormStats.btnLogins7dClick(Sender: TObject);
 begin
   if divLoginsAggChoices.Tag <> 5 then
   begin
-    Form1.LogAction('[ Changed Aggregate to 1w ]');
+    FormMain.LogAction('[ Changed Aggregate to 1w ]');
     divLoginsAggChoices.Tag := 5;
     btnLogins15m.ElementHandle.classList.remove('Selected');
     btnLogins1hr.ElementHandle.classList.remove('Selected');
@@ -554,10 +554,10 @@ begin
   end;
 end;
 
-procedure TForm2.btnLoginsClearSelectionClick(Sender: TObject);
+procedure TFormStats.btnLoginsClearSelectionClick(Sender: TObject);
 begin
   {$IFNDEF WIN32} asm {
-    var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+    var Tab = pas.UnitMain.FormMain.StatsForm.tabLogins;
     Tab.deselectRow();
     for (var i = 1; i <= Tab.getDataCount(); i++) {
       var row = Tab.getRowFromPosition(i);
@@ -567,20 +567,20 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm2.btnLoginsCloseClick(Sender: TObject);
+procedure TFormStats.btnLoginsCloseClick(Sender: TObject);
 begin
-  Form1.divStatisticsLabelClick(Sender);
+  FormMain.divStatisticsLabelClick(Sender);
 end;
 
-procedure TForm2.btnLoginsCopyChartClick(Sender: TObject);
+procedure TFormStats.btnLoginsCopyChartClick(Sender: TObject);
 var
   ChartName: String;
 begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin fa-xl"></i>';
 
   if divLoginsChoices.Tag = 1
-  then ChartName := Form1.App_Short+'-Chart-Users'
-  else ChartName := Form1.App_Short+'-Chart-Logins';
+  then ChartName := FormMain.App_Short+'-Chart-Users'
+  else ChartName := FormMain.App_Short+'-Chart-Logins';
   ChartName := ChartName +
     '-' +
     StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
@@ -588,7 +588,7 @@ begin
     StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]) +
     '.png';
 
-  Form1.LogAction('[ Copy Chart: '+ChartName+' ]');
+  FormMain.LogAction('[ Copy Chart: '+ChartName+' ]');
 
   {$IFNDEF WIN32} asm {
     try {
@@ -612,7 +612,7 @@ begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-xl"></i>';
 end;
 
-procedure TForm2.btnLoginsDateTime1Click(Sender: TObject);
+procedure TFormStats.btnLoginsDateTime1Click(Sender: TObject);
 begin
   {$IFNDEF WIN32} asm {
     divLoginsCalendarEdit1.style.setProperty('left',(btnLoginsDateTime1.getBoundingClientRect().x - divLoginsDateChoices.getBoundingClientRect().x - 25)+'px');
@@ -621,7 +621,7 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm2.btnLoginsDateTime2Click(Sender: TObject);
+procedure TFormStats.btnLoginsDateTime2Click(Sender: TObject);
 begin
   {$IFNDEF WIN32} asm {
     divLoginsCalendarEdit2.style.setProperty('left',(btnLoginsDateTime2.getBoundingClientRect().x - divLoginsDateChoices.getBoundingClientRect().x - 25)+'px');
@@ -630,15 +630,15 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm2.btnLoginsDownloadChartClick(Sender: TObject);
+procedure TFormStats.btnLoginsDownloadChartClick(Sender: TObject);
 var
   ChartName: String;
 begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin fa-xl"></i>';
 
   if divLoginsChoices.Tag = 1
-  then ChartName := Form1.App_Short+'-Chart-Users'
-  else ChartName := Form1.App_Short+'-Chart-Logins';
+  then ChartName := FormMain.App_Short+'-Chart-Users'
+  else ChartName := FormMain.App_Short+'-Chart-Logins';
   ChartName := ChartName +
     '-' +
     StringReplace(CurrentChartPeriod,' ','',[rfReplaceAll]) +
@@ -647,7 +647,7 @@ begin
     '-'+FormatDateTime('yyyymmdd-hhnnss',Now)+
     '.png';
 
-  Form1.LogAction('[ Download Chart: '+ChartName+' ]');
+  FormMain.LogAction('[ Download Chart: '+ChartName+' ]');
 
   {$IFNDEF WIN32} asm {
     var blob = await modernScreenshot.domToBlob(document.querySelector('#divLoginsChart'));
@@ -667,7 +667,7 @@ begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-xl"></i>';
 end;
 
-procedure TForm2.btnLoginsEMailClick(Sender: TObject);
+procedure TFormStats.btnLoginsEMailClick(Sender: TObject);
 var
   RequestResponse: String;
   MailSubject: String;
@@ -690,9 +690,9 @@ begin
     ')';
 
 
-  FOrm1.LogAction('[ E-Mail Chart: '+MailSubject+' ]');
+  FormMain.LogAction('[ E-Mail Chart: '+MailSubject+' ]');
 
-  MailSubject := '['+Form1.App_Short+'/'+Form1.User_Account+'] '+MailSubject+' '+FormatDateTime('yyyy-MMM-dd HH:nn:ss',Now);
+  MailSubject := '['+FormMain.App_Short+'/'+FormMain.User_Account+'] '+MailSubject+' '+FormatDateTime('yyyy-MMM-dd HH:nn:ss',Now);
 
   MailFont := TStringList.Create;
   MailFont.LoadFromFile('fonts/cairo.woff.base64');
@@ -725,30 +725,30 @@ begin
   MailBody.Add(  '<body>');
   MailBody.Add(    '<div style="font-family: Cairo, Verdana, sans-serif; font-size: 16px; line-height: 1.2;">');
   MailBody.Add(      'Hello!');
-  MailBody.Add(      '<p style="font-family: Cairo, Verdana; font-size: 16px; line-height: 1.2;">A request was just made by '+Form1.User_Account+' at <a href="'+FOrm1.App_URLLink+'">'+Form1.App_Short+'</a> for this chart.</p>');
+  MailBody.Add(      '<p style="font-family: Cairo, Verdana; font-size: 16px; line-height: 1.2;">A request was just made by '+FormMain.User_Account+' at <a href="'+FormMain.App_URLLink+'">'+FormMain.App_Short+'</a> for this chart.</p>');
   MailBody.Add(      '<img width="100%" src="'+MailImage+'">');
   MailBody.Add(      '<div style="margin: 16px 0px 32px 0px; display: flex;">');
   MailBody.Add(        '<div style="display: flex; justify-content: center; align-items: center; padding-top: 4px; width: 60px;">');
-  MailBody.Add(          '<a title="'+Form1.App_URL+'" href="'+Form1.App_URLLink+'">');
+  MailBody.Add(          '<a title="'+FormMain.App_URL+'" href="'+FormMain.App_URLLink+'">');
   MailBody.Add(            '<img width="100%" src="'+MailIcon.Text+'">');
   MailBody.Add(          '</a>');
   MailBody.Add(        '</div>');
   MailBody.Add(        '<div style="display: flex; align-items: start; justify-content: center; margin-left: 10px; flex-direction: column;">');
   MailBody.Add(          '<div>Warmest Regards,</div>');
-  MailBody.Add(          '<div>The '+Form1.App_Short+' Concierge.</div>');
-  MailBody.Add(          '<div><a href="'+Form1.App_URLLink+'">'+Form1.App_URL+'</a></div>');
+  MailBody.Add(          '<div>The '+FormMain.App_Short+' Concierge.</div>');
+  MailBody.Add(          '<div><a href="'+FormMain.App_URLLink+'">'+FormMain.App_URL+'</a></div>');
   MailBody.Add(        '</div>');
   MailBody.Add(      '</div>');
   MailBody.Add(    '</div>');
   MailBody.Add(    '<p><pre style="font-size:10px; line-height:70%;">');
-  MailBody.Add(      'Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+Form1.App_TZ+'<br />');
-  MailBody.Add(      'Ref &raquo; '+Form1.App_OS_Short+'/'+Form1.App_Browser_short+'/'+Form1.App_IPAddress+'/'+Form1.App_Session+'<br />');
-  MailBody.Add(      'Res &raquo; '+Form1.App_Country+'/'+Form1.App_Region+'/'+Form1.App_City);
+  MailBody.Add(      'Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+FormMain.App_TZ+'<br />');
+  MailBody.Add(      'Ref &raquo; '+FormMain.App_OS_Short+'/'+FormMain.App_Browser_short+'/'+FormMain.App_IPAddress+'/'+FormMain.App_Session+'<br />');
+  MailBody.Add(      'Res &raquo; '+FormMain.App_Country+'/'+FormMain.App_Region+'/'+FormMain.App_City);
   MailBody.Add(    '</pre></p>');
   MailBody.Add(  '</body>');
   MailBody.Add('</html>');
 
-  RequestResponse := await(Form1.StringRequest('ISystemService.SendEMail',[
+  RequestResponse := await(FormMain.StringRequest('ISystemService.SendEMail',[
     MailSubject,
     MailBody.Text,
     'StatChart'
@@ -756,22 +756,22 @@ begin
 
   if RequestResponse = 'Sent' then
   begin
-    Form1.LogAction('Chart E-Mail Sent');
+    FormMain.LogAction('Chart E-Mail Sent');
   end
   else
   begin
-    Form1.LogAction('Chart E-Mail Failed:');
-    Form1.LogAction(RequestResponse);
+    FormMain.LogAction('Chart E-Mail Failed:');
+    FormMain.LogAction(RequestResponse);
   end;
 
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-xl"></i>';
 
-  Form1.PreventCompilerHint(MailSubject);
-  Form1.PreventCompilerHint(MailBody);
-  Form1.PreventCompilerHint(MailImage);
+  FormMain.PreventCompilerHint(MailSubject);
+  FormMain.PreventCompilerHint(MailBody);
+  FormMain.PreventCompilerHint(MailImage);
 end;
 
-procedure TForm2.btnLoginsExportClick(Sender: TObject);
+procedure TFormStats.btnLoginsExportClick(Sender: TObject);
 begin
 
   if btnLoginsExport.Tag = 0 then
@@ -810,7 +810,7 @@ begin
 
 end;
 
-procedure TForm2.btnLoginsExportPrintClick(Sender: TObject);
+procedure TFormStats.btnLoginsExportPrintClick(Sender: TObject);
 var
   ExportName: String;
 begin
@@ -826,8 +826,8 @@ begin
     StringReplace(Aggregates[divLoginsAggChoices.Tag],' ','',[rfReplaceAll]);
 
   if (Sender is TWebButton)
-  then Form1.LogAction('[ Exported Chart: '+ExportName+' ('+StringReplace(((Sender as TWebButton).ElementID),'btnLoginsExport','',[])+') ]')
-  else Form1.LogAction('[ Exported Chart: '+ExportName+' ]');
+  then FormMain.LogAction('[ Exported Chart: '+ExportName+' ('+StringReplace(((Sender as TWebButton).ElementID),'btnLoginsExport','',[])+') ]')
+  else FormMain.LogAction('[ Exported Chart: '+ExportName+' ]');
 
   ExportName := ExportName + '-'+FormatDateTime('yyyyMMdd-HHnnss',Now);
 
@@ -845,15 +845,15 @@ begin
 
 end;
 
-procedure TForm2.btnLoginsLoginsClick(Sender: TObject);
+procedure TFormStats.btnLoginsLoginsClick(Sender: TObject);
 begin
   if divLoginsChoices.Tag <> 2 then
   begin
-    Form1.LogAction('[ Selected Chart: Logins ]');
+    FormMain.LogAction('[ Selected Chart: Logins ]');
 
     // Update Column in Tabulator with a new value
     {$IFNDEF WIN32} asm {
-      var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+      var Tab = pas.UnitMain.FormMain.StatsForm.tabLogins;
       Tab.updateColumnDefinition("logins", {title:"Logins"});
     } end; {$ENDIF}
 
@@ -864,14 +864,14 @@ begin
   end;
 end;
 
-procedure TForm2.btnLoginsPeriodAfterClick(Sender: TObject);
+procedure TFormStats.btnLoginsPeriodAfterClick(Sender: TObject);
 var
   StartPeriod: TDateTime;
   EndPeriod: TDateTime;
   Date1: String;
   Date2: String;
 begin
-  Form1.LogAction('[ Selected Next Period ]');
+  FormMain.LogAction('[ Selected Next Period ]');
 
   StartPeriod := EncodeDateTime(
     StrToInt(Copy(dateLogins1Selected,  1, 4)),
@@ -962,7 +962,7 @@ begin
     Date1 := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', StartPeriod);
     Date2 := '';
     {$IFNDEF WIN32} asm {
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       if (This.Periods.length > 0) {
         for (var i = 0; i < This.Periods.length; i++) {
           if ((Date2 == '') && (Date1 == This.Periods[i]['period_start']) && (i > 1) && (This.Periods[i - 1]['adjustment'] == 'period')) {
@@ -994,18 +994,18 @@ begin
     this.dateLogins2.setDate(Date2, true, 'Y-m-d H:i:s');
   } end; {$ENDIF}
 
-  Form1.PreventCompilerHint(Date1);
-  Form1.PreventCompilerHint(Date2);
+  FormMain.PreventCompilerHint(Date1);
+  FormMain.PreventCompilerHint(Date2);
 end;
 
-procedure TForm2.btnLoginsPeriodBeforeClick(Sender: TObject);
+procedure TFormStats.btnLoginsPeriodBeforeClick(Sender: TObject);
 var
   StartPeriod: TDateTime;
   EndPeriod: TDateTime;
   Date1: String;
   Date2: String;
 begin
-  Form1.LogAction('[ Selected Previous Period ]');
+  FormMain.LogAction('[ Selected Previous Period ]');
 
   StartPeriod := EncodeDateTime(
     StrToInt(Copy(dateLogins1Selected,  1, 4)),
@@ -1097,7 +1097,7 @@ begin
     Date1 := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', StartPeriod);
     Date2 := '';
     {$IFNDEF WIN32} asm {
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       if (This.Periods.length > 0) {
         for (var i = 0; i < This.Periods.length; i++) {
           if ((Date2 == '') && (Date1 == This.Periods[i]['period_start']) && (i < (This.Periods.length - 1)) && (This.Periods[i + 1]['adjustment'] == 'period')) {
@@ -1129,46 +1129,46 @@ begin
     this.dateLogins2.setDate(Date2, true, 'Y-m-d H:i:s');
   } end; {$ENDIF}
 
-  Form1.PreventCompilerHint(Date1);
-  Form1.PreventCompilerHint(Date2);
+  FormMain.PreventCompilerHint(Date1);
+  FormMain.PreventCompilerHint(Date2);
 end;
 
-procedure TForm2.btnLoginsPeriodClick(Sender: TObject);
+procedure TFormStats.btnLoginsPeriodClick(Sender: TObject);
 begin
-  if (Trunc(Form1.PeriodsGenerated) <> Trunc(Now)) or
-     (MinutesBetween(Now, Form1.PeriodsGenerated) > 5)
-  then Form1.GeneratePeriods;
+  if (Trunc(FormMain.PeriodsGenerated) <> Trunc(Now)) or
+     (MinutesBetween(Now, FormMain.PeriodsGenerated) > 5)
+  then FormMain.GeneratePeriods;
 
-  Form1.divShade3.Visible := True;
-  Form1.divPeriods.Visible := True;
-  Form1.divPeriods.Tag := 0; // Statistics - Logins
-  Form1.divShade3.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
-  Form1.divPeriods.ElementHandle.style.setProperty('opacity','1.0');
+  FormMain.divShade3.Visible := True;
+  FormMain.divPeriods.Visible := True;
+  FormMain.divPeriods.Tag := 0; // Statistics - Logins
+  FormMain.divShade3.ElementHandle.style.setProperty('opacity','var(--bl-opacity)');
+  FormMain.divPeriods.ElementHandle.style.setProperty('opacity','1.0');
 
   {$IFNDEF WIN32} asm {
-    pas.Unit1.Form1.tabPeriods.redraw(true);
+    pas.UnitMain.FormMain.tabPeriods.redraw(true);
 //    divSessionList.firstElementChild.style.setProperty('position','absolute');
 //    divSessionList.firstElementChild.style.setProperty('z-index', '10');
 //    divSessionList.firstElementChild.style.setProperty('top', 'px');
   } end; {$ENDIF}
 
-  Form1.LogAction('[ Selecting Period ]');
+  FormMain.LogAction('[ Selecting Period ]');
 
-  Form1.State := 'Periods';
-  Form1.StatePosition := Form1.StatePosition + 1;
-  window.history.pushState(Form1.CaptureState, '', Form1.StateURL);
+  FormMain.State := 'Periods';
+  FormMain.StatePosition := FormMain.StatePosition + 1;
+  window.history.pushState(FormMain.CaptureState, '', FormMain.StateURL);
 
-  Form1.HideToolTips;
+  FormMain.HideToolTips;
 end;
 
-procedure TForm2.btnLoginsPrintClick(Sender: TObject);
+procedure TFormStats.btnLoginsPrintClick(Sender: TObject);
 var
   PageHeader: String;
 
 begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin fa-xl"></i>';
 
-  PageHeader := Form1.App_Name+' / '+Form1.App_Version+' / '+Form1.User_Account+' / Chart / ';
+  PageHeader := FormMain.App_Name+' / '+FormMain.App_Version+' / '+FormMain.User_Account+' / Chart / ';
 
   if divLoginsChoices.Tag = 1
   then PageHeader := PageHeader + 'Users / '
@@ -1180,7 +1180,7 @@ begin
     ' / ';
   PageHeader := PageHeader + FormatDateTime('yyyyMMdd-HHnnss',Now);
 
-  Form1.LogAction('[ Print Chart: '+PageHeader+' ]');
+  FormMain.LogAction('[ Print Chart: '+PageHeader+' ]');
 
   {$IFNDEF WIN32} asm {
     var MailImage = await modernScreenshot.domToPng(document.querySelector('#divLoginsChart'));
@@ -1195,7 +1195,7 @@ begin
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-xl"></i>';
 end;
 
-procedure TForm2.btnLoginsRefreshClick(Sender: TObject);
+procedure TFormStats.btnLoginsRefreshClick(Sender: TObject);
 var
   ResponseString: String;
   ResponseRecords: Integer;
@@ -1217,15 +1217,15 @@ begin
   QueryName := Query+' / '+CurrentChartPeriod+' / '+Aggregates[Aggregate]+' / '+dateLogins1Selected+' - '+dateLogins2Selected;
 
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnLoginsRefresh)
-  then Form1.LogAction('[ Refreshing Chart: '+QueryName+' ]')
-  else Form1.LogAction('Updating Chart: '+QueryName);
+  then FormMain.LogAction('[ Refreshing Chart: '+QueryName+' ]')
+  else FormMain.LogAction('Updating Chart: '+QueryName);
 
   // Dates are yyyy-MM-dd hh:nn:ss so this should work fine.
   if (dateLogins1Selected <> '') and
      (dateLogins2Selected <> '') and
      (dateLogins1Selected < dateLogins2Selected) then
   begin
-    ResponseString := await(Form1.JSONRequest('IStatisticsService.StatQuery',[
+    ResponseString := await(FormMain.JSONRequest('IStatisticsService.StatQuery',[
        Query,
        Aggregate,
        dateLogins1Selected,
@@ -1234,7 +1234,7 @@ begin
   end
   else
   begin
-    Form1.LogAction('Query Skipped: ( '+dateLogins1Selected+' ) > ( '+dateLogins2Selected+' )');
+    FormMain.LogAction('Query Skipped: ( '+dateLogins1Selected+' ) > ( '+dateLogins2Selected+' )');
     ResponseString := '[]';
   end;
 
@@ -1242,7 +1242,7 @@ begin
   YData := '';
   ResponseRecords := 0;
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1.StatsForm;
+    var This = pas.UnitMain.FormMain.StatsForm;
     var data = JSON.parse(ResponseString);
     var selectedrows = This.tabLogins.getSelectedRows();
 
@@ -1308,14 +1308,14 @@ begin
   divLoginsRecords.HTML := 'Records: <span style="color: var(--bl-color-input)">'+IntToStr(ResponseRecords)+'</span>';
   btnLoginsRefresh.Caption := '<i class="fa-duotone fa-rotate fa-xl"></i>';
   CreateD3BarChart(divLoginsD3Chart, XData, YData, False);
-  Form1.HideTooltips;
-  Form1.PreventCompilerHint(ResponseString);
+  FormMain.HideTooltips;
+  FormMain.PreventCompilerHint(ResponseString);
 end;
 
-procedure TForm2.btnLoginsSelectAllClick(Sender: TObject);
+procedure TFormStats.btnLoginsSelectAllClick(Sender: TObject);
 begin
   {$IFNDEF WIN32} asm {
-    var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+    var Tab = pas.UnitMain.FormMain.StatsForm.tabLogins;
     Tab.selectRow();
     for (var i = 1; i <= Tab.getDataCount(); i++) {
       var row = Tab.getRowFromPosition(i);
@@ -1325,7 +1325,7 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm2.btnLoginsShowDatesClick(Sender: TObject);
+procedure TFormStats.btnLoginsShowDatesClick(Sender: TObject);
 var
   PanelSize: Double;
 begin
@@ -1339,7 +1339,7 @@ begin
     btnLoginsDateTime2.Visible := True;
     btnLoginsShowDates.Caption := '<i class="fa-duotone fa-arrows-to-line fa-rotate-90 fa-xl"></i>';
     {$IFNDEF WIN32} asm {
-      var This = pas.Unit1.Form1.StatsForm;
+      var This = pas.UnitMain.FormMain.StatsForm;
       btnLoginsDateTime1.innerHTML = This.dateLogins1Display;
       btnLoginsDateTime2.innerHTML = This.dateLogins2Display;
     } end; {$ENDIF}
@@ -1357,18 +1357,18 @@ begin
     if PanelSize <> divLoginsHeader.ElementHandle.getBoundingClientRect.Height
     then btnLoginsRefreshClick(Sender);
   end;
-  Form1.HideTooltips;
+  FormMain.HideTooltips;
 end;
 
-procedure TForm2.btnLoginsUniqueLoginsClick(Sender: TObject);
+procedure TFormStats.btnLoginsUniqueLoginsClick(Sender: TObject);
 begin
   if divLoginsChoices.Tag <> 1 then
   begin
-    Form1.LogAction('[ Selected Chart: Users ]');
+    FormMain.LogAction('[ Selected Chart: Users ]');
 
     // Update Column in Tabulator with a new value
     {$IFNDEF WIN32} asm {
-      var Tab = pas.Unit1.Form1.StatsForm.tabLogins;
+      var Tab = pas.UnitMain.FormMain.StatsForm.tabLogins;
       Tab.updateColumnDefinition("logins", {title:"Users"});
     } end; {$ENDIF}
 
@@ -1381,9 +1381,9 @@ begin
 
 end;
 
-procedure TForm2.SelectStatOption(OptionID: Integer);
+procedure TFormStats.SelectStatOption(OptionID: Integer);
 begin
-  Form1.HideTooltips;
+  FormMain.HideTooltips;
   CurrentStatsPage := pcStatistics.ActivePage.Name;
 
   // Fade In/Out between pages
@@ -1394,7 +1394,7 @@ begin
   end;
 
   {$IFNDEF WIN32} asm {
-    if (pas.Unit1.Form1.MenusCollapsed == true) {
+    if (pas.UnitMain.FormMain.MenusCollapsed == true) {
       divStatOptions.style.setProperty('width','40px');
     }
     else {
@@ -1405,7 +1405,7 @@ begin
   pcStatistics.TabIndex := OptionID;
   pcStatistics.ActivePage.ElementHandle.style.setProperty('opacity','1');
   if CurrentStatsPage <> pcStatistics.ActivePage.Name
-  then Form1.LogAction('[ Statistics: '+StringReplace(pcStatistics.ActivePage.Name,'pageAccount','',[])+' ]');
+  then FormMain.LogAction('[ Statistics: '+StringReplace(pcStatistics.ActivePage.Name,'pageAccount','',[])+' ]');
   CurrentStatsPage := pcStatistics.ActivePage.Name;
 
 
@@ -1415,7 +1415,7 @@ begin
   end;
 end;
 
-procedure TForm2.UpdateLoginsDateAdjustments;
+procedure TFormStats.UpdateLoginsDateAdjustments;
 var
   StartPeriod: TDateTime;
   EndPeriod: TDateTime;
@@ -1542,7 +1542,7 @@ begin
 
   PeriodName := 'Custom';
   {$IFNDEF WIN32} asm {
-    var That = pas.Unit1.Form1;
+    var That = pas.UnitMain.FormMain;
 
     // Search list of buttons for a match
     var i = 0;
@@ -1572,17 +1572,17 @@ begin
   btnLoginsPeriod.Caption := PeriodName;
   CurrentChartPeriod := PeriodName;
 
-  Form1.PreventCompilerHint(EndPeriod);
+  FormMain.PreventCompilerHint(EndPeriod);
 end;
 
-procedure TForm2.UpdateStatsNumbers;
+procedure TFormStats.UpdateStatsNumbers;
 var
   ResponseString: String;
 begin
-  ResponseString := await(Form1.JSONRequest('IStatisticsService.Today',[]));
+  ResponseString := await(FormMain.JSONRequest('IStatisticsService.Today',[]));
 
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1.StatsForm;
+    var This = pas.UnitMain.FormMain.StatsForm;
     var data = JSON.parse(ResponseString);
     This.tabStatOptions.getRow(0).getCell('Entries').setValue((data['Logins'][0]['logins']).toLocaleString());
     This.tabStatOptions.getRow(1).getCell('Entries').setValue((data['Sessions'][0]['sessions']).toLocaleString());
@@ -1593,10 +1593,10 @@ begin
     This.tabStatOptions.getRow(6).getCell('Entries').setValue((data['Endpoints'][0]['endpoints']).toLocaleString());
   } end; {$ENDIF}
 
-  Form1.PreventCompilerHint(ResponseString);
+  FormMain.PreventCompilerHint(ResponseString);
 end;
 
-procedure TForm2.WebFormCreate(Sender: TObject);
+procedure TFormStats.WebFormCreate(Sender: TObject);
 begin
 
   // Initialize this module
@@ -1666,17 +1666,17 @@ begin
       ]
     });
     this.tabStatOptions.on('rowClick', function(e, row){
-      var This = pas.Unit1.Form1.StatsForm;
+      var This = pas.UnitMain.FormMain.StatsForm;
       This.tabStatOptions.selectRow([row]);
       This.SelectStatOption(row.getCell('ID').getValue());
     });
     this.tabStatOptions.on('tableBuilt', function(e, row){
-      var This = pas.Unit1.Form1.StatsForm;
+      var This = pas.UnitMain.FormMain.StatsForm;
       This.tabStatOptions.selectRow([0]);
     });
     this.tabStatOptions.on('rowDblClick', function(e, row){
-      var This = pas.Unit1.Form1.StatsForm;
-      var That = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain.StatsForm;
+      var That = pas.UnitMain.FormMain;
       This.tabStatOptions.selectRow([row]);
       This.SelectStatOption(row.getCell('ID').getValue());
       if (That.MenusCollapsed == true) {
@@ -1723,7 +1723,7 @@ begin
       ]
     });
     this.tabLogins.on('rowClick', function(e, row){
-      var This = pas.Unit1.Form1.StatsForm;
+      var This = pas.UnitMain.FormMain.StatsForm;
       var bar = document.getElementById('Bar-Period-'+row.getCell('period').getValue().replaceAll('-','').replaceAll(':','').replaceAll(' ',''));
       if (row.isSelected()) {
         bar.setAttribute('fill', 'url(#gradient-highlightdivLoginsD3Chart-D3)');
@@ -1745,7 +1745,7 @@ begin
       time_24hr: true,
       dateFormat: "Y-M-d (D) H:i",
       onChange: function(selectedDates, dateStr, instance) {
-        var This = pas.Unit1.Form1.StatsForm;
+        var This = pas.UnitMain.FormMain.StatsForm;
         This.dateLogins1Selected = luxon.DateTime.fromJSDate(selectedDates[0]).toFormat('yyyy-MM-dd HH:mm:ss.SSS');
         This.dateLogins1Display = '<div>'+dateStr+'</div>';
         btnLoginsDateTime1.innerHTML = This.dateLogins1Display;
@@ -1764,7 +1764,7 @@ begin
       time_24hr: true,
       dateFormat: "Y-M-d (D) H:i",
       onChange: function(selectedDates, dateStr, instance) {
-        var This = pas.Unit1.Form1.StatsForm;
+        var This = pas.UnitMain.FormMain.StatsForm;
         This.dateLogins2Selected = luxon.DateTime.fromJSDate(selectedDates[0]).toFormat('yyyy-MM-dd HH:mm:ss.SSS');
         This.dateLogins2Display = '<div>'+dateStr+'</div>';
         btnLoginsDateTime2.innerHTML = This.dateLogins2Display;

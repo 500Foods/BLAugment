@@ -1,4 +1,4 @@
-﻿unit Unit1;
+﻿unit UnitMain;
 
 interface
 
@@ -30,7 +30,7 @@ uses
   WEBLib.ExtCtrls;
 
 type
-  TForm1 = class(TWebForm)
+  TFormMain = class(TWebForm)
     divHeader: TWebHTMLDiv;
     divLogo: TWebHTMLDiv;
     divMainMenu: TWebHTMLDiv;
@@ -619,15 +619,15 @@ type
   end;
 
 var
-  Form1: TForm1;
+  FormMain: TFormMain;
 
 implementation
 
-uses Unit2;
+uses UnitStats;
 
 {$R *.dfm}
 
-procedure TForm1.GeneratePeriods;
+procedure TFormMain.GeneratePeriods;
 var
   Period: Integer;
   PeriodShort: String;
@@ -660,7 +660,7 @@ var
     PeriodEndValue := FormatDateTime('yyyy-mm-dd hh:nn:ss', PeriodEnd);
 
     {$IFNDEF WIN32} asm {
-      pas.Unit1.Form1.PeriodArray.push({
+      pas.UnitMain.FormMain.PeriodArray.push({
         "id":Period,
         "long_name": PeriodLong,
         "short_name": PeriodShort,
@@ -958,7 +958,7 @@ begin
   PeriodStartDisplay := '';
   PeriodEndDisplay := '';
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var found = 0;
     if (This.Periods.length > 0) {
       for (var i = 0; i < This.Periods.length; i++) {
@@ -1070,7 +1070,7 @@ begin
   PeriodStartDisplay := '';
   PeriodEndDisplay := '';
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var found = 0;
     if (This.Periods.length > 0) {
       for (var i = 0; i < This.Periods.length; i++) {
@@ -1183,7 +1183,7 @@ begin
   PeriodStartDisplay := '';
   PeriodEndDisplay := '';
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var found = 0;
     if (This.Periods.length > 0) {
       for (var i = 0; i < This.Periods.length; i++) {
@@ -1217,7 +1217,7 @@ begin
   PreventcompilerHint(PeriodAdjustment);
 end;
 
-function TForm1.GetFavIcon(FavURL: String): String;
+function TFormMain.GetFavIcon(FavURL: String): String;
 var
   Domain: String;
   ImageLink: String;
@@ -1269,7 +1269,7 @@ begin
 
 end;
 
-procedure TForm1.PhotoChanged;
+procedure TFormMain.PhotoChanged;
 begin
   if btnPhotoCancel.Tag <> 1 then
   begin
@@ -1278,13 +1278,13 @@ begin
   end;
 end;
 
-procedure TForm1.PhotoNotChanged;
+procedure TFormMain.PhotoNotChanged;
 begin
   btnPhotoSave.Enabled := False;
   btnPhotoCancel.Enabled := False;
 end;
 
-procedure TForm1.HideToolTips;
+procedure TFormMain.HideToolTips;
 begin
   {$IFNDEF WIN32} asm {
     setTimeout(function() {
@@ -1312,7 +1312,7 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm1.btnActivityLogEMailClick(Sender: TObject);
+procedure TFormMain.btnActivityLogEMailClick(Sender: TObject);
 var
   RequestResponse: String;
   MailSubject: String;
@@ -1331,7 +1331,7 @@ begin
   MailIcon := TStringList.Create;
   MailIcon.LoadFromFile('icons/favicon-512x512.png.base64');
 
-  MailSubject := '['+Form1.App_Short+'/'+Form1.User_Account+'] Acitivity Log for '+btnSelectActivityLog.Caption;
+  MailSubject := '['+FormMain.App_Short+'/'+FormMain.User_Account+'] Acitivity Log for '+btnSelectActivityLog.Caption;
 
   MailBody := TStringList.Create;
   MailBody.Add('<!DOCTYPE html>');
@@ -1355,28 +1355,28 @@ begin
   MailBody.Add('<div style="font-family: Cairo, Verdana, sans-serif; font-size: 16px; line-height: 1.2;">');
 
     MailBody.Add('Hello!');
-    MailBody.Add('<p style="font-family: Cairo, Verdana; font-size: 16px; line-height: 1.2;">A request was just made by '+Form1.User_Account+' at <a href="'+FOrm1.App_URLLink+'">'+Form1.App_Short+'</a> for this activity log.</p>');
+    MailBody.Add('<p style="font-family: Cairo, Verdana; font-size: 16px; line-height: 1.2;">A request was just made by '+FormMain.User_Account+' at <a href="'+FormMain.App_URLLink+'">'+FormMain.App_Short+'</a> for this activity log.</p>');
 
     MailBody.Add(divActionLog.ElementHandle.innerHTML);
 
     MailBody.Add('<div style="margin: 16px 0px 32px 0px; display: flex;">');
       MailBody.Add('<div style="display: flex; justify-content: center; align-items: center; padding-top: 4px; width: 60px;">');
-        MailBody.Add('<a title="'+Form1.App_URL+'" href="'+Form1.App_URLLink+'">');
+        MailBody.Add('<a title="'+FormMain.App_URL+'" href="'+FormMain.App_URLLink+'">');
           MailBody.Add('<img width="100%" src="'+MailIcon.Text+'">');
         MailBody.Add('</a>');
       MailBody.Add('</div>');
       MailBody.Add('<div style="display: flex; align-items: start; justify-content: center; margin-left: 10px; flex-direction: column;">');
         MailBody.Add('<div>Warmest Regards,</div>');
-        MailBody.Add('<div>The '+Form1.App_Short+' Concierge.</div>');
-        MailBody.Add('<div><a href="'+Form1.App_URLLink+'">'+Form1.App_URL+'</a></div>');
+        MailBody.Add('<div>The '+FormMain.App_Short+' Concierge.</div>');
+        MailBody.Add('<div><a href="'+FormMain.App_URLLink+'">'+FormMain.App_URL+'</a></div>');
       MailBody.Add('</div>');
     MailBody.Add('</div>');
   MailBody.Add('</div>');
 
   MailBody.Add('<p><pre style="font-size:10px; line-height:70%;">');
-  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+Form1.App_TZ+'<br />');
-  MailBody.Add('Ref &raquo; '+Form1.App_OS_Short+'/'+Form1.App_Browser_short+'/'+Form1.App_IPAddress+'/'+Form1.App_Session+'<br />');
-  MailBody.Add('Res &raquo; '+Form1.App_Country+'/'+Form1.App_Region+'/'+Form1.App_City);
+  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+FormMain.App_TZ+'<br />');
+  MailBody.Add('Ref &raquo; '+FormMain.App_OS_Short+'/'+FormMain.App_Browser_short+'/'+FormMain.App_IPAddress+'/'+FormMain.App_Session+'<br />');
+  MailBody.Add('Res &raquo; '+FormMain.App_Country+'/'+FormMain.App_Region+'/'+FormMain.App_City);
   MailBody.Add('</pre></p>');
 
   MailBody.Add('  </body>');
@@ -1402,7 +1402,7 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnActivityLogPrintClick(Sender: TObject);
+procedure TFormMain.btnActivityLogPrintClick(Sender: TObject);
 var
   PageHeader: String;
 
@@ -1421,14 +1421,14 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm1.UpdateAccountLinks;
+procedure TFormMain.UpdateAccountLinks;
 begin
   {$IFNDEF WIN32} asm {
     this.tabAccountOptions.getRow(3).getCell('Entries').setValue(this.tabAccountLinks.getDataCount().toLocaleString());
     divAuthorProfileLinks.innerHTML = '';
     for (var i = 1; i <= this.tabAccountLinks.getDataCount(); i++) {
       var row = this.tabAccountLinks.getRowFromPosition(i);
-      var image = pas.Unit1.Form1.GetFavIcon(row.getCell('Link').getValue());
+      var image = pas.UnitMain.FormMain.GetFavIcon(row.getCell('Link').getValue());
       divAuthorProfileLinks.innerHTML += image;
     }
 
@@ -1442,7 +1442,7 @@ begin
     });
 
     // Also update navigator buttons
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var tab = This.tabAccountLinks;
     var rowcount = tab.getDataCount();
 
@@ -1468,7 +1468,7 @@ begin
 
 end;
 
-procedure TForm1.WebFormCreate(Sender: TObject);
+procedure TFormMain.WebFormCreate(Sender: TObject);
 var
   i: Int64;
   ConfigResponse: TJSXMLHttpRequest;
@@ -1860,12 +1860,12 @@ begin
       ]
     });
     this.tabAccountOptions.on('rowClick', function(e, row){
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       This.tabAccountOptions.selectRow([row]);
       This.SelectAccountOption(row.getCell('ID').getValue());
     });
     this.tabAccountOptions.on('rowDblClick', function(e, row){
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       This.tabAccountOptions.selectRow([row]);
       This.SelectAccountOption(row.getCell('ID').getValue());
       if (This.MenusCollapsed == true) {
@@ -1913,7 +1913,7 @@ begin
                 locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
               }
               var clientlocation = locndata[3]+', '+locndata[2]+', '+locndata[1];
-              return '<div title="'+clientlocation+'"'+pas.Unit1.Form1.BootstrapTT+'<img style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.7/1x1/'+locndata[0]+'.svg"></div>';
+              return '<div title="'+clientlocation+'"'+pas.UnitMain.FormMain.BootstrapTT+'<img style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.7/1x1/'+locndata[0]+'.svg"></div>';
             }
         },
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
@@ -1940,7 +1940,7 @@ begin
               else if (browser[0] == 'Edge') {
                 icon = '<i style="color: var(--bl-color-one); width:24px; height:24px;" class="fa-brands fa-edge"></i>';
               }
-              return '<div title="'+title+'"'+pas.Unit1.Form1.BootstrapTT+icon+'</div>';
+              return '<div title="'+title+'"'+pas.UnitMain.FormMain.BootstrapTT+icon+'</div>';
             }
         },
         { title: "", field: "browser_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
@@ -1982,7 +1982,7 @@ begin
               else {
                 icon = '<i style="color: var(--bl-color-input); width:24px; height:24px;" class="fa-duotone fa-display"></i>';
               }
-              return '<div title="'+title+'"'+pas.Unit1.Form1.BootstrapTT+icon+'</div>';
+              return '<div title="'+title+'"'+pas.UnitMain.FormMain.BootstrapTT+icon+'</div>';
             }
         },
         { title: "", field: "device_info", width: 30, minWidth: 30, resizable: false, headerSort: false, cssClass: "IconColumn",
@@ -2008,7 +2008,7 @@ begin
               else {
                 icon = '<i style="color: var(--bl-color-two); width:24px; height:24px;" class="fa-duotone fa-display Swap"></i>';
               }
-              return '<div title="'+title+'"'+pas.Unit1.Form1.BootstrapTT+icon+'</div>';
+              return '<div title="'+title+'"'+pas.UnitMain.FormMain.BootstrapTT+icon+'</div>';
             }
         },
 
@@ -2020,7 +2020,7 @@ begin
                 locndata = ['CA','undefined','undefined','undefined','undefined','undefined','EN'];
               }
               var clientlanguage = locndata[6];
-              return '<div title="'+clientlanguage+'"'+pas.Unit1.Form1.BootstrapTT+'<img style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+locndata[6].slice(0,2).toLowerCase()+'.svg"></div>';
+              return '<div title="'+clientlanguage+'"'+pas.UnitMain.FormMain.BootstrapTT+'<img style="width:24px; border-radius:4px;" src="https://cdn.jsdelivr.net/npm/language-icons@0.3.0/icons/'+locndata[6].slice(0,2).toLowerCase()+'.svg"></div>';
             }
         },
         { title: "IP Address", field: "ip_address", width: 125, minWidth: 100 },
@@ -2044,7 +2044,7 @@ begin
     });
 
     this.tabAccountHistory.on('rowClick', function(e, row){
-      pas.Unit1.Form1.tabAccountHistory.selectRow([row]);
+      pas.UnitMain.FormMain.tabAccountHistory.selectRow([row]);
     });
   } end; {$ENDIF}
 
@@ -2065,7 +2065,7 @@ begin
         { title: "", field: "Sort", width: 30, minWidth:30, formatter: "handle", sorter: "number" },
         { title: "", field: "LinkIcon", hozAlign: "center", formatter: "html", width: 40,
             formatter: function(cell, formatterParams, onRendered) {
-              return pas.Unit1.Form1.GetFavIcon(cell.getRow().getCell('Link').getValue());
+              return pas.UnitMain.FormMain.GetFavIcon(cell.getRow().getCell('Link').getValue());
             }
         },
         { title: "", field: "Link", cssClass: "Links" }
@@ -2078,10 +2078,10 @@ begin
       el.firstElementChild.firstElementChild.firstElementChild.appendChild(divAccountLinksNav);
     });
     this.tabAccountLinks.on('rowClick', function(e, row){
-      pas.Unit1.Form1.tabAccountLinks.selectRow([row]);
+      pas.UnitMain.FormMain.tabAccountLinks.selectRow([row]);
     });
     this.tabAccountLinks.on('rowMoved', function(row){
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       var tab = This.tabAccountLinks;
       for (var i = 1; i <= tab.getDataCount(); i++) {
         tab.getRowFromPosition(i).getCell('Sort').setValue(i);
@@ -2090,12 +2090,12 @@ begin
       This.LogAction('[ Reordered Account Links ]');
     });
     this.tabAccountLinks.on('cellEditing', function(cell){
-      pas.Unit1.Form1.tabAccountLinks.deselectRow();
-      pas.Unit1.Form1.tabAccountLinks.selectRow([cell.getRow()]);
+      pas.UnitMain.FormMain.tabAccountLinks.deselectRow();
+      pas.UnitMain.FormMain.tabAccountLinks.selectRow([cell.getRow()]);
     });
     this.tabAccountLinks.on('cellEdited', function(cell){
       if (cell.getField() == 'Link') {
-        var This = pas.Unit1.Form1;
+        var This = pas.UnitMain.FormMain;
         This.tabAccountLinks.redraw(true);
         This.UpdateAccountLinks();
         This.LogAction('[ Edited Account Link: '+cell.getValue()+' ]');
@@ -2121,7 +2121,7 @@ begin
             formatter: function(cell, formatterParams, onRendered) {
               var icon = '';
               var status = cell.getValue();
-              var TT = pas.Unit1.Form1.BootstrapTT;
+              var TT = pas.UnitMain.FormMain.BootstrapTT;
               if (status == 1) {
                 icon = '<div title="Browser Closed"'+TT+'<i class="fa-duotone fa-flag fa-lg Swap"></i></div>';
               }
@@ -2141,7 +2141,7 @@ begin
             formatter: function(cell, formatterParams, onRendered) {
               var icon = '';
               var start = cell.getValue();
-              var TT = pas.Unit1.Form1.BootstrapTT;
+              var TT = pas.UnitMain.FormMain.BootstrapTT;
               if (start == 1) {
                 icon = '<div title="Login"'+TT+'<i class="fa-duotone fa-shield-keyhole Swap fa-lg"></i></div>';
               }
@@ -2168,10 +2168,10 @@ begin
       divSessionList.firstElementChild.style.setProperty('top', '0px');
     });
     this.tabAccountSessions.on('rowClick', function(e, row){
-      pas.Unit1.Form1.tabAccountSessions.selectRow([row]);
+      pas.UnitMain.FormMain.tabAccountSessions.selectRow([row]);
     });
     this.tabAccountSessions.on('rowDblClick', function(e, row){
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       This.tabAccountSessions.selectRow([row]);
 
       if (This.btnActivityLogTimezone.FTag$1 == 0) {
@@ -2219,7 +2219,7 @@ begin
       ]
     });
     this.tabAccountRoles.on('rowClick', function(e, row){
-      pas.Unit1.Form1.tabAccountRoles.selectRow([row]);
+      pas.UnitMain.FormMain.tabAccountRoles.selectRow([row]);
     });
   } end; {$ENDIF}
 
@@ -2261,13 +2261,13 @@ begin
       ]
     });
     this.tabPeriods.on('tableBuilt', function() {
-      pas.Unit1.Form1.tabPeriods.setData(pas.Unit1.Form1.Periods);
+      pas.UnitMain.FormMain.tabPeriods.setData(pas.UnitMain.FormMain.Periods);
     });
     this.tabPeriods.on('rowClick', function(e, row){
-      pas.Unit1.Form1.tabPeriods.selectRow([row]);
+      pas.UnitMain.FormMain.tabPeriods.selectRow([row]);
     });
     this.tabPeriods.on('rowDblClick', function(e, row){
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       var Tab = This.tabPeriods;
       Tab.selectRow([row]);
       This.SelectPeriodRow(
@@ -2398,7 +2398,7 @@ begin
             target.setAttribute('data-x', x)
             target.setAttribute('data-y', y)
 
-            var That = pas.Unit1.Form1.StatsForm;
+            var That = pas.UnitMain.FormMain.StatsForm;
             That.CreateD3BarChart(That.Current_Chart, That.Current_XData, That.Current_YData);
 
           }
@@ -2476,9 +2476,9 @@ begin
 //      duration: 50,
       step: 0.1
     });
-    divAccountPhoto.addEventListener('wheel',pas.Unit1.Form1.pz.zoomWithWheel);
+    divAccountPhoto.addEventListener('wheel',pas.UnitMain.FormMain.pz.zoomWithWheel);
     divAccountPhoto.addEventListener('panzoomchange', (event) => {
-      pas.Unit1.Form1.PhotoChanged();
+      pas.UnitMain.FormMain.PhotoChanged();
     });
   } end; {$ENDIF}
 
@@ -2532,7 +2532,7 @@ begin
   // AutoLogout if possible - what to do if the browser closes unexpectedly
   {$IFNDEF WIN32} asm {
     window.addEventListener('beforeunload', async function (e) {
-      pas.Unit1.Form1.FinalRequest();
+      pas.UnitMain.FormMain.FinalRequest();
     });
   } end; {$ENDIF}
 
@@ -2563,7 +2563,7 @@ begin
           event.target.style.height = 'auto';
           event.target.style.height = event.target.scrollHeight + offset + 'px';
           event.target.parentElement.style.height = event.target.scrollHeight + offset + 4 + 'px';
-          pas.Unit1.Form1.scrollAccountAuthor.recalculate();
+          pas.UnitMain.FormMain.scrollAccountAuthor.recalculate();
         });
         element.removeAttribute('data-autoresize');
       });
@@ -2585,7 +2585,7 @@ begin
       selected.forEach(el => {
         el.classList.remove('Selected');
       });
-      pas.Unit1.Form1.btnIconOK.FEnabled = false;
+      pas.UnitMain.FormMain.btnIconOK.FEnabled = false;
       btnIconOK.setAttribute('disabled','');
 
      // What was clicked on? Could be the icon itself or the icon name
@@ -2593,12 +2593,12 @@ begin
       if (e.target.getAttribute('icon-library') !== null) {
         var el = e.target;
         this.IconSelected = el.firstElementChild.outerHTML;
-        pas.Unit1.Form1.btnIconOKClick(null);
+        pas.UnitMain.FormMain.btnIconOKClick(null);
       } else if (e.target.classList.contains('IconName')) {
         var el = e.target.parentElement;
         el.classList.add('Selected');
         btnIconOK.removeAttribute('disabled');
-        pas.Unit1.Form1.btnIconOK.FEnabled = true;
+        pas.UnitMain.FormMain.btnIconOK.FEnabled = true;
         divIconSearchData.innerHTML =
             '<div>Results: <span style="color: var(--bl-color-input);">'+this.IconResults+'</span></div>'+
             '<div>'+el.getAttribute('icon-library')+'</div>'+
@@ -2625,7 +2625,7 @@ begin
       return dataURL;
     }
     document.getElementById('fileinput').onchange = function () {
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       This.LogAction(' -- Original Image Name: '+this.files[0].name);
       This.LogAction(' -- Original Image Size: '+parseInt(this.files[0].size / 1024).toLocaleString()+' KB');
       This.LogAction(' -- Original Image Type: '+this.files[0].type);
@@ -2689,7 +2689,7 @@ begin
   // What to do when we hit back/forward button
   {$IFNDEF WIN32} asm {
     window.addEventListener('popstate', function(popstateEvent)  {
-      pas.Unit1.Form1.RevertState(popstateEvent.state);
+      pas.UnitMain.FormMain.RevertState(popstateEvent.state);
     });
   } end; {$ENDIF}
 
@@ -2700,7 +2700,7 @@ begin
   PreventCompilerHint(ResponseString);
 end;
 
-function TForm1.JSONRequest(Endpoint: String; Params: array of JSValue): String;
+function TFormMain.JSONRequest(Endpoint: String; Params: array of JSValue): String;
 var
   ClientConn: TXDataWebClient;
   Response: TXDataClientResponse;
@@ -2750,7 +2750,7 @@ begin
   PreventCompilerHint(Blob);
 end;
 
-procedure TForm1.labelAccountTitleDblClick(Sender: TObject);
+procedure TFormMain.labelAccountTitleDblClick(Sender: TObject);
 begin
   if divAccount.Tag = 0 then
   begin
@@ -2783,7 +2783,7 @@ begin
   end;
 end;
 
-function TForm1.StringRequest(Endpoint: String; Params: array of JSValue): String;
+function TFormMain.StringRequest(Endpoint: String; Params: array of JSValue): String;
 var
   ClientConn: TXDataWebClient;
   Response: TXDataClientResponse;
@@ -2834,7 +2834,7 @@ begin
   LogAction('Responded: '+Endpoint+' ('+IntToStr(MillisecondsBetween(Now, Elapsed))+'ms)');
 end;
 
-procedure TForm1.Logout(Reason: String; LogoutAll: Boolean);
+procedure TFormMain.Logout(Reason: String; LogoutAll: Boolean);
 var
   FinalLog: String;
 begin
@@ -2879,7 +2879,7 @@ begin
   end;
 end;
 
-procedure TForm1.memoAuthorDescriptionChange(Sender: TObject);
+procedure TFormMain.memoAuthorDescriptionChange(Sender: TObject);
 var
   displaytext: String;
   i: Integer;
@@ -2904,7 +2904,7 @@ begin
   end;
 end;
 
-procedure TForm1.XDataConnect;
+procedure TFormMain.XDataConnect;
 var
   ElapsedTime: TDateTime;
 begin
@@ -2931,12 +2931,12 @@ begin
   end;
 end;
 
-procedure TForm1.XDataConnRequest(Args: TXDataWebConnectionRequest);
+procedure TFormMain.XDataConnRequest(Args: TXDataWebConnectionRequest);
 begin
   Args.Request.Headers.SetValue('Authorization', JWT);
 end;
 
-procedure TForm1.LoadIconSets;
+procedure TFormMain.LoadIconSets;
 var
   i: Integer;
   count: integer;
@@ -2983,7 +2983,7 @@ begin
   PreventCompilerHint(ResponseString);
 end;
 
-procedure TForm1.LogAction(Action: String);
+procedure TFormMain.LogAction(Action: String);
 var
   FilterAction: String;
 begin
@@ -3005,7 +3005,7 @@ begin
 
 end;
 
-function TForm1.XDataLogin(Username, Password: String):String;
+function TFormMain.XDataLogin(Username, Password: String):String;
 var
   Response: TXDataClientResponse;
   ClientConn: TXDataWebClient;
@@ -3097,7 +3097,7 @@ begin
 end;
 
 
-procedure TForm1.ProcessJWT(aJWT: String);
+procedure TFormMain.ProcessJWT(aJWT: String);
 var
   JWTClaims: TJSONObject;
   i: Integer;
@@ -3157,7 +3157,7 @@ begin
 
 end;
 
-procedure TForm1.ProcessLogin;
+procedure TFormMain.ProcessLogin;
 begin
   btnRegister.Visible := False;
   btnLogin.Visible := False;
@@ -3165,7 +3165,7 @@ begin
   btnAccount.Visible := True;
 end;
 
-procedure TForm1.RevertState(StateData: JSValue);
+procedure TFormMain.RevertState(StateData: JSValue);
 var
   PriorState: String;
 begin
@@ -3200,7 +3200,7 @@ begin
   end;
 end;
 
-procedure TForm1.SelectAccountOption(OptionID: Integer);
+procedure TFormMain.SelectAccountOption(OptionID: Integer);
 var
   CurrentPage: String;
 begin
@@ -3251,7 +3251,7 @@ begin
   else if pcAccount.ActivePage.Name = 'pageAccountHistory' then
   begin
     {$IFNDEF WIN32} asm {
-      pas.Unit1.Form1.tabAccountHistory.redraw(true);
+      pas.UnitMain.FormMain.tabAccountHistory.redraw(true);
       divAccountHistory.firstElementChild.style.setProperty('position','absolute');
       divAccountHistory.firstElementChild.style.setProperty('z-index', '10');
       divAccountHistory.firstElementChild.style.setProperty('top', '0px');
@@ -3265,29 +3265,29 @@ begin
   else if pcAccount.ActivePage.Name = 'pageAccountAuthor' then
   begin
     {$IFNDEF WIN32} asm {
-      pas.Unit1.Form1.tabAccountLinks.redraw(true);
+      pas.UnitMain.FormMain.tabAccountLinks.redraw(true);
       memoAuthorDescription.dispatchEvent(new Event('input'));
     } end; {$ENDIF}
   end
   else if pcAccount.ActivePage.Name = 'pageAccountRoles' then
   begin
     {$IFNDEF WIN32} asm {
-      pas.Unit1.Form1.tabAccountRoles.redraw(true);
+      pas.UnitMain.FormMain.tabAccountRoles.redraw(true);
     } end; {$ENDIF}
   end;
 end;
 
-procedure TForm1.SelectPeriodRow(Category, ShortName, LongName,  PeriodStart, PeriodEnd, Adjustment: String);
+procedure TFormMain.SelectPeriodRow(Category, ShortName, LongName,  PeriodStart, PeriodEnd, Adjustment: String);
 begin
   LogAction('[ Selected Period: '+LongName+' ]');
   // Status - Logins
   if (divPeriods.Tag = 0) and (ShortName <> '') then
   begin
-    (StatsForm as TForm2).btnLoginsPeriod.Caption := LongName;
-    (StatsForm as TForm2).CurrentChartPeriod := LongName;
+    (StatsForm as TFormStats).btnLoginsPeriod.Caption := LongName;
+    (StatsForm as TFormStats).CurrentChartPeriod := LongName;
 
     {$IFNDEF WIN32} asm {
-      var That = pas.Unit1.Form1.StatsForm;
+      var That = pas.UnitMain.FormMain.StatsForm;
       That.dateLoginsAdjustment = Adjustment;
       That.ModuleInit = true;
       That.dateLogins1.setDate(PeriodStart, true, 'Y-m-d H:i:s');
@@ -3299,7 +3299,7 @@ begin
   divPeriodsLabelClick(nil);
 end;
 
-procedure TForm1.tmrJWTRenewalTimer(Sender: TObject);
+procedure TFormMain.tmrJWTRenewalTimer(Sender: TObject);
 var
   ResponseString: String;
   ActionLogSend: String;
@@ -3334,7 +3334,7 @@ begin
   end
 end;
 
-procedure TForm1.btnLoginOKClick(Sender: TObject);
+procedure TFormMain.btnLoginOKClick(Sender: TObject);
 var
   LoginCheck: String;
 begin
@@ -3392,7 +3392,7 @@ begin
 
 end;
 
-procedure TForm1.btnLogoutAllClick(Sender: TObject);
+procedure TFormMain.btnLogoutAllClick(Sender: TObject);
 begin
   // Logout All
   TWebLocalStorage.RemoveKey('Theme');
@@ -3409,7 +3409,7 @@ begin
   await(Logout('All', True));
 end;
 
-procedure TForm1.btnLogoutCleanClick(Sender: TObject);
+procedure TFormMain.btnLogoutCleanClick(Sender: TObject);
 begin
   // Logout Clean
   TWebLocalStorage.RemoveKey('Theme');
@@ -3426,13 +3426,13 @@ begin
   await(Logout('Clean', False));
 end;
 
-procedure TForm1.btnLogoutHereClick(Sender: TObject);
+procedure TFormMain.btnLogoutHereClick(Sender: TObject);
 begin
   // Logout Here
   await(Logout('Normal', False));
 end;
 
-procedure TForm1.btnAccountChangeClick(Sender: TObject);
+procedure TFormMain.btnAccountChangeClick(Sender: TObject);
 begin
 
   // Manage different Account
@@ -3441,7 +3441,7 @@ begin
 
 end;
 
-procedure TForm1.btnAccountClick(Sender: TObject);
+procedure TFormMain.btnAccountClick(Sender: TObject);
 var
   i: Integer;
   count: Integer;
@@ -3619,7 +3619,7 @@ begin
   PreventCompilerHint(count);
 end;
 
-procedure TForm1.btnBlogClick(Sender: TObject);
+procedure TFormMain.btnBlogClick(Sender: TObject);
 begin
   // Blog Button Clicked
 
@@ -3632,7 +3632,7 @@ begin
 
 end;
 
-procedure TForm1.btnChangeAccountEMailClick(Sender: TObject);
+procedure TFormMain.btnChangeAccountEMailClick(Sender: TObject);
 var
   RequestResponse: String;
   MailBody: TStringList;
@@ -3690,22 +3690,22 @@ begin
 
     MailBody.Add('<div style="margin: 16px 0px 32px 0px; display: flex;">');
       MailBody.Add('<div style="display: flex; justify-content: center; align-items: center; padding-top: 4px; width: 60px;">');
-        MailBody.Add('<a title="'+Form1.App_URL+'" href="'+Form1.App_URLLink+'">');
+        MailBody.Add('<a title="'+FormMain.App_URL+'" href="'+FormMain.App_URLLink+'">');
           MailBody.Add('<img width="100%" src="'+MailIcon.Text+'">');
         MailBody.Add('</a>');
       MailBody.Add('</div>');
       MailBody.Add('<div style="display: flex; align-items: start; justify-content: center; margin-left: 10px; flex-direction: column;">');
         MailBody.Add('<div>Warmest Regards,</div>');
-        MailBody.Add('<div>The '+Form1.App_Short+' Concierge.</div>');
-        MailBody.Add('<div><a href="'+Form1.App_URLLink+'">'+Form1.App_URL+'</a></div>');
+        MailBody.Add('<div>The '+FormMain.App_Short+' Concierge.</div>');
+        MailBody.Add('<div><a href="'+FormMain.App_URLLink+'">'+FormMain.App_URL+'</a></div>');
       MailBody.Add('</div>');
     MailBody.Add('</div>');
   MailBody.Add('</div>');
 
   MailBody.Add('<p><pre style="font-size:10px; line-height:70%;">');
-  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+Form1.App_TZ+'<br />');
-  MailBody.Add('Ref &raquo; '+Form1.App_OS_Short+'/'+Form1.App_Browser_short+'/'+Form1.App_IPAddress+'/'+Form1.App_Session+'<br />');
-  MailBody.Add('Res &raquo; '+Form1.App_Country+'/'+Form1.App_Region+'/'+Form1.App_City);
+  MailBody.Add('Req &raquo; '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now)+'/'+FormMain.App_TZ+'<br />');
+  MailBody.Add('Ref &raquo; '+FormMain.App_OS_Short+'/'+FormMain.App_Browser_short+'/'+FormMain.App_IPAddress+'/'+FormMain.App_Session+'<br />');
+  MailBody.Add('Res &raquo; '+FormMain.App_Country+'/'+FormMain.App_Region+'/'+FormMain.App_City);
   MailBody.Add('</pre></p>');
 
   MailBody.Add('  </body>');
@@ -3742,7 +3742,7 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnChangeAccountNameClick(Sender: TObject);
+procedure TFormMain.btnChangeAccountNameClick(Sender: TObject);
 var
   RequestResponse: String;
 begin
@@ -3773,7 +3773,7 @@ begin
 end;
 
 
-procedure TForm1.btnChangePasswordClick(Sender: TObject);
+procedure TFormMain.btnChangePasswordClick(Sender: TObject);
 var
   RequestResponse: String;
 begin
@@ -3811,12 +3811,12 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnDescriptionCancelClick(Sender: TObject);
+procedure TFormMain.btnDescriptionCancelClick(Sender: TObject);
 begin
   memoAuthorDescription.Lines.Text  := User_Description;
 end;
 
-procedure TForm1.btnDescriptionSaveClick(Sender: TObject);
+procedure TFormMain.btnDescriptionSaveClick(Sender: TObject);
 var
   RequestResponse: String;
   Description: String;
@@ -3852,7 +3852,7 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnFirstNameCancelClick(Sender: TObject);
+procedure TFormMain.btnFirstNameCancelClick(Sender: TObject);
 begin
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnFirstNameCancel)
   then LogAction('[ Reverting Account Names ]');
@@ -3865,7 +3865,7 @@ begin
   btnFirstNameCancel.Enabled := False;
 end;
 
-procedure TForm1.btnFirstNameSaveClick(Sender: TObject);
+procedure TFormMain.btnFirstNameSaveClick(Sender: TObject);
 var
   RequestResponse: String;
 begin
@@ -3906,7 +3906,7 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnLoginClick(Sender: TObject);
+procedure TFormMain.btnLoginClick(Sender: TObject);
 begin
   HideToolTips;
 
@@ -3926,13 +3926,13 @@ begin
   end;
 end;
 
-procedure TForm1.btnForgotPasswordClick(Sender: TObject);
+procedure TFormMain.btnForgotPasswordClick(Sender: TObject);
 begin
   editPassword.Text := '';
   editPassword.SetFocus;
 end;
 
-procedure TForm1.btnPeriodSelect(Sender: TObject);
+procedure TFormMain.btnPeriodSelect(Sender: TObject);
 var
   Period: Integer;
   PeriodShort: String;
@@ -3989,7 +3989,7 @@ begin
   //   "group": "local"
 
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var selected = This.PeriodArray.find(elem => elem.id === Period);
     if (selected !== undefined) {
       PeriodShort = selected['short_name'];
@@ -4010,7 +4010,7 @@ begin
   if (divPeriods.Tag = 0) and (PeriodShort <> '') then
   begin
     {$IFNDEF WIN32} asm {
-      var That = pas.Unit1.Form1.StatsForm;
+      var That = pas.UnitMain.FormMain.StatsForm;
       That.dateLoginsAdjustment = PeriodAdjustment;
       That.btnLoginsPeriod.GetElementHandle().innerHTML = PeriodLong;
       That.ModuleInit = true;
@@ -4032,7 +4032,7 @@ begin
   PreventCompilerHint(PeriodAdjustment);
 end;
 
-procedure TForm1.btnPhotoCancelClick(Sender: TObject);
+procedure TFormMain.btnPhotoCancelClick(Sender: TObject);
 begin
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnPhotoCancel)
   then LogAction('[ Cancelled Photo Change ]');
@@ -4055,7 +4055,7 @@ begin
         this.pz.zoom(Scale);
 //        divAccountPhoto.firstElementChild.style.setProperty('transform','scale(1) translate(0cqh, 0cqh)')
 //        await sleep(250);
-        pas.Unit1.Form1.pz.pan(
+        pas.UnitMain.FormMain.pz.pan(
           (LeftOffset / 100) * (divAccountPhotoFG.getBoundingClientRect().width ),
           (TopOffset / 100) * (divAccountPhotoFG.getBoundingClientRect().height )
         );
@@ -4069,7 +4069,7 @@ begin
 
 end;
 
-procedure TForm1.btnPhotoClearClick(Sender: TObject);
+procedure TFormMain.btnPhotoClearClick(Sender: TObject);
 begin
   HideTooltips;
   if divAccountPhoto.ElementHandle.innerHTML <> '' then
@@ -4081,7 +4081,7 @@ begin
   LogAction('[ Cleared Photo ]');
 end;
 
-procedure TForm1.btnPhotoIconsClick(Sender: TObject);
+procedure TFormMain.btnPhotoIconsClick(Sender: TObject);
 begin
   HideTooltips;
   editIconSearch.Text := '';
@@ -4103,7 +4103,7 @@ begin
 
 end;
 
-procedure TForm1.btnPhotoResetClick(Sender: TObject);
+procedure TFormMain.btnPhotoResetClick(Sender: TObject);
 begin
   HideTooltips;
   LogAction('[ Reset Photo Size / Position ]');
@@ -4111,13 +4111,13 @@ begin
   btnRotate.Tag := 0;
   {$IFNDEF WIN32} asm {
     // Reset Pan/Zoom
-    pas.Unit1.Form1.pz.reset();
+    pas.UnitMain.FormMain.pz.reset();
     btnRotate.Tag = 0;
     divAccountPhoto.firstElementChild.style.removeProperty('transform');
   } end; {$ENDIF}
 end;
 
-procedure TForm1.btnPhotoSaveClick(Sender: TObject);
+procedure TFormMain.btnPhotoSaveClick(Sender: TObject);
 var
   RequestResponse: String;
   Rotation: Integer;
@@ -4179,7 +4179,7 @@ begin
   PreventCompilerHint(Rotation);
 end;
 
-procedure TForm1.btnPhotoUploadClick(Sender: TObject);
+procedure TFormMain.btnPhotoUploadClick(Sender: TObject);
 begin
   HideTooltips;
   LogAction('[ Uploading Photo ]');
@@ -4188,7 +4188,7 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm1.btnPhotoURLClick(Sender: TObject);
+procedure TFormMain.btnPhotoURLClick(Sender: TObject);
 begin
   HideTooltips;
   editURL.Text := '';
@@ -4209,13 +4209,13 @@ begin
 
 end;
 
-procedure TForm1.btnRegisterClick(Sender: TObject);
+procedure TFormMain.btnRegisterClick(Sender: TObject);
 begin
   // Register Account
 
 end;
 
-procedure TForm1.btnRotateClick(Sender: TObject);
+procedure TFormMain.btnRotateClick(Sender: TObject);
 begin
   if btnRotate.Tag = 0 then
   begin
@@ -4279,14 +4279,14 @@ begin
   HideToolTips;
 end;
 
-procedure TForm1.btnSearchClick(Sender: TObject);
+procedure TFormMain.btnSearchClick(Sender: TObject);
 begin
   HideToolTips;
   // Search for Blogs
 
 end;
 
-procedure TForm1.btnSelectActivityLogClick(Sender: TObject);
+procedure TFormMain.btnSelectActivityLogClick(Sender: TObject);
 var
   SessionCount: Integer;
 begin
@@ -4319,7 +4319,7 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnServerStatsClick(Sender: TObject);
+procedure TFormMain.btnServerStatsClick(Sender: TObject);
 var
   ElapsedTime: TDateTime;
 
@@ -4343,7 +4343,7 @@ begin
   ElapsedTime := Now;
 
    // Launch Form
-  StatsForm := TForm2.CreateNew(divStatisticsHolder.ElementID, @AfterCreate);
+  StatsForm := TFormStats.CreateNew(divStatisticsHolder.ElementID, @AfterCreate);
 
   State := 'Statistics';
   StatePosition := StatePosition + 1;
@@ -4354,13 +4354,13 @@ begin
   HideTooltips;
 end;
 
-procedure TForm1.btnForgotUsernameClick(Sender: TObject);
+procedure TFormMain.btnForgotUsernameClick(Sender: TObject);
 begin
   editUsername.Text := '';
   editUsername.SetFocus;
 end;
 
-procedure TForm1.btnIconCancelClick(Sender: TObject);
+procedure TFormMain.btnIconCancelClick(Sender: TObject);
 begin
   divShade2.ElementHandle.style.setProperty('opacity','0');
   divIconSearch.ElementHandle.style.setProperty('opacity','0');
@@ -4376,7 +4376,7 @@ begin
 
 end;
 
-procedure TForm1.btnIconOKClick(Sender: TObject);
+procedure TFormMain.btnIconOKClick(Sender: TObject);
 begin
   if IconSelected <> '' then
   begin
@@ -4390,7 +4390,7 @@ begin
 
 end;
 
-procedure TForm1.btnIconSearchClick(Sender: TObject);
+procedure TFormMain.btnIconSearchClick(Sender: TObject);
 var
   Search: String;
   IconSize: Integer;
@@ -4436,7 +4436,7 @@ begin
     });
 
     // Update count
-    pas.Unit1.Form1.LogAction('[ Icon Search: '+Search+' ('+results.length+' results) ]');
+    pas.UnitMain.FormMain.LogAction('[ Icon Search: '+Search+' ('+results.length+' results) ]');
     divIconSearchData.innerHTML = '<div>Results: <span style="color: var(--bl-color-input);">'+results.length+'</span></div>';
     this.IconResults = results.length;
 
@@ -4477,7 +4477,7 @@ begin
   PreventCompilerHint(SearchLib);
 end;
 
-procedure TForm1.ActivityLogChange(Sender: TObject);
+procedure TFormMain.ActivityLogChange(Sender: TObject);
 var
   Response: String;
   RemoteActionLog: TStringList;
@@ -4544,7 +4544,7 @@ begin
 
 end;
 
-procedure TForm1.btnThemeDarkClick(Sender: TObject);
+procedure TFormMain.btnThemeDarkClick(Sender: TObject);
 begin
   HideToolTips;
 
@@ -4577,7 +4577,7 @@ begin
   LogAction('[ Changed Theme: '+Theme+' ]');
 end;
 
-procedure TForm1.btnURLCancelClick(Sender: TObject);
+procedure TFormMain.btnURLCancelClick(Sender: TObject);
 begin
   divShade2.ElementHandle.style.setProperty('opacity','0');
   divURL.ElementHandle.style.setProperty('opacity','0');
@@ -4592,7 +4592,7 @@ begin
   window.history.pushState(CaptureState, '', StateURL);
 end;
 
-procedure TForm1.btnURLOKClick(Sender: TObject);
+procedure TFormMain.btnURLOKClick(Sender: TObject);
 var
   RowCount: Integer;
   Link: String;
@@ -4616,7 +4616,7 @@ begin
     RowCount := -1;
     Link := editURL.Text;
     {$IFNDEF WIN32} asm {
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       var newid = This.tabAccountLinks.getDataCount();
       This.tabAccountLinks.addRow({
         "ID": newid,
@@ -4637,7 +4637,7 @@ begin
     RowCount := -1;
     Link := editURL.Text;
     {$IFNDEF WIN32} asm {
-      var This = pas.Unit1.Form1;
+      var This = pas.UnitMain.FormMain;
       var tab = This.tabAccountLinks;
       var rows = tab.getSelectedRows();
       rows[0].getCell('Link').setValue(Link);
@@ -4650,7 +4650,7 @@ begin
   btnURLCancelClick(Sender);
 end;
 
-function TForm1.CaptureState: JSValue;
+function TFormMain.CaptureState: JSValue;
 begin
   Result := nil;
   // Return state of some kind
@@ -4663,7 +4663,7 @@ begin
   } end; {$ENDIF}
 end;
 
-procedure TForm1.AddBootstrapTooltips;
+procedure TFormMain.AddBootstrapTooltips;
 begin
   // If Font Awesome Pro is not available, switch to the free version
   //Button.Caption := StringReplace(Button.Caption,'fa-duotone','fa-solid',[]);
@@ -4673,7 +4673,7 @@ begin
     var hint = '';
     for (var i = 0; i < elements.length; i++) {
       if (elements[i].id !== undefined) {
-        hint = eval('pas.Unit1.Form1.'+elements[i].id+'.FHint');
+        hint = eval('pas.UnitMain.FormMain.'+elements[i].id+'.FHint');
         if (hint !== '') {
           elements[i].setAttribute('title',hint);
           elements[i].setAttribute('data-bs-toggle','tooltip');
@@ -4689,7 +4689,7 @@ begin
   HideTooltips;
 end;
 
-procedure TForm1.divPeriodsLabelClick(Sender: TObject);
+procedure TFormMain.divPeriodsLabelClick(Sender: TObject);
 begin
   // Serves as our close button
   divShade3.ElementHandle.style.setProperty('opacity','0');
@@ -4706,7 +4706,7 @@ begin
   window.history.pushState(CaptureState, '', StateURL);
 end;
 
-procedure TForm1.divSessionListLabelClick(Sender: TObject);
+procedure TFormMain.divSessionListLabelClick(Sender: TObject);
 begin
   // Serves as our close button
   divShade2.ElementHandle.style.setProperty('opacity','0');
@@ -4723,7 +4723,7 @@ begin
 
 end;
 
-procedure TForm1.divShade2Click(Sender: TObject);
+procedure TFormMain.divShade2Click(Sender: TObject);
 begin
   if divSessions.Visible then divSessionListLabelClick(Sender)
   else if divURL.Visible then btnURLCancelClick(Sender)
@@ -4731,18 +4731,18 @@ begin
   else if divStatistics.Visible then divStatisticsLabelClick(Sender);
 end;
 
-procedure TForm1.divShade3Click(Sender: TObject);
+procedure TFormMain.divShade3Click(Sender: TObject);
 begin
   if divPeriods.Visible then divPeriodsLabelClick(Sender);
 end;
 
-procedure TForm1.divShadeClick(Sender: TObject);
+procedure TFormMain.divShadeClick(Sender: TObject);
 begin
   if divAccount.Visible then btnAccountCloseClick(Sender);
   if divLogin.Visible then btnLoginCancelClick(Sender);
 end;
 
-procedure TForm1.divStatisticsLabelClick(Sender: TObject);
+procedure TFormMain.divStatisticsLabelClick(Sender: TObject);
 begin
   // Serves as our close button
   divShade2.ElementHandle.style.setProperty('opacity','0');
@@ -4763,7 +4763,7 @@ begin
   window.history.pushState(CaptureState, '', StateURL);
 end;
 
-function TForm1.AccountIsValid(acct: String):String;
+function TFormMain.AccountIsValid(acct: String):String;
 var
   i: Integer;
   fail: Integer;
@@ -4806,7 +4806,7 @@ begin
   end;
 end;
 
-procedure TForm1.editAccountNameChange(Sender: TObject);
+procedure TFormMain.editAccountNameChange(Sender: TObject);
 var
   ValidTest: String;
   ValidText: String;
@@ -4840,7 +4840,7 @@ begin
   end;
 end;
 
-procedure TForm1.editCurrentPasswordChange(Sender: TObject);
+procedure TFormMain.editCurrentPasswordChange(Sender: TObject);
 var
   ComplexTest: String;
   ComplexText: String;
@@ -4927,7 +4927,7 @@ begin
   end;
 end;
 
-function TForm1.EMailIsValid(EMail: String):String;
+function TFormMain.EMailIsValid(EMail: String):String;
 var
   RequestResponse: String;
 
@@ -4956,7 +4956,7 @@ begin
   end;
 end;
 
-procedure TForm1.editEMailChange(Sender: TObject);
+procedure TFormMain.editEMailChange(Sender: TObject);
 var
   EMailValid: String;
 
@@ -4989,7 +4989,7 @@ begin
   end;
 end;
 
-procedure TForm1.editEMailCodeChange(Sender: TObject);
+procedure TFormMain.editEMailCodeChange(Sender: TObject);
 var
   RequestResponse: String;
 begin
@@ -5040,7 +5040,7 @@ begin
   end;
 end;
 
-procedure TForm1.editFirstNameChange(Sender: TObject);
+procedure TFormMain.editFirstNameChange(Sender: TObject);
 begin
 
   if (Trim(editFirstName.Text) <> User_FirstName) or
@@ -5057,7 +5057,7 @@ begin
 
 end;
 
-procedure TForm1.FinalRequest;
+procedure TFormMain.FinalRequest;
 begin
   LogAction(' ');
   LogAction('Browser Closed');
@@ -5066,14 +5066,14 @@ begin
   tmrJWTRenewalTimer(nil);
 end;
 
-procedure TForm1.btnLinkCancelClick(Sender: TObject);
+procedure TFormMain.btnLinkCancelClick(Sender: TObject);
 begin
   if (Sender is TWebButton) and ((Sender as TWebButton) = btnLinkCancel)
   then LogAction('[ Revert Account Links ]')
   else LogAction('Reverting Account Links');
 
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var tab = This.tabAccountLinks;
     This.LinksData = JSON.parse(JSON.stringify(This.LinksDataBackup));
     tab.setData(This.LinksData);
@@ -5084,14 +5084,14 @@ begin
   divAccountLinks.SetFocus();
 end;
 
-procedure TForm1.btnLinkDeleteClick(Sender: TObject);
+procedure TFormMain.btnLinkDeleteClick(Sender: TObject);
 var
   Link: String;
 begin
   Link := 'not defined';
   {$IFNDEF WIN32}
   asm
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var tab = This.tabAccountLinks;
     var rows = tab.getSelectedRows();
     tab.deselectRow();
@@ -5118,13 +5118,13 @@ begin
   LogAction('[ Delete Account Link: '+Link+' ]');
 end;
 
-procedure TForm1.btnLinkEditClick(Sender: TObject);
+procedure TFormMain.btnLinkEditClick(Sender: TObject);
 var
   CurrentLink: String;
 begin
   CurrentLink := 'none';
   {$IFNDEF WIN32} asm {
-    var This = pas.Unit1.Form1;
+    var This = pas.UnitMain.FormMain;
     var tab = This.tabAccountLinks;
     var rows = tab.getSelectedRows();
     if (rows.length == 1) {
@@ -5151,7 +5151,7 @@ begin
   end;
 end;
 
-procedure TForm1.btnLinkInsertClick(Sender: TObject);
+procedure TFormMain.btnLinkInsertClick(Sender: TObject);
 begin
   editURL.Text := '';
   {$IFNDEF WIN32} asm {
@@ -5171,7 +5171,7 @@ begin
   editURL.setFocus;
 end;
 
-procedure TForm1.btnLinkSaveClick(Sender: TObject);
+procedure TFormMain.btnLinkSaveClick(Sender: TObject);
 var
   RequestResponse: String;
   LinkSave: String;
@@ -5180,7 +5180,7 @@ begin
 
   LinkSave := '';
   {$IFNDEF WIN32} asm {
-    LinkSave = JSON.stringify(pas.Unit1.Form1.tabAccountLinks.getData());
+    LinkSave = JSON.stringify(pas.UnitMain.FormMain.tabAccountLinks.getData());
   } end; {$ENDIF}
 
   LogAction('[ Saving Account Links ]');
@@ -5211,7 +5211,7 @@ begin
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate Swap fa-xl"></i>';
 end;
 
-procedure TForm1.btnLoginCancelClick(Sender: TObject);
+procedure TFormMain.btnLoginCancelClick(Sender: TObject);
 begin
   divShade.ElementHandle.style.setProperty('opacity','0.0');
   divLogin.ElementHandle.style.setProperty('opacity','0.0');
@@ -5220,7 +5220,7 @@ begin
   divLogin.Visible := False;
 end;
 
-procedure TForm1.btnAccountCloseClick(Sender: TObject);
+procedure TFormMain.btnAccountCloseClick(Sender: TObject);
 begin
   HideTooltips;
 
@@ -5250,7 +5250,7 @@ begin
   await(tmrJWTRenewalTimer(Sender));
 end;
 
-procedure TForm1.btnAccountRefreshClick(Sender: TObject);
+procedure TFormMain.btnAccountRefreshClick(Sender: TObject);
 begin
   HideToolTips;
   btnAccountRefresh.Caption := '<i class="fa-duotone fa-rotate fa-spin Swap fa-xl"></i>';
@@ -5269,7 +5269,7 @@ begin
 end;
 
 
-procedure TForm1.btnActivityLogReloadClick(Sender: TObject);
+procedure TFormMain.btnActivityLogReloadClick(Sender: TObject);
 var
   LocalActionLog: TStringList;
   LogLine: String;
@@ -5314,7 +5314,7 @@ begin
   end;
 end;
 
-procedure TForm1.btnActivityLogTimezoneClick(Sender: TObject);
+procedure TFormMain.btnActivityLogTimezoneClick(Sender: TObject);
 begin
 
   if btnActivityLogTimezone.Tag = 0 then
@@ -5333,7 +5333,7 @@ begin
   btnAccountRefreshClick(Sender);
 end;
 
-procedure TForm1.WebFormKeyDown(Sender: TObject; var Key: Word;
+procedure TFormMain.WebFormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (divLogin.Visible) and divLoginMessage.ElementHandle.classList.contains('d-none') then
@@ -5387,7 +5387,7 @@ begin
 end;
 
 
-procedure TForm1.WebFormResize(Sender: TObject);
+procedure TFormMain.WebFormResize(Sender: TObject);
 var
   innerWidth: Double;
   innerHeight: Double;
@@ -5429,20 +5429,20 @@ begin
   if divStatistics.Visible then
   begin
     {$IFNDEF WIN32} asm {
-      var That = pas.Unit1.Form1.StatsForm;
+      var That = pas.UnitMain.FormMain.StatsForm;
       That.CreateD3BarChart(That.Current_Chart, That.Current_XData, That.Current_YData);
     } end; {$ENDIF}
   end;
 
 end;
 
-procedure TForm1.tmrLogoutTimer(Sender: TObject);
+procedure TFormMain.tmrLogoutTimer(Sender: TObject);
 begin
   tmrLogout.Enabled := False;
   window.location.reload(true);
 end;
 
-function TForm1.SHA256(Text2Encode: String): String;
+function TFormMain.SHA256(Text2Encode: String): String;
 var
   EncodedText: String;
 begin
@@ -5551,10 +5551,10 @@ begin
   Result := EncodedText;
 end;
 
-procedure TForm1.StopLinkerRemoval(P: Pointer);                          begin end;
-procedure TForm1.PreventCompilerHint(H: TJSHTMLElement);       overload; begin end;
-procedure TForm1.PreventCompilerHint(I: integer);              overload; begin end;
-procedure TForm1.PreventCompilerHint(J: JSValue);              overload; begin end;
-procedure TForm1.PreventCompilerHint(S: string);               overload; begin end;
+procedure TFormMain.StopLinkerRemoval(P: Pointer);                          begin end;
+procedure TFormMain.PreventCompilerHint(H: TJSHTMLElement);       overload; begin end;
+procedure TFormMain.PreventCompilerHint(I: integer);              overload; begin end;
+procedure TFormMain.PreventCompilerHint(J: JSValue);              overload; begin end;
+procedure TFormMain.PreventCompilerHint(S: string);               overload; begin end;
 
 end.

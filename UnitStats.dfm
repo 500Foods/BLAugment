@@ -1,4 +1,4 @@
-object Form2: TForm2
+object FormStats: TFormStats
   Width = 1092
   Height = 713
   CSSLibrary = cssBootstrap

@@ -3,16 +3,72 @@ unit Unit2;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,System.Types,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls, Unit1, System.IOUtils, System.DateUtils, IdStack, IdGlobal, psAPI, WinAPi.ShellAPI,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
-  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
-  FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait,
-  FireDAC.Stan.ExprFuncs, FireDAC.Phys.SQLiteDef, FireDAC.Stan.Param,
-  FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.Phys.SQLite,
-  Vcl.ExtCtrls, System.JSON, System.StrUtils,IdGlobalProtocols, System.Generics.Collections;
+  Winapi.Windows,
+  Winapi.Messages,
+  WinAPi.ShellAPI,
+  psAPI,
+
+  System.SysUtils,
+  System.Variants,
+  System.Types,
+  System.Classes,
+  System.IOUtils,
+  System.DateUtils,
+  System.JSON,
+  System.StrUtils,
+  System.Generics.Collections,
+
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+
+  Data.DB,
+
+  IdStack,
+  IdGlobal,
+  IdGlobalProtocols,
+  IdBaseComponent,
+  IdComponent,
+  IdTCPConnection,
+  IdTCPClient,
+  IdHTTP,
+  IdMessageClient,
+  IdMessage,
+  IdMessageBuilder,
+  IdAttachment,
+  IdMessageParts,
+  IdEMailAddress,
+  IdAttachmentFile,
+  IdSMTPBase,
+  IdSMTP,
+  IdAttachmentMemory,
+
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.VCLUI.Wait,
+  FireDAC.Stan.ExprFuncs,
+  FireDAC.Phys.SQLiteDef,
+  FireDAC.Stan.Param,
+  FireDAC.DatS,
+  FireDAC.DApt.Intf,
+  FireDAC.DApt,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
+  FireDAC.Phys.SQLite,
+
+  Unit1, IdSSLOpenSSL, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack,
+  IdSSL, System.Net.URLClient, System.Net.HttpClient,
+  System.Net.HttpClientComponent;
 
 type
   TMainForm = class(TForm)
@@ -25,6 +81,8 @@ type
     Query1: TFDQuery;
     tmrStart: TTimer;
     tmrInit: TTimer;
+    NetHTTPClient1: TNetHTTPClient;
+
     procedure btStartClick(ASender: TObject);
     procedure btStopClick(ASender: TObject);
     procedure FormCreate(ASender: TObject);
@@ -43,6 +101,11 @@ type
     procedure tmrStartTimer(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure tmrInitTimer(Sender: TObject);
+    procedure NetHTTPClient1ValidateServerCertificate(
+      const Sender: TObject; const ARequest: TURLRequest;
+      const Certificate: TCertificate; var Accepted: Boolean);
+    procedure NetHTTPClient1RequestError(const Sender: TObject;
+      const AError: string);
   public
     AppName: String;
     AppVersion: String;
@@ -78,6 +141,10 @@ type
     DatabasePassword: String;
     DatabaseConfig: String;
 
+    SiteCheckSuccess: Boolean;
+    SiteCheckName: String;
+    SiteCheckURL: String;
+
   strict private
     procedure UpdateGUI;
   end;
@@ -90,6 +157,8 @@ implementation
 {$R *.dfm}
 
 { TMainForm }
+uses
+  Unit3;
 
 procedure TMainForm.btStartClick(ASender: TObject);
 begin
@@ -264,6 +333,194 @@ begin
 end;
 
 
+procedure TMainForm.NetHTTPClient1RequestError(const Sender: TObject; const AError: string);
+var
+  SMTP1: TIdSMTP;
+  Msg1: TIdMessage;
+  Addr1: TIdEmailAddressItem;
+  Html1: TIdMessageBuilderHtml;
+  SMTPResult: WideString;
+begin
+  mmInfo.Lines.Add('   WARNING: Site Check failed: '+SiteCheckURL);
+  mmInfo.Lines.Add('   WARNING: '+AError);
+  SiteCheckSuccess := False;
+
+  if not(MailServerAvailable) then
+  begin
+    mmInfo.Lines.Add('   WARNING: Site Check failure notification e-mail not sent (Mail services not configured)');
+  end
+  else
+  begin
+
+    // Send warning email
+    Msg1  := nil;
+    Addr1 := nil;
+    SMTP1 := TIdSMTP.Create(nil);
+    SMTP1.Host     := MainForm.MailServerHost;
+    SMTP1.Port     := MainForm.MailServerPort;
+    SMTP1.Username := MainForm.MailServerUser;
+    SMTP1.Password := MainForm.MailServerPass;
+
+    try
+      Html1 := TIdMessageBuilderHtml.Create;
+      try
+        Html1.Html.Add('<html>');
+        Html1.Html.Add('<head>');
+        Html1.Html.Add('</head>');
+        Html1.Html.Add('<body><pre>');
+        Html1.Html.Add('Site Check: ');
+        Html1.Html.Add('...Server: '+SiteCheckName);
+        Html1.Html.Add('...URL: '+SiteCheckURL);
+        Html1.Html.Add('...Error: '+AError);
+        Html1.Html.Add('</pre></body>');
+        Html1.Html.Add('</html>');
+        Html1.HtmlCharSet := 'utf-8';
+
+        Msg1 := Html1.NewMessage(nil);
+        Msg1.Subject := 'Site Check failure notification: '+SiteCheckName;
+        Msg1.From.Text := MainForm.MailServerFrom;
+        Msg1.From.Name := MainForm.MailServerName;
+
+        Addr1 := Msg1.Recipients.Add;
+        Addr1.Address := MainForm.MailserverFrom;
+
+        SMTP1.Connect;
+        try
+          try
+            SMTP1.Send(Msg1);
+          except on E: Exception do
+            begin
+              SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+            end;
+          end;
+        finally
+          SMTP1.Disconnect();
+        end;
+      finally
+        Addr1.Free;
+        Msg1.Free;
+        Html1.Free;
+      end;
+    except on E: Exception do
+      begin
+        SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+      end;
+    end;
+    SMTP1.Free;
+
+    if SMTPResult = ''
+    then mmInfo.Lines.Add('   WARNING: Site Check notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+    else
+    begin
+      mmInfo.Lines.Add('   WARNING: Site Check notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+      mmInfo.Lines.Add('   WARNING: SMTP Error: '+SMTPResult);
+    end;
+  end;
+end;
+
+procedure TMainForm.NetHTTPClient1ValidateServerCertificate(
+  const Sender: TObject; const ARequest: TURLRequest;
+  const Certificate: TCertificate; var Accepted: Boolean);
+var
+  SMTP1: TIdSMTP;
+  Msg1: TIdMessage;
+  Addr1: TIdEmailAddressItem;
+  Html1: TIdMessageBuilderHtml;
+  SMTPResult: WideString;
+const
+  WarningThreshold = 21;
+
+begin
+  mmInfo.Lines.Add('   Server Certificate Check...');
+  mminfo.Lines.Add('   ...Certificate Name: '+Certificate.CertName);
+  mmInfo.Lines.Add('   ...Certificate Issuer: '+StringReplace(Certificate.Issuer, chr(13)+chr(10), ' / ', [rfReplaceAll]));
+  mmInfo.Lines.Add('   ...Not Valid Before: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Start)+' UTC');
+  mmInfo.Lines.Add('   ...Not Valid After: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Expiry)+' UTC');
+
+  if (DaysBetween(Certificate.Expiry, Now) > WarningThreshold) then
+  begin
+    mmInfo.Lines.Add('   ...Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now)));
+  end
+  else
+  begin
+    mmInfo.Lines.Add('   ...WARNING: Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now)));
+    if not(MailServerAvailable) then
+    begin
+      mmInfo.Lines.Add('   ...WARNING: SSL Certificate warning e-mail not sent (Mail services not configured)');
+    end
+    else
+    begin
+
+      // Send warning email
+      Msg1  := nil;
+      Addr1 := nil;
+      SMTP1 := TIdSMTP.Create(nil);
+      SMTP1.Host     := MainForm.MailServerHost;
+      SMTP1.Port     := MainForm.MailServerPort;
+      SMTP1.Username := MainForm.MailServerUser;
+      SMTP1.Password := MainForm.MailServerPass;
+
+      try
+        Html1 := TIdMessageBuilderHtml.Create;
+        try
+          Html1.Html.Add('<html>');
+          Html1.Html.Add('<head>');
+          Html1.Html.Add('</head>');
+          Html1.Html.Add('<body><pre>');
+          Html1.Html.Add('Server Certificate Check:');
+          Html1.Html.Add('...Certificate Name: '+Certificate.CertName);
+          Html1.Html.Add('...Certificate Issuer: '+StringReplace(Certificate.Issuer, chr(13)+chr(10), ' / ', [rfReplaceAll]));
+          Html1.Html.Add('...Not Valid Before: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Start)+' UTC');
+          Html1.Html.Add('...Not Valid After: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Expiry)+' UTC');
+          Html1.Html.Add('...Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now))+' days');
+          Html1.Html.Add('...Warning Threshold: '+IntToStr(WarningThreshold)+' days');
+          Html1.Html.Add('</pre></body>');
+          Html1.Html.Add('</html>');
+          Html1.HtmlCharSet := 'utf-8';
+
+          Msg1 := Html1.NewMessage(nil);
+          Msg1.Subject := 'SSL Certificate Expiration Warning: '+Certificate.CertName+' expires in '+IntToStr(DaysBetween(Certificate.Expiry, now))+' days';
+          Msg1.From.Text := MainForm.MailServerFrom;
+          Msg1.From.Name := MainForm.MailServerName;
+
+          Addr1 := Msg1.Recipients.Add;
+          Addr1.Address := MainForm.MailserverFrom;
+
+          SMTP1.Connect;
+          try
+            try
+              SMTP1.Send(Msg1);
+            except on E: Exception do
+              begin
+                SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+              end;
+            end;
+          finally
+            SMTP1.Disconnect();
+          end;
+        finally
+          Addr1.Free;
+          Msg1.Free;
+          Html1.Free;
+        end;
+      except on E: Exception do
+        begin
+          SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+        end;
+      end;
+      SMTP1.Free;
+
+      if SMTPResult = ''
+      then mmInfo.Lines.Add('   ...WARNING: SSL Certificate warning e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+      else
+      begin
+        mmInfo.Lines.Add('   ...WARNING: SSL Certificate warning e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+        mmInfo.Lines.Add('   ...WARNING: SMTP Error: '+SMTPResult);
+      end;
+    end;
+  end;
+end;
+
 procedure TMainForm.tmrInitTimer(Sender: TObject);
 var
   i: Integer;
@@ -385,6 +642,9 @@ var
   IconHeight: Integer;
   IconCount: Integer;
   IconTotal: Integer;
+  Response: IHTTPResponse;
+  SMTP1: TIdSMTP;
+  LogErrors: Integer;
 begin
 
   tmrStart.Enabled := False;
@@ -514,6 +774,7 @@ begin
   mmInfo.Lines.Add('');
 
   // Cache Folder
+  Application.ProcessMessages;
   if (AppConfiguration.GetValue('Cache Folder') <> nil)
   then AppCacheFolder := (AppConfiguration.GetValue('Cache Folder') as TJSONString).Value
   else AppCacheFolder := GetCurrentDir+'/cache';
@@ -537,7 +798,9 @@ begin
     CacheFolderSize := CacheFolderSize + (FileSizeByName(CacheFolderList[i]) / 1024 / 1024);
 
   // Display System Values
-  mmInfo.Lines.Add('App Name: '+AppName);
+  Application.ProcessMessages;
+  mmInfo.Lines.Add('Configuring Server...');
+  mmInfo.Lines.Add('...App Name: '+AppName);
   mmInfo.Lines.Add('...Version: '+AppVersion);
   mmInfo.Lines.Add('...Release: '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', AppRelease));
   mmInfo.Lines.Add('...Release UTC: '+FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', AppReleaseUTC));
@@ -552,6 +815,7 @@ begin
   mmInfo.Lines.Add('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
 
   mmInfo.Lines.Add('...Parameters:');
+  Application.ProcessMessages;
   i := 0;
   while i < AppParameters.Count do
   begin
@@ -560,6 +824,7 @@ begin
   end;
 
   mmInfo.Lines.Add('...IP Addresses:');
+  Application.ProcessMessages;
   i := 0;
   while i < IPAddresses.Count do
   begin
@@ -569,6 +834,7 @@ begin
 
 
   // Are chat services avialable?
+  Application.ProcessMessages;
   if (AppConfiguration.GetValue('Chat Interface') as TJSONArray) = nil
   then mmInfo.Lines.Add('...Chat: UNAVAILABLE')
   else
@@ -584,6 +850,7 @@ begin
 
 
   // Load up Icon Sets
+  Application.ProcessMessages;
   if (AppConfiguration.GetValue('Icons') <> nil)
   then AppIconsFolder := (AppConfiguration.GetValue('Icons') as TJSONString).Value
   else AppIconsFolder := GetCurrentDir+'/icon-sets';
@@ -608,6 +875,7 @@ begin
     for i := 0 to Length(IconFiles)-1 do
     begin
       // Load JSON File
+      Application.ProcessMessages;
       IconFile.LoadFromFile(IconFiles[i], TEncoding.UTF8);
       IconJSON := TJSONObject.ParseJSONValue(IconFile.Text) as TJSONObject;
       AppIcons.Add(IconJSON);
@@ -648,8 +916,6 @@ begin
         '"count":'+IntToStr(IconCount)+','+
         '"library":'+IntToStr(i)+
         '}') as TJSONObject);
-
-      Application.ProcessMessages;
     end;
     IconFile.Free;
   end;
@@ -659,18 +925,127 @@ begin
   // then return just that when asked for this ata.
   AppIconSets := IconSets.ToString;
 
-
+  // This is added at the end to be sure to capture the icon memory usage, which can be rather significant.
   mmInfo.Lines.Add('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
-
   mmInfo.Lines.Add('Done.');
+
+
+  // If any of the above have somehow failed, we won't get to here, so a bit of a sanity check.
+  mmInfo.Lines.Add('');
+  mmInfo.Lines.Add('Initialization complete: Starting Server.');
   mmInfo.Lines.Add('');
 
   // Start Server
   ServerContainer.SparkleHttpSysDispatcher.Active := True;
   UpdateGUI;
+  Application.ProcessMessages;
+
+   // Check expiration date of SSL certificate for wherever this server is running.
+  // Be sure to include any directly related systems, like mail servers for example.
+  // Perform Site Checks based on sites listed in the configuration JSON
+  if (AppConfiguration.GetValue('Site Checks') = nil) then
+  begin
+    mmInfo.Lines.Add('');
+    mmInfo.Lines.Add('Site Checks: No site checks configured.');
+    mmInfo.Lines.Add('');
+  end
+  else
+  begin
+    mmInfo.Lines.Add('');
+    for i := 0 to (AppConfiguration.GetValue('Site Checks') as TJSONArray).Count - 1 do
+    begin
+      Application.ProcessMessages;
+      SiteCheckSuccess := True;
+      sitecheckName := (((AppConfiguration.GetValue('Site Checks') as TJSONArray).Items[I] as TJSONObject).GetValue('Server') as TJSONString).Value;
+      SiteCheckURL := (((AppConfiguration.GetValue('Site Checks') as TJSONArray).Items[I] as TJSONObject).GetValue('URL') as TJSONString).Value;
+
+      mmInfo.Lines.Add(SiteCheckName+': '+SiteCheckURL);
+      if Pos('http', SiteCheckURL) = 1 then
+      begin
+        // Regular HTTP(S) Check
+        Response := NetHTTPClient1.Get(SiteCheckURL) as THTTPResponse;
+      end
+      else
+      begin
+        // SMTP Check
+        SiteCheckSuccess := False;
+        SMTP1 := TIdSMTP.Create(nil);
+        SMTP1.Host := Copy(SiteCheckURL,1,Pos(':',SiteCheckURL)-1);
+        SMTP1.Port := StrToInt(Trim(Copy(SiteCheckURL,Pos(':',SiteCheckURL)+1,5)));
+        SMTP1.ConnectTimeout := 10000;
+        try
+          SMTP1.Connect;
+        except on E:Exception do
+          begin
+            NetHTTPClient1RequestError(nil, '['+E.ClassName+'] '+E.Message);
+          end;
+        end;
+        if SMTP1.Connected then
+        begin
+          SMTP1.Disconnect;
+          SiteCheckSuccess := True;
+          mmInfo.Lines.Add('   SMTP Connection Successful.');
+          Response := NetHTTPClient1.Get('https://'+SMTP1.Host) as THTTPResponse;
+        end
+        else
+        begin
+          mmInfo.Lines.Add('   SMTP Connection Failed.');
+        end;
+        SMTP1.Free;
+      end;
+
+      if (SiteCheckSuccess = False) then
+      begin
+        mmInfo.Lines.Add('   Server Offline.');
+      end
+      else
+      begin
+        mmInfo.Lines.Add('   Server Online.');
+      end;
+      mmInfo.Lines.Add('Done.');
+      mmInfo.Lines.Add(' ');
+    end;
+  end;
+
+
+  // Store a copy of the log in the database
+  Application.ProcessMessages;
+  mmInfo.Lines.Add('Logging startup.');
+  LogErrors := DBSupport.Occurrences(' fail',LowerCase(mmInfo.Lines.Text));
+  try
+    {$Include sql\system\action_history_insert\action_history_insert.inc}
+    Query1.ParamByName('PERSONID').AsInteger := 0;
+    Query1.ParamByName('IPADDRESS').AsString := 'localhost';
+    Query1.ParamByName('APPLICATION').AsString := AppName;
+    Query1.ParamByName('VERSION').AsString := AppVersion;
+    Query1.ParamByName('SESSIONID').AsString := 'server';
+    Query1.ParamByName('SESSIONSTART').AsDateTime := Now;
+    Query1.ParamByName('SESSIONRECORDED').AsDateTime := TTimeZone.local.ToUniversalTime(Now);
+    Query1.ParamByName('LOGSTATUS').AsInteger := 0;
+    Query1.ParamByName('LOGERRORS').AsInteger := LogErrors;
+    Query1.ParamByName('LOGEVENTS').AsInteger := 0;
+    Query1.ParamByName('LOGSTART').AsInteger := 0;
+    Query1.ParamByName('LOGCHANGES').AsInteger := 0;
+    Query1.ParamByName('ACTIONS').AsString := mmInfo.Lines.Text;
+    Query1.ExecSQL;
+  except on E: Exception do
+    begin
+      DBSupport.DisconnectQuery(DBConn, Query1);
+      mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+    end;
+  end;
+  mmInfo.Lines.Add('Startup complete.');
+  mmInfo.Lines.Add('');
 
   // Cleanup
   ImageFile.Free;
+  try
+    DBSupport.DisconnectQuery(DBConn, Query1);
+  except on E: Exception do
+    begin
+      mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+    end;
+  end;
 end;
 
 procedure TMainForm.UpdateGUI;
