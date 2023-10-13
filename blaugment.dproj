@@ -785,6 +785,18 @@
         </RcItem>
         <None Include="icons\favicon-512x512.png.base64"/>
         <None Include="fonts\cairo.woff.base64"/>
+        <RcItem Include="splashes\banner-750x300.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_151</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\banner-750x500.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_152</ResourceId>
+        </RcItem>
+        <RcItem Include="splashes\banner-1000x500.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>PngImage_153</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -1321,6 +1333,12 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="splashes\banner-750x500.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="icons\iconApplicationIcon-120x120.png" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
@@ -1352,6 +1370,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="splashes\screenSplashscreen-1116x540.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\banner-1000x500.png" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -1448,6 +1472,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="icons\favicon-1024x1024.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="splashes\banner-750x300.png" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
