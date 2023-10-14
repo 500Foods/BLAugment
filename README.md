@@ -9,5 +9,22 @@ This project came about as a result of writing a series of blog posts for TMS So
 
 There are other tools, like RSS readers, that offer interfaces to allow for managing this kind of thing with folders and even custom tags (something like NewsBlur for example), there's more that can be done with the content we're working with here.
 
+## Repository Information
+```
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Pascal                          18           2597           4655          19349
+Delphi Form                      5             29              0           6938
+CSS                              1            100             48           1182
+Markdown                         7             28              0            145
+HTML                             2             31             24             91
+JSON                             1              0              0             30
+JavaScript                       1              3              0             25
+YAML                             2              4              8             15
+-------------------------------------------------------------------------------
+SUM:                            37           2792           4735          27775
+-------------------------------------------------------------------------------
+```
 ## Sponsor / Donate / Support
 If you find this work interesting, helpful, or useful, or that it has sved you time, money, or both, please consider direclty supporting these efforts financially via [GitHub Sponsors](https://github.com/sponsors/500Foods) or donating via [Buy Me a Pizza](https://www.buymeacoffee.com/andrewsimard500). Also, be sure to check out these other [GitHub Repositories](https://github.com/500Foods?tab=repositories&q=&sort=stargazers) that may be of interest to you.
