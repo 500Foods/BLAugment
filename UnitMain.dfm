@@ -5966,8 +5966,8 @@ object FormMain: TFormMain
   object tmrJWTRenewal: TWebTimer
     Enabled = False
     OnTimer = tmrJWTRenewalTimer
-    Left = 992
-    Top = 112
+    Left = 1000
+    Top = 128
   end
   object tmrLogout: TWebTimer
     Enabled = False
