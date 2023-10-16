@@ -11,7 +11,7 @@ There are other tools, like RSS readers, that offer interfaces to allow for mana
 
 ## Repository Information
 ```
- -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 Pascal                          18           2597           4655          19349
@@ -26,5 +26,6 @@ YAML                             2              4              8             15
 SUM:                            37           2792           4735          27792
 -------------------------------------------------------------------------------
 ```
+
 ## Sponsor / Donate / Support
-If you find this work interesting, helpful, or useful, or that it has sved you time, money, or both, please consider direclty supporting these efforts financially via [GitHub Sponsors](https://github.com/sponsors/500Foods) or donating via [Buy Me a Pizza](https://www.buymeacoffee.com/andrewsimard500). Also, be sure to check out these other [GitHub Repositories](https://github.com/500Foods?tab=repositories&q=&sort=stargazers) that may be of interest to you.
+If you find this work interesting, helpful, or valuable, or that it has saved you time, money, or both, please consider directly supporting these efforts financially via [GitHub Sponsors](https://github.com/sponsors/500Foods) or donating via [Buy Me a Pizza](https://www.buymeacoffee.com/andrewsimard500). Also, check out these other [GitHub Repositories](https://github.com/500Foods?tab=repositories&q=&sort=stargazers) that may interest you.
