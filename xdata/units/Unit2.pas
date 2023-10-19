@@ -82,6 +82,7 @@ type
     tmrStart: TTimer;
     tmrInit: TTimer;
     NetHTTPClient1: TNetHTTPClient;
+    btRedoc: TButton;
 
     procedure btStartClick(ASender: TObject);
     procedure btStopClick(ASender: TObject);
@@ -106,6 +107,7 @@ type
       const Certificate: TCertificate; var Accepted: Boolean);
     procedure NetHTTPClient1RequestError(const Sender: TObject;
       const AError: string);
+    procedure btRedocClick(Sender: TObject);
   public
     AppName: String;
     AppVersion: String;
@@ -159,6 +161,20 @@ implementation
 { TMainForm }
 uses
   Unit3;
+
+procedure TMainForm.btRedocClick(Sender: TObject);
+var
+  url: String;
+const
+  cHttp = '://+';
+  cHttpLocalhost = '://localhost';
+begin
+  url := StringReplace(
+      ServerContainer.XDataServer.BaseUrl,
+      cHttp, cHttpLocalhost, [rfIgnoreCase])+'/redoc';
+  ShellExecute(0, 'open', PChar(url), nil, nil, SW_SHOWNORMAL);
+end;
+
 
 procedure TMainForm.btStartClick(ASender: TObject);
 begin
