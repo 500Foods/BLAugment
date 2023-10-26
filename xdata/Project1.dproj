@@ -148,10 +148,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Build>29</VerInfo_Build>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.29;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <Icon_MainIcon>..\icons\favicon.ico</Icon_MainIcon>
-        <UWP_DelphiLogo150>..\icons\favicon-150x150.png</UWP_DelphiLogo150>
+        <Icon_MainIcon>blaugment-256.ico</Icon_MainIcon>
+        <UWP_DelphiLogo150>blaugment-256.png</UWP_DelphiLogo150>
         <PostBuildEventCancelOnError>false</PostBuildEventCancelOnError>
-        <UWP_DelphiLogo44>..\icons\favicon-44x44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo44>blaugment-256.png</UWP_DelphiLogo44>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -382,14 +382,14 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     <Source Name="MainSource">Project1.dpr</Source>
                 </Source>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\FMXTMSFNCWXPackPkgDXE12.bpl">TMS FNC WX Pack for FMX</Excluded_Packages>
                     <Excluded_Packages Name="C:\Program Files (x86)\Steema Software\Steema TeeChart Standard VCL FMX 2022.35\Delphi26\Delphi26.win32\Bin\DclTee926.bpl">TeeChart Standard 2022 Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\FMXTMSFNCWXPackPkgDXE12.bpl">TMS FNC WX Pack for FMX</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCWXPackPkgDEDXE12.bpl">TMS FNC WX Pack for FMX/VCL Designtime</Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCCorePkgDEDXE12.bpl">TMS FNC Core for FMX/VCL Designtime</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCUIPackPkgDEDXE12.bpl">TMS FNC UI Pack for FMX/VCL Designtime</Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCChartPkgDEDXE12.bpl">TMS FNC Chart for FMX/VCL Designtime</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCUIPackPkgDEDXE12.bpl">TMS FNC UI Pack for FMX/VCL Designtime</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\TMSFNCWXPackPkgDEDXE12.bpl">TMS FNC WX Pack for FMX/VCL Designtime</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
@@ -783,20 +783,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\icons\favicon-150x150.png" Configuration="Release" Class="UWP_DelphiLogo150">
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="sql\stats\today_logins\today_logins.inc" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win64">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="sql\person\actions_recent\actions_recent.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -808,13 +795,25 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="sql\system\token_insert\token_insert_sqlite.inc" Configuration="Release" Class="ProjectFile">
+                <DeployFile LocalName="sql\person\actions_recent\actions_recent.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="sql\stats\logins\logins_1m_sqlite.inc" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="sql\system\token_insert\token_insert_sqlite.inc" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="sql\admin\period_past\period_past.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -827,12 +826,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="ddl\person\person.inc" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win64">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="sql\admin\period_past\period_past.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -1348,6 +1341,13 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="blaugment-256.png" Configuration="Release" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="sql\ai\chatai\chatai_usage_sqlite.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
@@ -1489,13 +1489,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                 <DeployFile LocalName="ddl\login_fail\login_fail_sqlite.inc" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="..\icons\favicon-44x44.png" Configuration="Release" Class="UWP_DelphiLogo44">
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo44x44.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

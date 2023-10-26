@@ -22,7 +22,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'TMS XData Template Demo Data';
+  Application.Title := 'Blaugment';
   Application.CreateForm(TServerContainer, ServerContainer);
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TDBSupport, DBSupport);
