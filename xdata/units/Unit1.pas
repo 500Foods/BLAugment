@@ -45,7 +45,7 @@ begin
   XDataServer.Model.Version := '1.0';
   XDataServer.Model.Description :=
     '### Overview'#13#10 +
-    'This is the REST API for interacting with Blaugment.';
+    'This is the REST API for interacting with SrcDest.';
 end;
 
 end.

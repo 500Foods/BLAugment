@@ -606,12 +606,12 @@ begin
     // Create an empty AppConfiguration
     mmInfo.Lines.Add('...Using Default Configuration');
     AppConfiguration := TJSONObject.Create;
-    AppConfiguration.AddPair('BaseURL','http://+:44444/tms/xdata');
+    AppConfiguration.AddPair('BaseURL','http://+:44444/blaugment');
   end;
 
   if AppConfiguration.GetValue('BaseURL') <> nil
   then ServerContainer.XDataServer.BaseURL := (AppConfiguration.getValue('BaseURL') as TJSONString).Value
-  else ServerContainer.XDataServer.BaseURL := 'http://+:44444/tms/xdata';
+  else ServerContainer.XDataServer.BaseURL := 'http://+:44444/blaugment';
   mmInfo.Lines.Add('...Server BaseURL: '+ServerContainer.XDataServer.BaseURL);
 
   // Get Mail Configuration
@@ -1075,6 +1075,7 @@ begin
   begin
     mmInfo.Lines.Add('XData Server started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase]));
     mmInfo.Lines.Add('SwaggerUI started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/swaggerui');
+    mmInfo.Lines.Add('Redoc started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/redoc');
   end
   else
   begin

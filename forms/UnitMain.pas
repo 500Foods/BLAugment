@@ -1718,7 +1718,7 @@ begin
 
   if (Server_URL = '') then
   begin
-    Server_URL := 'http://localhost:44444/tms/xdata';
+    Server_URL := 'http://localhost:44444/blaugment';
     LogAction(' -- Configuration Missing');
     LogAction('Server (Default)');
     LogAction(' -- '+Server_URL);
@@ -2533,7 +2533,7 @@ begin
   {$IFNDEF WIN32} asm {
     window.addEventListener('beforeunload', async function (e) {
       pas.UnitMain.FormMain.FinalRequest();
-    });
+    });                                  f
   } end; {$ENDIF}
 
 
