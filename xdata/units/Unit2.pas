@@ -109,6 +109,7 @@ type
       const AError: string);
     procedure btRedocClick(Sender: TObject);
     procedure SendStartupConfirmation;
+    procedure LogEvent(Details: String);
   public
     AppName: String;
     AppVersion: String;
@@ -124,6 +125,7 @@ type
     AppConfiguration: TJSONObject;
     ChatModels: TStringList;
     AppCacheFolder: String;
+    AppStartup: TDateTime;
 
     AppIconsFolder: String;
     AppIcons: TJSONArray;
@@ -204,6 +206,7 @@ end;
 
 procedure TMainForm.FormCreate(ASender: TObject);
 begin
+  AppStartup := Now;
   tmrInit.Enabled := True;
 end;
 
@@ -346,9 +349,20 @@ begin
   MemCounters.cb := SizeOf(MemCounters);
   if GetProcessMemoryInfo(GetCurrentProcess, @MemCounters, SizeOf(MemCounters))
   then Result := MemCounters.WorkingSetSize
-  else mmInfo.Lines.add('ERROR: WorkingSetSize not available');
+  else LogEvent('ERROR: WorkingSetSize not available');
 end;
 
+
+procedure TMainForm.LogEvent(Details: String);
+begin
+  try
+    mmInfo.Lines.Add(FormatDateTime('yyyy-mm-dd HH:nn:ss.zzz', Now)+'  '+Details);
+    SendMessage(mmInfo.Handle, EM_LINESCROLL, 0, mmInfo.Lines.Count);
+  except on E: Exception do
+    begin
+    end;
+  end;
+end;
 
 procedure TMainForm.NetHTTPClient1RequestError(const Sender: TObject; const AError: string);
 var
@@ -358,13 +372,13 @@ var
   Html1: TIdMessageBuilderHtml;
   SMTPResult: WideString;
 begin
-  mmInfo.Lines.Add('   WARNING: Site Check failed: '+SiteCheckURL);
-  mmInfo.Lines.Add('   WARNING: '+AError);
+  LogEvent('WARNING: Site Check failed: '+SiteCheckURL);
+  LogEvent('WARNING: '+AError);
   SiteCheckSuccess := False;
 
   if not(MailServerAvailable) then
   begin
-    mmInfo.Lines.Add('   WARNING: Site Check failure notification e-mail not sent (Mail services not configured)');
+    LogEvent('WARNING: Site Check failure notification e-mail not sent (Mail services not configured)');
   end
   else
   begin
@@ -426,11 +440,11 @@ begin
     SMTP1.Free;
 
     if SMTPResult = ''
-    then mmInfo.Lines.Add('   WARNING: Site Check notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+    then LogEvent('WARNING: Site Check notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
     else
     begin
-      mmInfo.Lines.Add('   WARNING: Site Check notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
-      mmInfo.Lines.Add('   WARNING: SMTP Error: '+SMTPResult);
+      LogEvent('WARNING: Site Check notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+      LogEvent('WARNING: SMTP Error: '+SMTPResult);
     end;
   end;
 end;
@@ -445,7 +459,7 @@ var
 begin
   if not(MailServerAvailable) then
   begin
-    mmInfo.Lines.Add('   WARNING: Startup notification e-mail not sent (Mail services not configured)');
+    LogEvent('WARNING: Startup notification e-mail not sent (Mail services not configured)');
   end
   else
   begin
@@ -472,7 +486,7 @@ begin
         Html1.HtmlCharSet := 'utf-8';
 
         Msg1 := Html1.NewMessage(nil);
-        Msg1.Subject := 'Startup notification: '+AppName;
+        Msg1.Subject := 'Startup notification: '+AppName+' ('+IntToStr(MillisecondsBetween(Now, AppStartup))+'ms)';
         Msg1.From.Text := MainForm.MailServerFrom;
         Msg1.From.Name := MainForm.MailServerName;
 
@@ -504,11 +518,11 @@ begin
     SMTP1.Free;
 
     if SMTPResult = ''
-    then mmInfo.Lines.Add('NOTICE: Startup notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+    then LogEvent('NOTICE: Startup notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
     else
     begin
-      mmInfo.Lines.Add('WARNING: Startup notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
-      mmInfo.Lines.Add('WARNING: SMTP Error: '+SMTPResult);
+      LogEvent('WARNING: Startup notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+      LogEvent('WARNING: SMTP Error: '+SMTPResult);
     end;
   end;
 end;
@@ -526,22 +540,22 @@ const
   WarningThreshold = 21;
 
 begin
-  mmInfo.Lines.Add('   Server Certificate Check...');
-  mminfo.Lines.Add('   ...Certificate Name: '+Certificate.CertName);
-  mmInfo.Lines.Add('   ...Certificate Issuer: '+StringReplace(Certificate.Issuer, chr(13)+chr(10), ' / ', [rfReplaceAll]));
-  mmInfo.Lines.Add('   ...Not Valid Before: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Start)+' UTC');
-  mmInfo.Lines.Add('   ...Not Valid After: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Expiry)+' UTC');
+  LogEvent('Server Certificate Check...');
+  LogEvent('...Certificate Name: '+Certificate.CertName);
+  LogEvent('...Certificate Issuer: '+StringReplace(Certificate.Issuer, chr(13)+chr(10), ' / ', [rfReplaceAll]));
+  LogEvent('...Not Valid Before: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Start)+' UTC');
+  LogEvent('...Not Valid After: '+FormatDateTime('yyyy-MM-dd hh:nn:ss', Certificate.Expiry)+' UTC');
 
   if (DaysBetween(Certificate.Expiry, Now) > WarningThreshold) then
   begin
-    mmInfo.Lines.Add('   ...Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now)));
+    LogEvent('...Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now)));
   end
   else
   begin
-    mmInfo.Lines.Add('   ...WARNING: Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now)));
+    LogEvent('...WARNING: Days Remaining: '+IntToStr(DaysBetween(Certificate.Expiry, Now)));
     if not(MailServerAvailable) then
     begin
-      mmInfo.Lines.Add('   ...WARNING: SSL Certificate warning e-mail not sent (Mail services not configured)');
+      LogEvent('...WARNING: SSL Certificate warning e-mail not sent (Mail services not configured)');
     end
     else
     begin
@@ -606,11 +620,11 @@ begin
       SMTP1.Free;
 
       if SMTPResult = ''
-      then mmInfo.Lines.Add('   ...WARNING: SSL Certificate warning e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+      then LogEvent('...WARNING: SSL Certificate warning e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
       else
       begin
-        mmInfo.Lines.Add('   ...WARNING: SSL Certificate warning e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
-        mmInfo.Lines.Add('   ...WARNING: SMTP Error: '+SMTPResult);
+        LogEvent('...WARNING: SSL Certificate warning e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+        LogEvent('...WARNING: SMTP Error: '+SMTPResult);
       end;
     end;
   end;
@@ -650,7 +664,7 @@ begin
   GetIPAddresses(IPAddresses);
 
   // Load JSON Configuration
-  mmINfo.Lines.Add('Loading Configuration ...');
+  LogEvent('Loading Configuration ...');
   AppConfigFile := StringReplace(ExtractFileName(ParamStr(0)),'exe','json',[]);
   i := 0;
   while i < AppParameters.Count do
@@ -664,18 +678,18 @@ begin
   begin
     try
       ConfigFile.LoadFromFile(AppConfigFile);
-      mmInfo.Lines.Add('...Configuration File Loaded: '+AppConfigFile);
+      LogEvent('...Configuration File Loaded: '+AppConfigFile);
       AppConfiguration := TJSONObject.ParseJSONValue(ConfigFile.Text) as TJSONObject;
     except on E: Exception do
       begin
-        mmInfo.Lines.Add('...Configuration File Error: '+AppConfigFile);
-        mmInfo.Lines.Add('...['+E.ClassName+'] '+E.Message);
+        LogEvent('...Configuration File Error: '+AppConfigFile);
+        LogEvent('...['+E.ClassName+'] '+E.Message);
       end;
     end;
   end
   else // File doesn't exist
   begin
-    mmInfo.Lines.Add('...Configuration File Not Found: '+AppConfigFile);
+    LogEvent('...Configuration File Not Found: '+AppConfigFile);
   end;
   ConfigFile.Free;
   Application.ProcessMessages;
@@ -683,7 +697,7 @@ begin
   if Appconfiguration = nil then
   begin
     // Create an empty AppConfiguration
-    mmInfo.Lines.Add('...Using Default Configuration');
+    LogEvent('...Using Default Configuration');
     AppConfiguration := TJSONObject.Create;
     AppConfiguration.AddPair('BaseURL','http://+:44444/blaugment');
   end;
@@ -691,7 +705,7 @@ begin
   if AppConfiguration.GetValue('BaseURL') <> nil
   then ServerContainer.XDataServer.BaseURL := (AppConfiguration.getValue('BaseURL') as TJSONString).Value
   else ServerContainer.XDataServer.BaseURL := 'http://+:44444/blaugment';
-  mmInfo.Lines.Add('...Server BaseURL: '+ServerContainer.XDataServer.BaseURL);
+  LogEvent('...Server BaseURL: '+ServerContainer.XDataServer.BaseURL);
 
   // Get Mail Configuration
   MailServerAvailable := False;
@@ -704,15 +718,15 @@ begin
     MailServerPass := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Pass') as TJSONString).Value;
     MailServerFrom := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP From') as TJSONString).Value;
     MailServerName := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Name') as TJSONString).Value;
-    mmInfo.Lines.Add('...SMTP Mail Server: '+MailServerHost+' / '+IntToStr(MailServerPort));
+    LogEvent('...SMTP Mail Server: '+MailServerHost+' / '+IntToStr(MailServerPort));
   end
   else
   begin
-    mmInfo.Lines.Add('...SMTP Mail Server: Unavailable');
+    LogEvent('...SMTP Mail Server: Unavailable');
   end;
 
-  mmInfo.Lines.Add('Done.');
-  mmInfo.Lines.Add('');
+  LogEvent('Done.');
+  LogEvent('');
   Application.ProcessMessages;
 
 
@@ -759,7 +773,7 @@ begin
   // DatabaseUsername is a Form Variable
   // DatabasePassword is a Form Variable
 
-  mmInfo.Lines.Add('Initializing Database...');
+  LogEvent('Initializing Database...');
 
   DatabaseEngine := 'sqlite';
   DatabaseName := 'DemoData.sqlite';
@@ -821,7 +835,7 @@ begin
 
   DBConn.Open;
   Query1.Connection := DBConn;
-  mmInfo.Lines.Add('...['+DatabaseEngine+'] '+DatabaseName);
+  LogEvent('...['+DatabaseEngine+'] '+DatabaseName);
 
   Application.ProcessMessages;
 
@@ -866,8 +880,8 @@ begin
   Application.ProcessMessages;
 
 
-  mmInfo.Lines.Add('Done.');
-  mmInfo.Lines.Add('');
+  LogEvent('Done.');
+  LogEvent('');
 
   // Cache Folder
   Application.ProcessMessages;
@@ -878,13 +892,13 @@ begin
   then AppCacheFolder := AppCacheFolder + '/';
 
   if not(ForceDirectories(AppCacheFolder))
-  then mmInfo.Lines.Add('ERROR Initializing Cache Folder: '+AppCacheFolder);
+  then LogEvent('ERROR Initializing Cache Folder: '+AppCacheFolder);
   if not(ForceDirectories(AppCacheFolder+'images'))
-  then mmInfo.Lines.Add('ERROR Initializing Cache Folder: '+AppCacheFolder+'images');
+  then LogEvent('ERROR Initializing Cache Folder: '+AppCacheFolder+'images');
   if not(ForceDirectories(AppCacheFolder+'images/ai'))
-  then mmInfo.Lines.Add('ERROR Initializing Cache Folder: '+AppCacheFolder+'images/ai');
+  then LogEvent('ERROR Initializing Cache Folder: '+AppCacheFolder+'images/ai');
   if not(ForceDirectories(AppCacheFolder+'images/people'))
-  then mmInfo.Lines.Add('ERROR Initializing Cache Folder: '+AppCacheFolder+'images/people');
+  then LogEvent('ERROR Initializing Cache Folder: '+AppCacheFolder+'images/people');
 
   CacheFolderDirs  := FloatToStrF(Length(TDirectory.GetDirectories(AppCacheFolder,'*',TsearchOption.soAllDirectories)),ffNumber,8,0);
   CacheFolderList := TDirectory.GetFiles(AppCacheFolder,'*.*',TsearchOption.soAllDirectories);
@@ -895,36 +909,36 @@ begin
 
   // Display System Values
   Application.ProcessMessages;
-  mmInfo.Lines.Add('Configuring Server...');
-  mmInfo.Lines.Add('...App Name: '+AppName);
-  mmInfo.Lines.Add('...Version: '+AppVersion);
-  mmInfo.Lines.Add('...Release: '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', AppRelease));
-  mmInfo.Lines.Add('...Release UTC: '+FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', AppReleaseUTC));
-  mmInfo.Lines.Add('...Server Time: '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now));
-  mmInfo.Lines.Add('...TimeZone: '+AppTimeZone);
-  mmInfo.Lines.Add('...TimeZone Offset: '+IntToStr(AppTimeZoneOffset)+'m');
-  mmInfo.Lines.Add('...Base URL: '+ServerContainer.XDataServer.BaseURL);
-  mmInfo.Lines.Add('...File Name: '+AppFileName);
-  mmInfo.Lines.Add('...File Size: '+Format('%.1n',[AppFileSize / 1024 / 1024])+' MB');
-  mmInfo.Lines.Add('...Cache Folder: '+AppCacheFolder);
-  mmInfo.Lines.Add('...Cache Statistics: '+CacheFolderDirs+' Folders, '+CacheFolderFiles+' Files, '+FloatToStrF(CacheFolderSize,ffNumber,8,1)+' MB');
-  mmInfo.Lines.Add('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
+  LogEvent('Configuring Server...');
+  LogEvent('...App Name: '+AppName);
+  LogEvent('...Version: '+AppVersion);
+  LogEvent('...Release: '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', AppRelease));
+  LogEvent('...Release UTC: '+FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', AppReleaseUTC));
+  LogEvent('...Server Time: '+FormatDateTime('yyyy-mmm-dd (ddd) hh:nn:ss', Now));
+  LogEvent('...TimeZone: '+AppTimeZone);
+  LogEvent('...TimeZone Offset: '+IntToStr(AppTimeZoneOffset)+'m');
+  LogEvent('...Base URL: '+ServerContainer.XDataServer.BaseURL);
+  LogEvent('...File Name: '+AppFileName);
+  LogEvent('...File Size: '+Format('%.1n',[AppFileSize / 1024 / 1024])+' MB');
+  LogEvent('...Cache Folder: '+AppCacheFolder);
+  LogEvent('...Cache Statistics: '+CacheFolderDirs+' Folders, '+CacheFolderFiles+' Files, '+FloatToStrF(CacheFolderSize,ffNumber,8,1)+' MB');
+  LogEvent('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
 
-  mmInfo.Lines.Add('...Parameters:');
+  LogEvent('...Parameters:');
   Application.ProcessMessages;
   i := 0;
   while i < AppParameters.Count do
   begin
-    mmInfo.Lines.Add('        '+StringReplace(AppParameters[i],'"','',[rfReplaceAll]));
+    LogEvent('     '+StringReplace(AppParameters[i],'"','',[rfReplaceAll]));
     i := i + 1;
   end;
 
-  mmInfo.Lines.Add('...IP Addresses:');
+  LogEvent('...IP Addresses:');
   Application.ProcessMessages;
   i := 0;
   while i < IPAddresses.Count do
   begin
-    mmInfo.Lines.Add('        '+StringReplace(IPAddresses[i],'"','',[rfReplaceAll]));
+    LogEvent('     '+StringReplace(IPAddresses[i],'"','',[rfReplaceAll]));
     i := i + 1;
   end;
 
@@ -932,14 +946,14 @@ begin
   // Are chat services avialable?
   Application.ProcessMessages;
   if (AppConfiguration.GetValue('Chat Interface') as TJSONArray) = nil
-  then mmInfo.Lines.Add('...Chat: UNAVAILABLE')
+  then LogEvent('...Chat: UNAVAILABLE')
   else
   begin
-    mmInfo.Lines.Add('...Chat:');
+    LogEvent('...Chat:');
     i := 0;
     while i < (AppConfiguration.GetValue('Chat Interface') as TJSONArray).Count do
     begin;
-      mmInfo.Lines.Add('        '+(((AppConfiguration.GetValue('Chat Interface') as TJSONArray).items[i] as TJSONObject).getValue('Name') as TJSONString).Value);
+      LogEvent('     '+(((AppConfiguration.GetValue('Chat Interface') as TJSONArray).items[i] as TJSONObject).getValue('Name') as TJSONString).Value);
       i := i + 1;
     end;
   end;
@@ -961,11 +975,11 @@ begin
 
   if length(IconFiles) = 0 then
   begin
-    mmInfo.Lines.Add('...No Icon Sets Loaded: None Found.');
+    LogEvent('...No Icon Sets Loaded: None Found.');
   end
   else
   begin
-    mmInfo.Lines.Add('...Loading '+IntToStr(Length(IconFiles))+' Icon Sets:');
+    LogEvent('...Loading '+IntToStr(Length(IconFiles))+' Icon Sets:');
     IconFile := TStringList.Create;
 
     for i := 0 to Length(IconFiles)-1 do
@@ -981,7 +995,7 @@ begin
       IconTotal := IconTotal + IconCount;
 
       // Log what we're doing
-      mmInfo.Lines.Add('        ['+TPath.GetFileName(IconFiles[i])+'] '+
+      LogEvent('     ['+TPath.GetFileName(IconFiles[i])+'] '+
         ((IconJSON.GetValue('info') as TJSONObject).GetValue('name') as TJSONString).Value+' - '+
         IntToStr(IconCount)+' Icons');
 
@@ -1015,21 +1029,21 @@ begin
     end;
     IconFile.Free;
   end;
-  mmInfo.Lines.Add('        Icons Loaded: '+FloatToStrF(IconTotal,ffNumber,10,0));
+  LogEvent('     Icons Loaded: '+FloatToStrF(IconTotal,ffNumber,10,0));
 
   // We don't need to do anything else with this, so we'll store it as a string and
   // then return just that when asked for this ata.
   AppIconSets := IconSets.ToString;
 
   // This is added at the end to be sure to capture the icon memory usage, which can be rather significant.
-  mmInfo.Lines.Add('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
-  mmInfo.Lines.Add('Done.');
+  LogEvent('...Memory Usage: '+Format('%.1n',[GetMemoryUsage / 1024 / 1024])+' MB');
+  LogEvent('Done.');
 
 
   // If any of the above have somehow failed, we won't get to here, so a bit of a sanity check.
-  mmInfo.Lines.Add('');
-  mmInfo.Lines.Add('Initialization complete: Starting Server.');
-  mmInfo.Lines.Add('');
+  LogEvent('');
+  LogEvent('Initialization complete: Starting Server.');
+  LogEvent('');
 
   // Start Server
   ServerContainer.SparkleHttpSysDispatcher.Active := True;
@@ -1041,13 +1055,13 @@ begin
   // Perform Site Checks based on sites listed in the configuration JSON
   if (AppConfiguration.GetValue('Site Checks') = nil) then
   begin
-    mmInfo.Lines.Add('');
-    mmInfo.Lines.Add('Site Checks: No site checks configured.');
-    mmInfo.Lines.Add('');
+    LogEvent('');
+    LogEvent('Site Checks: No site checks configured.');
+    LogEvent('');
   end
   else
   begin
-    mmInfo.Lines.Add('');
+    LogEvent('');
     for i := 0 to (AppConfiguration.GetValue('Site Checks') as TJSONArray).Count - 1 do
     begin
       Application.ProcessMessages;
@@ -1055,7 +1069,7 @@ begin
       sitecheckName := (((AppConfiguration.GetValue('Site Checks') as TJSONArray).Items[I] as TJSONObject).GetValue('Server') as TJSONString).Value;
       SiteCheckURL := (((AppConfiguration.GetValue('Site Checks') as TJSONArray).Items[I] as TJSONObject).GetValue('URL') as TJSONString).Value;
 
-      mmInfo.Lines.Add(SiteCheckName+': '+SiteCheckURL);
+      LogEvent(SiteCheckName+': '+SiteCheckURL);
       if Pos('http', SiteCheckURL) = 1 then
       begin
         // Regular HTTP(S) Check
@@ -1080,33 +1094,33 @@ begin
         begin
           SMTP1.Disconnect;
           SiteCheckSuccess := True;
-          mmInfo.Lines.Add('   SMTP Connection Successful.');
+          LogEvent('SMTP Connection Successful.');
           Response := NetHTTPClient1.Get('https://'+SMTP1.Host) as THTTPResponse;
         end
         else
         begin
-          mmInfo.Lines.Add('   SMTP Connection Failed.');
+          LogEvent('SMTP Connection Failed.');
         end;
         SMTP1.Free;
       end;
 
       if (SiteCheckSuccess = False) then
       begin
-        mmInfo.Lines.Add('   Server Offline.');
+        LogEvent('Server Offline.');
       end
       else
       begin
-        mmInfo.Lines.Add('   Server Online.');
+        LogEvent('Server Online.');
       end;
-      mmInfo.Lines.Add('Done.');
-      mmInfo.Lines.Add(' ');
+      LogEvent('Done.');
+      LogEvent(' ');
     end;
   end;
 
 
   // Store a copy of the log in the database
   Application.ProcessMessages;
-  mmInfo.Lines.Add('Logging startup.');
+  LogEvent('Logging startup.');
   LogErrors := DBSupport.Occurrences(' fail',LowerCase(mmInfo.Lines.Text));
   try
     {$Include sql\system\action_history_insert\action_history_insert.inc}
@@ -1127,11 +1141,9 @@ begin
   except on E: Exception do
     begin
       DBSupport.DisconnectQuery(DBConn, Query1);
-      mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      LogEvent('['+E.Classname+'] '+E.Message);
     end;
   end;
-  mmInfo.Lines.Add('Startup complete.');
-  mmInfo.Lines.Add('');
 
   // Cleanup
   ImageFile.Free;
@@ -1139,11 +1151,17 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      LogEvent('['+E.Classname+'] '+E.Message);
     end;
   end;
 
+  // Send an email if so configured
   SendStartupConfirmation;
+
+  // All done at last
+  LogEvent('Startup complete ('+IntToStr(MillisecondsBetween(Now, AppStartup))+'ms).');
+  LogEvent('');
+
 end;
 
 procedure TMainForm.UpdateGUI;
@@ -1155,13 +1173,13 @@ begin
   btStop.Enabled := not btStart.Enabled;
   if ServerContainer.SparkleHttpSysDispatcher.Active then
   begin
-    mmInfo.Lines.Add('XData Server started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase]));
-    mmInfo.Lines.Add('SwaggerUI started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/swaggerui');
-    mmInfo.Lines.Add('Redoc started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/redoc');
+    LogEvent('XData Server started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase]));
+    LogEvent('SwaggerUI started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/swaggerui');
+    LogEvent('Redoc started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/redoc');
   end
   else
   begin
-    mmInfo.Lines.Add('XData Server stopped');
+    LogEvent('XData Server stopped');
   end;
 end;
 
