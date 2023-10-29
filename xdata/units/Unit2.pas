@@ -108,6 +108,7 @@ type
     procedure NetHTTPClient1RequestError(const Sender: TObject;
       const AError: string);
     procedure btRedocClick(Sender: TObject);
+    procedure SendStartupConfirmation;
   public
     AppName: String;
     AppVersion: String;
@@ -434,6 +435,84 @@ begin
   end;
 end;
 
+procedure TMainForm.SendStartupConfirmation;
+var
+  SMTP1: TIdSMTP;
+  Msg1: TIdMessage;
+  Addr1: TIdEmailAddressItem;
+  Html1: TIdMessageBuilderHtml;
+  SMTPResult: WideString;
+begin
+  if not(MailServerAvailable) then
+  begin
+    mmInfo.Lines.Add('   WARNING: Startup notification e-mail not sent (Mail services not configured)');
+  end
+  else
+  begin
+
+    // Send warning email
+    Msg1  := nil;
+    Addr1 := nil;
+    SMTP1 := TIdSMTP.Create(nil);
+    SMTP1.Host     := MainForm.MailServerHost;
+    SMTP1.Port     := MainForm.MailServerPort;
+    SMTP1.Username := MainForm.MailServerUser;
+    SMTP1.Password := MainForm.MailServerPass;
+
+    try
+      Html1 := TIdMessageBuilderHtml.Create;
+      try
+        Html1.Html.Add('<html>');
+        Html1.Html.Add('<head>');
+        Html1.Html.Add('</head>');
+        Html1.Html.Add('<body><pre>');
+        Html1.Html.Add(mmInfo.Lines.Text);
+        Html1.Html.Add('</pre></body>');
+        Html1.Html.Add('</html>');
+        Html1.HtmlCharSet := 'utf-8';
+
+        Msg1 := Html1.NewMessage(nil);
+        Msg1.Subject := 'Startup notification: '+AppName;
+        Msg1.From.Text := MainForm.MailServerFrom;
+        Msg1.From.Name := MainForm.MailServerName;
+
+        Addr1 := Msg1.Recipients.Add;
+        Addr1.Address := MainForm.MailserverFrom;
+
+        SMTP1.Connect;
+        try
+          try
+            SMTP1.Send(Msg1);
+          except on E: Exception do
+            begin
+              SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+            end;
+          end;
+        finally
+          SMTP1.Disconnect();
+        end;
+      finally
+        Addr1.Free;
+        Msg1.Free;
+        Html1.Free;
+      end;
+    except on E: Exception do
+      begin
+        SMTPResult := SMTPResult+'[ '+E.ClassName+' ] '+E.Message+Chr(10);
+      end;
+    end;
+    SMTP1.Free;
+
+    if SMTPResult = ''
+    then mmInfo.Lines.Add('NOTICE: Startup notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+    else
+    begin
+      mmInfo.Lines.Add('WARNING: Startup notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+      mmInfo.Lines.Add('WARNING: SMTP Error: '+SMTPResult);
+    end;
+  end;
+end;
+
 procedure TMainForm.NetHTTPClient1ValidateServerCertificate(
   const Sender: TObject; const ARequest: TURLRequest;
   const Certificate: TCertificate; var Accepted: Boolean);
@@ -638,6 +717,7 @@ begin
 
 
   tmrStart.Enabled := True;
+
 
 end;
 
@@ -1062,6 +1142,8 @@ begin
       mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
     end;
   end;
+
+  SendStartupConfirmation;
 end;
 
 procedure TMainForm.UpdateGUI;
