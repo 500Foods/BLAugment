@@ -98,7 +98,7 @@ begin
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
     end;
   end;
@@ -111,7 +111,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
@@ -150,7 +150,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L15M');
         end;
       end;
@@ -168,7 +168,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L1H');
         end;
       end;
@@ -186,7 +186,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L3H');
         end;
       end;
@@ -204,7 +204,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L1D');
         end;
       end;
@@ -222,7 +222,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L1W');
         end;
       end;
@@ -240,7 +240,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L1M');
         end;
       end;
@@ -258,7 +258,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L1Q');
         end;
       end;
@@ -276,7 +276,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-L1Y');
         end;
       end;
@@ -300,7 +300,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL15M');
         end;
       end;
@@ -318,7 +318,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL1H');
         end;
       end;
@@ -336,7 +336,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL3H');
         end;
       end;
@@ -354,7 +354,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL1D');
         end;
       end;
@@ -372,7 +372,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL1W');
         end;
       end;
@@ -390,7 +390,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL1M');
         end;
       end;
@@ -408,7 +408,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL1Q');
         end;
       end;
@@ -426,7 +426,7 @@ begin
         Query1.Open;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: ST-UL1Y');
         end;
       end;
@@ -464,7 +464,7 @@ begin
     Query1.ExecSQL;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
     end;
   end;
@@ -474,7 +474,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
     end;
   end;
@@ -514,7 +514,7 @@ begin
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
     end;
   end;
@@ -527,7 +527,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: TC');
     end;
   end;
@@ -553,7 +553,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TL');
     end;
   end;
@@ -567,7 +567,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TS');
     end;
   end;
@@ -581,7 +581,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TE');
     end;
   end;
@@ -595,7 +595,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TC');
     end;
   end;
@@ -609,7 +609,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TB');
     end;
   end;
@@ -623,7 +623,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TR');
     end;
   end;
@@ -638,7 +638,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ST-TP');
     end;
   end;
@@ -668,7 +668,7 @@ begin
     Query1.ExecSQL;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
     end;
   end;
@@ -678,7 +678,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
     end;
   end;

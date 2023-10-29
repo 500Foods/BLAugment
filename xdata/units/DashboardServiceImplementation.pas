@@ -72,7 +72,7 @@ begin
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
     end;
   end;
@@ -85,7 +85,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: JC');
     end;
   end;
@@ -114,7 +114,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: List By ID');
     end;
   end;
@@ -128,7 +128,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: Photo');
     end;
   end;
@@ -156,7 +156,7 @@ begin
     Query1.ExecSQL;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
     end;
   end;
@@ -166,7 +166,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
     end;
   end;

@@ -131,7 +131,7 @@ begin
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
     end;
   end;
@@ -144,7 +144,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: JC');
     end;
   end;
@@ -157,15 +157,15 @@ begin
   // Returning JSON, so flag it as such
   TXDataOperationContext.Current.Response.Headers.SetValue('content-type', 'application/json');
 
-//  MainForm.mmInfo.Lines.Add('Model Name: '+Model);
-//  MainForm.mmInfo.Lines.Add('Conversation: '+Conversation);
-//  MainForm.mmInfo.Lines.Add('Context: '+Context);
-//  MainForm.mmInfo.Lines.Add('Choices: '+IntToStr(Choices));
-//  MainForm.mmInfo.Lines.Add('ChatID: '+ChatID);
-//  MainForm.mmInfo.Lines.Add('Model: '+((ModelJSON.GetValue('Model') as TJSONString).Value));
-//  MainForm.mmInfo.Lines.Add('API Key: '+((ModelJSON.GetValue('API Key') as TJSONString).Value));
-//  MainForm.mmInfo.Lines.Add('Endpoint: '+((ModelJSON.GetValue('Endpoint') as TJSONString).Value));
-//  MainForm.mmInfo.Lines.Add('Organization: '+((ModelJSON.GetValue('Organization') as TJSONString).Value));
+//  MainForm.LogEvent('Model Name: '+Model);
+//  MainForm.LogEvent('Conversation: '+Conversation);
+//  MainForm.LogEvent('Context: '+Context);
+//  MainForm.LogEvent('Choices: '+IntToStr(Choices));
+//  MainForm.LogEvent('ChatID: '+ChatID);
+//  MainForm.LogEvent('Model: '+((ModelJSON.GetValue('Model') as TJSONString).Value));
+//  MainForm.LogEvent('API Key: '+((ModelJSON.GetValue('API Key') as TJSONString).Value));
+//  MainForm.LogEvent('Endpoint: '+((ModelJSON.GetValue('Endpoint') as TJSONString).Value));
+//  MainForm.LogEvent('Organization: '+((ModelJSON.GetValue('Organization') as TJSONString).Value));
 
   // Prepare the request
   Client := TNetHTTPClient.Create(nil);
@@ -239,7 +239,7 @@ begin
 
   except on E: Exception do
     begin
-      MainForm.mmInfo.LInes.Add('[ '+E.ClassName+' ] '+E.Message);
+      MainForm.LogEvent('[ '+E.ClassName+' ] '+E.Message);
     end;
   end;
 
@@ -270,7 +270,7 @@ begin
         Query1.ExecSQL;
       except on E: Exception do
         begin
-          MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+          MainForm.LogEvent('['+E.Classname+'] '+E.Message);
           raise EXDataHttpUnauthorized.Create('Internal Error: LCAI');
         end;
       end;
@@ -301,7 +301,7 @@ begin
           Query1.ExecSQL;
         except on E: Exception do
           begin
-            MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+            MainForm.LogEvent('['+E.Classname+'] '+E.Message);
             raise EXDataHttpUnauthorized.Create('Internal Error: LIAI');
           end;
         end;
@@ -332,7 +332,7 @@ begin
     Query1.ExecSQL;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
     end;
   end;
@@ -342,7 +342,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
     end;
   end;
@@ -389,7 +389,7 @@ begin
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
     end;
   end;
@@ -442,7 +442,7 @@ begin
       Query1.Open;
     except on E: Exception do
       begin
-        MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+        MainForm.LogEvent('['+E.Classname+'] '+E.Message);
         DBSupport.DisconnectQuery(DBConn, Query1);
         raise EXDataHttpUnauthorized.Create('Internal Error: IAIR');
       end;
@@ -501,7 +501,7 @@ begin
     Query1.ExecSQL;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       DBSupport.DisconnectQuery(DBConn, Query1);
       raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
     end;
@@ -512,7 +512,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
     end;
   end;
@@ -554,7 +554,7 @@ begin
     DBSupport.ConnectQuery(DBConn, Query1, DatabaseName, DatabaseEngine);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: CQ');
     end;
   end;
@@ -567,7 +567,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: JC');
     end;
   end;
@@ -613,7 +613,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ChatAI Usage');
     end;
   end;
@@ -626,7 +626,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ChatAI Recent');
     end;
   end;
@@ -639,7 +639,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ImageAI Usage');
     end;
   end;
@@ -653,7 +653,7 @@ begin
     Query1.Open;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: ImageAI Recent');
     end;
   end;
@@ -678,7 +678,7 @@ begin
     Query1.ExecSQL;
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: EHI');
     end;
   end;
@@ -688,7 +688,7 @@ begin
     DBSupport.DisconnectQuery(DBConn, Query1);
   except on E: Exception do
     begin
-      MainForm.mmInfo.Lines.Add('['+E.Classname+'] '+E.Message);
+      MainForm.LogEvent('['+E.Classname+'] '+E.Message);
       raise EXDataHttpUnauthorized.Create('Internal Error: DQ');
     end;
   end;
@@ -710,7 +710,7 @@ begin
   LimitChars := Limit * 2; // 3 seems to not give enough room for basic responses
   ContextJSON := nil;
 
-//  MainForm.mmInfo.Lines.Add('Trim Start: '+IntToStr(LimitChars)+' limit, '+IntToStr(Length(Conversation))+' conv, '+IntToStr(Length(Context))+' ctx.');
+//  MainForm.LogEvent('Trim Start: '+IntToStr(LimitChars)+' limit, '+IntToStr(Length(Conversation))+' conv, '+IntToStr(Length(Context))+' ctx.');
 
   // Our conversation is so long that there is no room for context.
   if length(Conversation) > LimitChars then
@@ -764,8 +764,8 @@ begin
     Result := 'Normal';
   end;
 
-//  MainForm.mmInfo.Lines.Add('Trim End: '+IntToStr(LimitChars)+' limit, '+IntToStr(Length(Conversation))+' conv, '+IntToStr(Length(Context))+' ctx: '+Result);
-//  MainForm.mmInfo.Lines.Add('Context: '+Context);
+//  MainForm.LogEvent('Trim End: '+IntToStr(LimitChars)+' limit, '+IntToStr(Length(Conversation))+' conv, '+IntToStr(Length(Context))+' ctx: '+Result);
+//  MainForm.LogEvent('Context: '+Context);
 
 end;
 
