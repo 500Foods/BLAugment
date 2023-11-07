@@ -9,6 +9,22 @@ This project came about as a result of writing a series of blog posts for TMS So
 
 There are other tools, like RSS readers, that offer interfaces to allow for managing this kind of thing with folders and even custom tags (something like NewsBlur for example), there's more that can be done with the content we're working with here.
 
+## Key Dependencies
+As with any modern web application, other JavaScript libraries/dependencies have been used in this project. Most of the time, this is handled via a CDN link (usually JSDelivr) in the Project.html file. In some cases, for performance or other reasons, they may be included directly.
+- [TMS WEB Core](https://www.tmssoftware.com/site/tmswebcore.asp) - This is a TMS WEB Core project, after all
+- [Bootstrap](https://getbootstrap.com/) - No introduction needed
+- [Tabulator](https://www.tabulator.info) - Fantastic pure JavaScript web data tables
+- [Font Awesome](https://www.fontawesome.com) - The very best icons
+- [Material Design Icons](https://pictogrammers.com/library/mdi/) - Used throughout Home Assistant
+- [Luxon](https://moment.github.io/luxon/#/) - For handling date/time conversions
+- [Shoelace](https://shoelace.style/) - Web components, particularly the color picker for lights
+- [FlatPickr](https://flatpickr.js.org) - Main UI date pickers
+- [PanZoom](https://github.com/timmywil/panzoom) - Used when viewing photos/posters/backgrounds
+- [HackTimer](https://github.com/turuslan/HackTimer) - Bypasses normal JavaScript timer behaviour
+
+## Additional Notes
+While this project is currently under active development, feel free to give it a try and post any issues you encounter.  Or start a discussion if you would like to help steer the project in a particular direction.  Early days yet, so a good time to have your voice heard.  As the project unfolds, additional resources will be made available, including platform binaries, more documentation, demos, and so on.
+
 ## Repository Information
 ```
 -------------------------------------------------------------------------------
