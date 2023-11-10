@@ -1,4 +1,4 @@
-program Project1;
+program Blaugment;
 
 uses
   Vcl.Forms,
@@ -22,7 +22,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'Blaugment';
+  Application.Title := 'BlaugmentServer';
   Application.CreateForm(TServerContainer, ServerContainer);
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TDBSupport, DBSupport);

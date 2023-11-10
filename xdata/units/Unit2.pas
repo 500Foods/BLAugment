@@ -108,7 +108,7 @@ type
     procedure NetHTTPClient1RequestError(const Sender: TObject;
       const AError: string);
     procedure btRedocClick(Sender: TObject);
-    procedure SendStartupConfirmation;
+    procedure SendActivityLog(Subject: String);
     procedure LogEvent(Details: String);
   public
     AppName: String;
@@ -449,7 +449,7 @@ begin
   end;
 end;
 
-procedure TMainForm.SendStartupConfirmation;
+procedure TMainForm.SendActivityLog(Subject: String);
 var
   SMTP1: TIdSMTP;
   Msg1: TIdMessage;
@@ -459,7 +459,7 @@ var
 begin
   if not(MailServerAvailable) then
   begin
-    LogEvent('WARNING: Startup notification e-mail not sent (Mail services not configured)');
+    LogEvent('WARNING: '+Subject+' e-mail not sent (Mail services not configured)');
   end
   else
   begin
@@ -486,7 +486,12 @@ begin
         Html1.HtmlCharSet := 'utf-8';
 
         Msg1 := Html1.NewMessage(nil);
-        Msg1.Subject := 'Startup notification: '+AppName+' ('+IntToStr(MillisecondsBetween(Now, AppStartup))+'ms)';
+
+        // Startup should be < 10s but otherwise send the running time
+        if MillisecondsBetween(Now, AppStartup) < 10000
+        then Msg1.Subject := '['+GetEnvironmentVariable('COMPUTERNAME')+'] '+Subject+': '+MainForm.Caption+' ('+IntToStr(MillisecondsBetween(Now, AppStartup))+'ms)'
+        else Msg1.Subject := '['+GetEnvironmentVariable('COMPUTERNAME')+'] '+Subject+': '+MainForm.Caption+' ('+FormatDateTime('hh:nn:ss', Now - AppStartup)+'}';
+
         Msg1.From.Text := MainForm.MailServerFrom;
         Msg1.From.Name := MainForm.MailServerName;
 
@@ -518,14 +523,15 @@ begin
     SMTP1.Free;
 
     if SMTPResult = ''
-    then LogEvent('NOTICE: Startup notification e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
+    then LogEvent('NOTICE: '+Subject+' e-mail sent to '+MailServerName+' <'+MailServerFrom+'>')
     else
     begin
-      LogEvent('WARNING: Startup notification e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
+      LogEvent('WARNING: '+Subject+' e-mail to '+MailServerName+' <'+MailServerFrom+'> FAILED.');
       LogEvent('WARNING: SMTP Error: '+SMTPResult);
     end;
   end;
 end;
+
 
 procedure TMainForm.NetHTTPClient1ValidateServerCertificate(
   const Sender: TObject; const ARequest: TURLRequest;
@@ -1156,7 +1162,7 @@ begin
   end;
 
   // Send an email if so configured
-  SendStartupConfirmation;
+  SendActivityLog('Startup Confirmation');
 
   // All done at last
   LogEvent('Startup complete ('+IntToStr(MillisecondsBetween(Now, AppStartup))+'ms).');
