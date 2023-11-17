@@ -1,4 +1,4 @@
-program Blaugment;
+program BlaugmentServer;
 
 uses
   Vcl.Forms,

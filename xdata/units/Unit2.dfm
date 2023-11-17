@@ -54,17 +54,29 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'Swagger'
+    Enabled = False
     TabOrder = 3
     OnClick = btSwaggerClick
   end
   object btRedoc: TButton
     Left = 252
-    Top = 8
+    Top = 9
     Width = 75
     Height = 25
     Caption = 'Redoc'
+    Enabled = False
     TabOrder = 4
     OnClick = btRedocClick
+  end
+  object btEMail: TButton
+    Left = 333
+    Top = 9
+    Width = 75
+    Height = 25
+    Caption = 'E-Mail'
+    Enabled = False
+    TabOrder = 5
+    OnClick = btEMailClick
   end
   object DBConn: TFDConnection
     FormatOptions.AssignedValues = [fvMaxStringSize]

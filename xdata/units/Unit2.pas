@@ -83,6 +83,7 @@ type
     tmrInit: TTimer;
     NetHTTPClient1: TNetHTTPClient;
     btRedoc: TButton;
+    btEMail: TButton;
 
     procedure btStartClick(ASender: TObject);
     procedure btStopClick(ASender: TObject);
@@ -110,6 +111,7 @@ type
     procedure btRedocClick(Sender: TObject);
     procedure SendActivityLog(Subject: String);
     procedure LogEvent(Details: String);
+    procedure btEMailClick(Sender: TObject);
   public
     AppName: String;
     AppVersion: String;
@@ -164,6 +166,11 @@ implementation
 { TMainForm }
 uses
   Unit3;
+
+procedure TMainForm.btEMailClick(Sender: TObject);
+begin
+  SendActivityLog('Activity Log');
+end;
 
 procedure TMainForm.btRedocClick(Sender: TObject);
 var
@@ -488,7 +495,7 @@ begin
         Msg1 := Html1.NewMessage(nil);
 
         // Startup should be < 10s but otherwise send the running time
-        if MillisecondsBetween(Now, AppStartup) < 10000
+        if MillisecondsBetween(Now, AppStartup) < 30000
         then Msg1.Subject := '['+GetEnvironmentVariable('COMPUTERNAME')+'] '+Subject+': '+MainForm.Caption+' ('+IntToStr(MillisecondsBetween(Now, AppStartup))+'ms)'
         else Msg1.Subject := '['+GetEnvironmentVariable('COMPUTERNAME')+'] '+Subject+': '+MainForm.Caption+' ('+FormatDateTime('hh:nn:ss', Now - AppStartup)+'}';
 
@@ -659,6 +666,8 @@ begin
   AppTimeZone := GetAppTimeZone;
   AppTimeZoneOffset := GetAppTimeZoneOffset;
 
+  Caption := AppName+'     Ver '+AppVersion+'     Rel '+FormatDateTime('yyyy-mmmdd',AppRelease);
+
   // List of App Parameters
   AppParameters := TStringList.Create;
   AppParameters.QuoteChar := ' ';
@@ -717,6 +726,7 @@ begin
   MailServerAvailable := False;
   if AppConfiguration.GetValue('Mail Services') <> nil then
   begin
+    btEmail.Enabled := True;
     MailServerAvailable := True;
     MailServerHost := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Host') as TJSONString).Value;
     MailServerPort := ((AppConfiguration.GetValue('Mail Services') as TJSONObject).GetValue('SMTP Port') as TJSONNumber).AsInt;
@@ -1182,10 +1192,14 @@ begin
     LogEvent('XData Server started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase]));
     LogEvent('SwaggerUI started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/swaggerui');
     LogEvent('Redoc started at '+StringReplace( ServerContainer.XDataServer.BaseUrl, cHttp, cHttpLocalhost, [rfIgnoreCase])+'/redoc');
+    btSwagger.Enabled := True;
+    btRedoc.Enabled := True;
   end
   else
   begin
     LogEvent('XData Server stopped');
+    btSwagger.Enabled := False;
+    btRedoc.Enabled := False;
   end;
 end;
 
