@@ -26,22 +26,22 @@ As with any modern web application, other JavaScript libraries/dependencies have
 While this project is currently under active development, feel free to give it a try and post any issues you encounter.  Or start a discussion if you would like to help steer the project in a particular direction.  Early days yet, so a good time to have your voice heard.  As the project unfolds, additional resources will be made available, including platform binaries, more documentation, demos, and so on.
 
 ## Repository Information
+<!--CLOC-START -->
 ```
+Last Updated at 2023-11-27 01:52:22 UTC
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Pascal                          18           2597           4655          19349
-Delphi Form                      5             29              0           6938
-CSS                              1            100             48           1182
-Markdown                         7             28              0            162
-HTML                             2             31             24             91
-JSON                             1              0              0             30
-JavaScript                       1              3              0             25
-YAML                             2              4              8             15
+Pascal                           2             48             62            160
+Delphi Form                      1              0              0             39
+Markdown                         1              8              2             39
+YAML                             2             11             13             33
+HTML                             2              7              0             23
 -------------------------------------------------------------------------------
-SUM:                            37           2792           4735          27792
+SUM:                             8             74             77            294
 -------------------------------------------------------------------------------
 ```
+<!--CLOC-END-->
 
 ## Sponsor / Donate / Support
 If you find this work interesting, helpful, or valuable, or that it has saved you time, money, or both, please consider directly supporting these efforts financially via [GitHub Sponsors](https://github.com/sponsors/500Foods) or donating via [Buy Me a Pizza](https://www.buymeacoffee.com/andrewsimard500). Also, check out these other [GitHub Repositories](https://github.com/500Foods?tab=repositories&q=&sort=stargazers) that may interest you.
