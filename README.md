@@ -29,21 +29,22 @@ While this project is currently under active development, feel free to give it a
 [![Count Lines of Code](https://github.com/500Foods/Blaugment/actions/workflows/main.yml/badge.svg)](https://github.com/500Foods/Blaugment/actions/workflows/main.yml)
 <!--CLOC-START -->
 ```
-Last Updated at 2023-12-24 05:17:21 UTC
+Last Updated at 2025-06-10 03:32:31 UTC
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Pascal                          18           2616           4659          19463
+Pascal                         107           3261           5495          21454
 Delphi Form                      5             29              0           6960
 CSS                              1            100             48           1182
 Markdown                         6             18              2            149
 HTML                             2             31             24             91
+Fortran 77                      89              1              0             89
 YAML                             2              8             12             33
 JSON                             1              0              0             30
 JavaScript                       1              3              0             25
 Text                             1              0              0              1
 -------------------------------------------------------------------------------
-SUM:                            37           2805           4745          27934
+SUM:                           215           3451           5581          30014
 -------------------------------------------------------------------------------
 ```
 <!--CLOC-END-->
